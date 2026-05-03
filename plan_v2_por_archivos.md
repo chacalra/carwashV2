@@ -14,6 +14,7 @@ La idea es responder:
 Construir una nueva versión del sistema con estas diferencias principales respecto al MVP:
 
 - soporte multi-tenant mediante `lavanderia`
+- resolución de tenant por subdominio o dominio
 - PostgreSQL como base de datos principal
 - `FastAPI` como stack objetivo de backend
 - `SQLAlchemy 2.0` como capa principal de persistencia
@@ -114,6 +115,7 @@ Implementar el modelo nuevo:
 - definir `UNIQUE`
 - definir `CHECK`
 - definir campos opcionales y obligatorios
+- agregar identificador técnico para tenant, por ejemplo `subdominio`
 
 ### Resultado esperado
 
@@ -182,6 +184,7 @@ La idea de acceso a datos sigue siendo útil, pero debe cambiar para trabajar:
 - con PostgreSQL
 - con `lavanderia_id`
 - con el nuevo modelo relacional
+- y, en el caso de `lavanderias_repository.py`, con resolución por subdominio
 
 ## 5.2 Repositories a crear o rediseñar
 
@@ -218,6 +221,10 @@ Debe ser reemplazado por `venta` y `detalle_venta`.
 
 La capa de negocio se mantiene, pero con nuevas reglas y relaciones.
 
+Caso particular:
+
+- `auth_service.py` debe asumir resolución previa de tenant por subdominio.
+
 ## 6.2 Services a crear o rediseñar
 
 - `sale_service.py`
@@ -249,6 +256,10 @@ Debe evolucionar a un servicio orientado a ventas con múltiples detalles.
 ### Motivo
 
 Siguen existiendo en la V2, pero con otro backend y otra estructura de datos.
+
+Caso particular:
+
+- `login_view.py` no debería pedir lavandería manualmente si el tenant ya viene determinado por la URL.
 
 ## 7.2 Vistas que deben rediseñarse fuerte
 

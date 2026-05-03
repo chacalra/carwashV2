@@ -15,6 +15,9 @@ Acá se documentan las reglas de negocio e integridad que luego pueden implement
 - Toda entidad operativa pertenece a una `lavanderia`.
 - Ninguna lavandería debe ver ni modificar datos de otra lavandería.
 - Los catálogos `producto`, `servicio`, `tipo_vehiculo`, `categoria_egreso`, `cliente`, `vehiculo`, `rol`, `usuario`, `venta` y `egreso` deben quedar asociados a una `lavanderia`.
+- La resolución del tenant no se hará por selector manual en el login.
+- La resolución del tenant debe apoyarse en el dominio o subdominio de acceso, por ejemplo `autocare.mukusoft.com`.
+- La entidad `lavanderia` debe poder identificarse por un `subdominio` o `slug` único.
 
 ## 2. Usuarios, roles y permisos
 
@@ -26,6 +29,9 @@ Acá se documentan las reglas de negocio e integridad que luego pueden implement
 - Un `permiso` puede pertenecer a muchos roles.
 - No se debe repetir la misma combinación `rol_id + permiso_id`.
 - `nombre_usuario` debe ser único dentro de una misma `lavanderia`.
+- Puede existir el mismo `nombre_usuario` en varias lavanderías distintas.
+- El login no debe asumir unicidad global del nombre de usuario.
+- El contexto de `lavanderia` debe venir resuelto antes de autenticar, idealmente por subdominio.
 
 ## 3. Clientes
 
@@ -131,3 +137,4 @@ Acá se documentan las reglas de negocio e integridad que luego pueden implement
 - Definir si `cliente.email` debe tener alguna restricción de unicidad.
 - Definir si en el futuro habrá una entidad separada de `factura`.
 - Definir si se agregarán límites o planes de suscripción por `lavanderia`.
+- Definir el nombre exacto del campo técnico para resolución de tenant: `subdominio`, `slug` o similar.

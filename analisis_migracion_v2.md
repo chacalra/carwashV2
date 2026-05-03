@@ -171,6 +171,17 @@ La V2 aparece por varias necesidades detectadas:
 
 - `lavanderia` es la raíz del tenant.
 - Toda entidad operativa debe quedar asociada a una `lavanderia`.
+- La resolución del tenant se hará por dominio o subdominio, no por selector manual en el login.
+- Eso permite reutilizar usuarios iniciales como `Administrador/admin` en varias lavanderías sin ambigüedad, siempre que cada una entre por su URL propia.
+
+### Resolución de tenant
+
+- Una `lavanderia` debe tener un identificador técnico único para entrada, por ejemplo `subdominio`.
+- Ejemplos esperados:
+  - `autocare.mukusoft.com`
+  - `carwash2.mukusoft.com`
+- El backend debe resolver primero el tenant desde el host y después autenticar al usuario dentro de esa lavandería.
+- Esto no cambia el modelo base ya implementado de `usuario.lavanderia_id`; cambia cómo se descubre el tenant al iniciar sesión.
 
 ### Roles y permisos
 
@@ -217,6 +228,25 @@ La V2 aparece por varias necesidades detectadas:
 5. Adaptar auth, roles y permisos.
 6. Recién después rediseñar formularios y vistas principales.
 
+## 8.1 Impacto de la decisión por subdominio
+
+Esta decisión no invalida el trabajo ya hecho.
+
+Se mantiene:
+
+- `usuario.lavanderia_id`
+- `rol.lavanderia_id`
+- la estructura multi-tenant actual
+- la base PostgreSQL y Alembic
+- repositories y services ya creados para tenant, clientes y ventas
+
+Se deberá ajustar:
+
+- `lavanderias` para incluir un identificador único de acceso, por ejemplo `subdominio`
+- repositories de lavandería para resolver por subdominio
+- `auth_service` para consumir tenant resuelto por host en vez de depender de heurísticas temporales
+- la UI o API de login para asumir que el tenant ya viene determinado por la URL
+
 ## 9. Conclusión
 
 La V2 no debe tratarse como un proyecto completamente nuevo ni como un simple parche sobre el MVP.
@@ -229,5 +259,6 @@ La mejor lectura es:
 - se adopta `SQLAlchemy 2.0` como base de persistencia
 - se prepara la base para `FastAPI` y migraciones con `Alembic`
 - se adapta el sistema a multi-tenant real
+- se orienta la autenticación a resolución de tenant por subdominio
 
 Esto permite avanzar con criterio, reutilizando lo útil del MVP sin quedar atrapado por decisiones que ya no representan bien el negocio.

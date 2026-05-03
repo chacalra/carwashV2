@@ -33,6 +33,11 @@ Ahora el proyecto ya tiene una primera base técnica real orientada a:
 - Alembic
 - multi-tenant por `lavanderia`
 
+También quedó más clara una decisión de arquitectura:
+
+- la resolución de tenant se hará por dominio o subdominio
+- no por selector manual en el login
+
 ## 2. Documentación consolidada
 
 Se dejaron como documentos principales de contexto:
@@ -71,6 +76,22 @@ Se definió que la V2 apuntará a:
 - `python-dotenv`
 - `Pydantic`
 - PostgreSQL
+
+## 4.1 Decisión de tenant
+
+Se consolidó una decisión importante para la V2:
+
+- `usuario` sigue perteneciendo a una `lavanderia`
+- el mismo `nombre_usuario` puede repetirse entre lavanderías distintas
+- el tenant debe resolverse desde la URL de acceso
+- ejemplo esperado:
+  - `autocare.mukusoft.com`
+  - `carwash2.mukusoft.com`
+
+Resultado:
+
+- no hace falta pedir lavandería manualmente en el login final
+- el backend primero resuelve tenant y recién después autentica
 
 Esto reemplaza el enfoque del MVP basado en:
 
@@ -244,10 +265,10 @@ Datos confirmados:
 
 Todavía falta:
 
-- rehacer repositories del nuevo dominio
-- rehacer services del dominio nuevo
 - rediseñar UI orientada a `venta + detalle_venta`
-- adaptar auth y flujo de usuarios/roles al nuevo esquema
+- agregar campo técnico de tenant en `lavanderias`, por ejemplo `subdominio`
+- ajustar auth para resolución definitiva por host/subdominio en vez de la heurística temporal actual
+- adaptar `catalog_service.py` y otros servicios heredados del MVP
 - reemplazar definitivamente el corazón del MVP basado en `income`
 
 ## 11. Punto exacto donde quedó el proyecto
@@ -266,14 +287,29 @@ Hoy el proyecto quedó en este estado:
 - primera migración generada
 - primera migración aplicada
 - seed inicial verificado
+- repositories base nuevos creados:
+  - `lavanderias`
+  - `clientes`
+  - `ventas`
+  - `detalle_venta`
+- services nuevos creados:
+  - `tenant_service`
+  - `client_service`
+  - `sale_service`
+- `auth_service` ya adaptado al esquema multi-tenant actual
+- el login quedó con una heurística temporal:
+  - si el usuario existe una sola vez, entra
+  - si existe en varias lavanderías, exige contexto de tenant
+- esa heurística será reemplazada por resolución de tenant vía subdominio
 
 ## 12. Siguiente paso natural
 
 El siguiente paso recomendado ya está claro:
 
-1. empezar los repositories nuevos del dominio
-2. construir los services nuevos sobre esa base
-3. recién después adaptar UI y tests
+1. incorporar `subdominio` o campo equivalente en `lavanderias`
+2. generar migración para esa decisión
+3. alinear auth y login al modelo de tenant por URL
+4. después seguir con adaptación de servicios heredados, UI y tests
 
 ## 13. Dirección del proyecto
 
@@ -284,6 +320,7 @@ La dirección actual de la V2 es:
 - consolidar multi-tenant real
 - pasar a PostgreSQL
 - apoyar el backend en `FastAPI + SQLAlchemy 2.0 + Alembic`
+- resolver tenant por subdominio
 - modelar correctamente:
   - `cliente`
   - `vehiculo`
