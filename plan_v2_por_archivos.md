@@ -15,6 +15,9 @@ Construir una nueva versión del sistema con estas diferencias principales respe
 
 - soporte multi-tenant mediante `lavanderia`
 - PostgreSQL como base de datos principal
+- `FastAPI` como stack objetivo de backend
+- `SQLAlchemy 2.0` como capa principal de persistencia
+- `Alembic` para migraciones
 - reemplazo del concepto `income` por `venta + detalle_venta`
 - separación más clara entre `cliente`, `vehiculo` y `venta`
 - roles por lavandería y permisos globales
@@ -63,18 +66,20 @@ Adaptar.
 
 ### Objetivo
 
-Reemplazar SQLite por PostgreSQL.
+Definir la base técnica de persistencia sobre PostgreSQL usando `SQLAlchemy 2.0` y `psycopg`.
 
 ### Tareas
 
 - definir conexión a PostgreSQL
 - usar variables de entorno
-- preparar conexión reutilizable
-- pensar si conviene usar `psycopg`, `sqlalchemy` u otra capa
+- preparar `engine`
+- preparar `SessionLocal`
+- preparar `get_session()`
+- dejar la base lista para `FastAPI`
 
 ### Resultado esperado
 
-Una conexión estable a PostgreSQL lista para repositories y tests.
+Una base técnica estable lista para repositories, services, tests y futura API.
 
 ## 4.2 `database/schema.py`
 
@@ -104,6 +109,7 @@ Implementar el modelo nuevo:
 ### Tareas
 
 - definir tablas
+- decidir si la definición vivirá primero como SQLAlchemy ORM, SQLAlchemy Core o SQL de migración
 - definir PK y FK
 - definir `UNIQUE`
 - definir `CHECK`
@@ -133,6 +139,27 @@ Sembrar datos base mínimos para que el sistema arranque.
 ### Resultado esperado
 
 Sistema arrancable sin depender de carga manual total.
+
+## 4.4 `alembic/`
+
+### Estado
+
+Crear.
+
+### Objetivo
+
+Gestionar el esquema y sus cambios de forma versionada.
+
+### Tareas
+
+- inicializar Alembic
+- configurar conexión a PostgreSQL
+- preparar la primera migración base
+- dejar el proyecto listo para futuras migraciones incrementales
+
+### Resultado esperado
+
+Migraciones repetibles, auditables y alineadas con el modelo nuevo.
 
 ## 5. Plan de repositories
 
@@ -284,24 +311,27 @@ La V2 debe crecer con tests acordes a las nuevas reglas del dominio.
 
 Si hubiera que empezar ya, el primer bloque de trabajo sería:
 
-1. PostgreSQL en `database/connection.py`
-2. nuevo esquema en `database/schema.py`
-3. nuevo `seed.py`
-4. crear:
+1. base técnica con `FastAPI + SQLAlchemy 2.0 + psycopg + dotenv`
+2. Alembic listo para migraciones
+3. nuevo esquema en `database/schema.py`
+4. nuevo `seed.py`
+5. crear:
    - `lavanderias_repository.py`
    - `clients_repository.py`
    - `sales_repository.py`
    - `sale_items_repository.py`
-5. crear:
+6. crear:
    - `sale_service.py`
    - `client_service.py`
-6. dejar para después la UI nueva
+7. dejar para después la UI nueva
 
 ## 11. Prioridad por impacto
 
 ### Alta prioridad
 
 - conexión PostgreSQL
+- base técnica con SQLAlchemy
+- Alembic
 - esquema nuevo
 - `venta`
 - `detalle_venta`

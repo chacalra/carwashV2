@@ -4,6 +4,9 @@ Este documento resume el análisis de transición desde el MVP actual hacia una 
 
 - multi-tenant
 - PostgreSQL
+- FastAPI
+- SQLAlchemy 2.0
+- Alembic
 - modelo de `venta + detalle_venta`
 - separación más clara entre `cliente`, `vehiculo` y `venta`
 
@@ -18,6 +21,7 @@ El cambio fuerte está en:
 - modelo de negocio
 - aislamiento por `lavanderia`
 - evolución de `income` hacia `venta`
+- adopción de un stack moderno de backend y persistencia
 
 La estructura por capas del MVP sigue siendo válida:
 
@@ -36,6 +40,8 @@ La estrategia recomendada para la V2 es:
 - rediseñar el dominio central
 - adaptar gradualmente módulos reutilizables
 - reemplazar los módulos cuyo diseño depende demasiado de `income` como unidad única
+- usar PostgreSQL mediante `SQLAlchemy 2.0` sobre `psycopg`
+- preparar la base técnica para `FastAPI` y migraciones con `Alembic`
 
 ## 3. Matriz de migración
 
@@ -57,7 +63,7 @@ La estrategia recomendada para la V2 es:
 ### Se adapta
 
 - `database/connection.py`
-  Cambia de SQLite a PostgreSQL.
+  Cambia de SQLite a PostgreSQL y pasa a usar `SQLAlchemy 2.0`.
 - `database/schema.py`
   Debe rehacerse según el nuevo modelo multi-tenant.
 - `database/seed.py`
@@ -139,6 +145,8 @@ La estrategia recomendada para la V2 es:
 - `cliente`
 - multi-tenant real
 - PostgreSQL
+- adopción de `SQLAlchemy 2.0`
+- incorporación de `FastAPI` y `Alembic` como stack objetivo
 
 ## 5. Razones del rediseño
 
@@ -197,16 +205,17 @@ La V2 aparece por varias necesidades detectadas:
 
 ## 8. Recomendación de orden de implementación
 
-1. Rehacer `database/schema.py` según el modelo nuevo.
-2. Diseñar el esquema físico PostgreSQL.
-3. Crear repositorios base nuevos o adaptados para:
+1. Consolidar la base técnica con `FastAPI + SQLAlchemy 2.0 + psycopg + Alembic`.
+2. Rehacer `database/schema.py` según el modelo nuevo.
+3. Diseñar el esquema físico PostgreSQL.
+4. Crear repositorios base nuevos o adaptados para:
    - `lavanderia`
    - `cliente`
    - `venta`
    - `detalle_venta`
    - `vehiculo`
-4. Adaptar auth, roles y permisos.
-5. Recién después rediseñar formularios y vistas principales.
+5. Adaptar auth, roles y permisos.
+6. Recién después rediseñar formularios y vistas principales.
 
 ## 9. Conclusión
 
@@ -217,6 +226,8 @@ La mejor lectura es:
 - se conserva la arquitectura por capas
 - se rediseña el dominio central
 - se migra a PostgreSQL
+- se adopta `SQLAlchemy 2.0` como base de persistencia
+- se prepara la base para `FastAPI` y migraciones con `Alembic`
 - se adapta el sistema a multi-tenant real
 
 Esto permite avanzar con criterio, reutilizando lo útil del MVP sin quedar atrapado por decisiones que ya no representan bien el negocio.

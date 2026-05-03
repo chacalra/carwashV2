@@ -1,24 +1,55 @@
-"""Conexion centralizada a SQLite."""
+"""Conexion centralizada con SQLAlchemy 2.0 sobre PostgreSQL."""
 
 import os
-from pathlib import Path
-import sqlite3
+from urllib.parse import quote
+
+from dotenv import load_dotenv
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 
-BASE_DIR = Path(__file__).resolve().parent.parent
-_data_dir = Path(os.environ.get("DATA_DIR", BASE_DIR / "data"))
-DB_PATH = _data_dir / "carwash.db"
+load_dotenv()
 
 
-def enable_foreign_keys(connection):
-    """Activa el soporte de foreign keys para la conexion actual."""
-    connection.execute("PRAGMA foreign_keys = ON;")
+def _build_database_url():
+    """Construye DATABASE_URL si no fue definida explícitamente."""
+    database_url = os.environ.get("DATABASE_URL")
+    if database_url:
+        return database_url
+
+    host = os.environ.get("PGHOST", "localhost")
+    port = os.environ.get("PGPORT", "5432")
+    user = os.environ.get("PGUSER", "postgres")
+    password = os.environ.get("PGPASSWORD", "")
+    database = os.environ.get("PGDATABASE", "carwash")
+
+    auth = quote(user)
+    if password:
+        auth = f"{auth}:{quote(password)}"
+
+    return f"postgresql+psycopg://{auth}@{host}:{port}/{database}"
 
 
-def get_connection():
-    """Crea y devuelve una conexion SQLite lista para usar."""
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
-    connection = sqlite3.connect(DB_PATH)
-    connection.row_factory = sqlite3.Row
-    enable_foreign_keys(connection)
-    return connection
+DATABASE_URL = _build_database_url()
+
+
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True,
+)
+
+SessionLocal = sessionmaker(
+    bind=engine,
+    autoflush=False,
+    autocommit=False,
+    expire_on_commit=False,
+)
+
+
+def get_session():
+    """Entrega una sesión SQLAlchemy y garantiza su cierre."""
+    session = SessionLocal()
+    try:
+        yield session
+    finally:
+        session.close()
