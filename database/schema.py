@@ -1,5 +1,6 @@
 """Esquema físico base de la V2 con SQLAlchemy 2.0."""
 
+from datetime import date, datetime
 from decimal import Decimal
 from typing import Optional
 

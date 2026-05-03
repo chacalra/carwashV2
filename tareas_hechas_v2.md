@@ -180,13 +180,35 @@ Hecho:
 - se configuró para usar la misma `DATABASE_URL` del proyecto
 - se agregó `.env.example`
 - se agregó `.env` a `.gitignore`
+- se generó la primera migración base:
+  - `alembic/versions/8a982724c18c_create_v2_schema.py`
+- se aplicó `uv run alembic upgrade head`
 
 Resultado:
 
 - la infraestructura de migraciones ya está preparada
-- todavía no se generó la primera migración porque falta una base PostgreSQL accesible
+- el esquema V2 ya quedó versionado y aplicado sobre PostgreSQL
 
-## 7. Dependencias
+## 7. PostgreSQL local
+
+Hecho:
+
+- se agregó `compose.yml`
+- se configuró PostgreSQL con `postgres:16`
+- se evitó conflicto con otro servicio local usando el puerto `5433`
+- se creó `.env` local de desarrollo
+- se validó conexión real desde SQLAlchemy
+
+Resultado:
+
+- la V2 ya tiene una base local reproducible
+- el entorno de desarrollo ya puede levantarse con:
+
+```bash
+docker compose up -d
+```
+
+## 8. Dependencias
 
 Hecho:
 
@@ -204,20 +226,31 @@ Resultado:
 
 - el proyecto ya está alineado al stack objetivo de la V2
 
-## 8. Qué NO está hecho todavía
+## 9. Seed inicial verificado
+
+Hecho:
+
+- se ejecutó `seed_initial_data()`
+- se verificó carga inicial sobre PostgreSQL
+
+Datos confirmados:
+
+- `8` permisos
+- `1` lavandería demo
+- `1` usuario administrador
+- `1` cliente genérico
+
+## 10. Qué NO está hecho todavía
 
 Todavía falta:
 
-- levantar PostgreSQL real para desarrollo
-- definir `.env` real
-- probar conexión efectiva a PostgreSQL
-- generar primera migración Alembic
-- correr `upgrade`
 - rehacer repositories del nuevo dominio
 - rehacer services del dominio nuevo
 - rediseñar UI orientada a `venta + detalle_venta`
+- adaptar auth y flujo de usuarios/roles al nuevo esquema
+- reemplazar definitivamente el corazón del MVP basado en `income`
 
-## 9. Punto exacto donde quedó el proyecto
+## 11. Punto exacto donde quedó el proyecto
 
 Hoy el proyecto quedó en este estado:
 
@@ -229,33 +262,20 @@ Hoy el proyecto quedó en este estado:
 - `database/schema.py` listo como base declarativa
 - `database/seed.py` listo como carga inicial
 - Alembic inicializado
-- falta conectar con una instancia real de PostgreSQL
+- PostgreSQL local levantado en Docker
+- primera migración generada
+- primera migración aplicada
+- seed inicial verificado
 
-## 10. Siguiente paso natural
+## 12. Siguiente paso natural
 
 El siguiente paso recomendado ya está claro:
 
-1. levantar PostgreSQL para desarrollo local
-2. crear `.env` real
-3. probar conexión
-4. generar primera migración:
+1. empezar los repositories nuevos del dominio
+2. construir los services nuevos sobre esa base
+3. recién después adaptar UI y tests
 
-```bash
-uv run alembic revision --autogenerate -m "create v2 schema"
-```
-
-5. aplicar migración:
-
-```bash
-uv run alembic upgrade head
-```
-
-6. recién después seguir con:
-   - repositories nuevos
-   - services nuevos
-   - adaptación progresiva del resto del proyecto
-
-## 11. Dirección del proyecto
+## 13. Dirección del proyecto
 
 La dirección actual de la V2 es:
 
@@ -274,4 +294,4 @@ En resumen:
 
 La planificación base ya está hecha.
 La infraestructura inicial también.
-El próximo salto ya no es más análisis, sino levantar PostgreSQL y empezar el versionado real de la base.
+El próximo salto ya no es más análisis ni setup de base, sino construir el dominio nuevo sobre repositories y services.
