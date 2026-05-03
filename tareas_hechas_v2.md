@@ -333,6 +333,12 @@ Hoy el proyecto quedó en este estado:
   - registra ventas nuevas usando `sale_service.py`
   - permite cargar múltiples líneas de servicio o producto
   - reutiliza el tenant activo y el `user_id` autenticado
+- `report_service.py` ya empezó a salir del vocabulario `income`:
+  - expone `get_sales_summary()` y helpers orientados a ventas
+  - mantiene aliases temporales para no romper vistas heredadas
+- las pantallas de consulta principales ya empezaron a reflejar el dominio nuevo:
+  - `dashboard.py` ya muestra métricas de ventas
+  - `movements_view.py` ya presenta la pestaña principal como ventas
 - `roles_repository.py`, `users_repository.py` y `role_permissions_repository.py` ya respetan el tenant actual por defecto
 - smoke real verificado para:
   - alta
@@ -348,15 +354,16 @@ Hoy el proyecto quedó en este estado:
   - se retiró el viejo `tests/test_repositories.py` basado en SQLite
   - se creó `tests/test_sales_repositories.py` para repositories del dominio nuevo
   - `tests/test_catalog_service.py` ya quedó adaptado al flujo multi-tenant
-  - `uv run pytest` ya vuelve a pasar completo con `113 passed`
+  - se agregó `tests/test_report_service.py` para cubrir el resumen orientado a ventas
+  - `uv run pytest` ya vuelve a pasar completo con `118 passed`
 
 ## 12. Siguiente paso natural
 
 El siguiente paso recomendado ya está claro:
 
-1. seguir con piezas todavía atadas a `income`, especialmente las vistas heredadas de ingresos
+1. seguir reduciendo piezas todavía atadas a `income`, especialmente reportes y exportaciones heredadas
 2. continuar ampliando la UI orientada al dominio nuevo de `venta + detalle_venta`
-3. revisar reportes/exportaciones y otras pantallas heredadas que todavía usan el vocabulario `income`
+3. decidir si el siguiente bloque conviene enfocarlo en `sales_edit_view.py` o en una capa de reportes ya 100% nativa sobre ventas
 4. más adelante mover la resolución de tenant desde el campo manual temporal hacia el host real de FastAPI
 
 ## 13. Dirección del proyecto

@@ -259,6 +259,7 @@ Caso particular:
 - `vehicle_service.py` ya quedó adaptado al esquema multi-tenant nuevo
 - `expense_service.py` ya quedó adaptado al esquema multi-tenant nuevo
 - `income_service.py` ya quedó adaptado como puente legacy sobre `venta + detalle_venta`
+- `report_service.py` ya empezó a exponer resumen orientado a ventas con compatibilidad temporal hacia `income`
 
 ## 6.2 Services a crear o rediseñar
 
@@ -304,6 +305,11 @@ Siguen existiendo en la V2, pero con otro backend y otra estructura de datos.
 Caso particular:
 
 - `login_view.py` no debería pedir lavandería manualmente si el tenant ya viene determinado por la URL.
+
+### Estado actual
+
+- `dashboard.py` y `movements_view.py` ya empezaron a reflejar el vocabulario de ventas
+- `export_view.py` sigue pendiente porque la estructura final de exportación todavía no está definida con el cliente
 
 ## 7.2 Vistas que deben rediseñarse fuerte
 
@@ -382,6 +388,7 @@ La V2 debe crecer con tests acordes a las nuevas reglas del dominio.
 - `tests/test_catalog_service.py` ya quedó adaptado al flujo multi-tenant
 - `tests/test_income_service.py` ya volvió a pasar sobre el nuevo puente V2
 - el viejo `tests/test_repositories.py` de SQLite ya fue reemplazado por `tests/test_sales_repositories.py`
+- `tests/test_report_service.py` ya cubre el resumen orientado a ventas y sus aliases legacy
 - `uv run pytest` ya vuelve a pasar completo sobre la base actual
 - falta ampliar cobertura de ventas, egresos y multi-tenant completo
 
@@ -406,7 +413,7 @@ Si hubiera que empezar ya, el primer bloque de trabajo sería:
 ### Estado actual
 
 - este primer sprint ya quedó básicamente cumplido
-- el siguiente bloque natural ahora es ampliar la UI nueva orientada a ventas y revisar reportes/exportaciones que todavía hablan en términos de `income`
+- el siguiente bloque natural ahora es ampliar la UI nueva orientada a ventas y seguir quitando deuda legacy de reportes/exportaciones
 
 ## 11. Prioridad por impacto
 
