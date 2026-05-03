@@ -256,6 +256,9 @@ Caso particular:
 
 - `auth_service.py` ya quedó adaptado a resolución por `subdominio` o `host`
 - `catalog_service.py` ya quedó adaptado al esquema multi-tenant nuevo
+- `vehicle_service.py` ya quedó adaptado al esquema multi-tenant nuevo
+- `expense_service.py` ya quedó adaptado al esquema multi-tenant nuevo
+- `income_service.py` ya quedó adaptado como puente legacy sobre `venta + detalle_venta`
 
 ## 6.2 Services a crear o rediseñar
 
@@ -278,6 +281,11 @@ La lógica central ya no debe girar en torno a `income`, sino a `venta`.
 ### Motivo
 
 Debe evolucionar a un servicio orientado a ventas con múltiples detalles.
+
+### Estado actual
+
+- `income_service.py` ya dejó de depender del modelo SQLite
+- hoy registra ventas legacy de un solo ítem sobre el esquema V2
 
 ## 7. Plan de UI
 
@@ -307,6 +315,11 @@ Caso particular:
 
 Hoy dependen de `income`.
 La V2 debe registrar ventas con uno o muchos detalles.
+
+### Estado actual
+
+- siguen pendientes de adaptación completa
+- hoy consumen un `incomes_repository.py` puente montado sobre `venta + detalle_venta`
 
 ## 7.3 Vistas nuevas probables
 
@@ -357,6 +370,7 @@ La V2 debe crecer con tests acordes a las nuevas reglas del dominio.
 ### Estado actual
 
 - tests de auth ya adaptados al flujo por tenant
+- `tests/test_income_service.py` ya volvió a pasar sobre el nuevo puente V2
 - falta ampliar cobertura de catálogos, ventas, egresos y multi-tenant completo
 
 ## 10. Primer sprint recomendado
@@ -380,7 +394,7 @@ Si hubiera que empezar ya, el primer bloque de trabajo sería:
 ### Estado actual
 
 - este primer sprint ya quedó básicamente cumplido
-- el siguiente bloque natural ahora es seguir con `expense_service.py`, `vehicle_service.py` y la UI nueva orientada a ventas
+- el siguiente bloque natural ahora es seguir con `incomes_form.py`, `edit_income_view.py`, `void_incomes_view.py` y la UI nueva orientada a ventas
 
 ## 11. Prioridad por impacto
 

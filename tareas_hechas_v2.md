@@ -308,6 +308,22 @@ Hoy el proyecto quedó en este estado:
   - `products_repository.py`
   - `vehicle_types_repository.py`
   - `expense_categories_repository.py`
+- `vehicle_service.py` ya fue adaptado al modelo V2 multi-tenant
+- `vehicles_repository.py` ya usa PostgreSQL y el esquema nuevo:
+  - serializa `vehiculo` + `tipo_vehiculo`
+  - resuelve el propietario puente desde `cliente`
+  - busca por matrícula dentro de la `lavanderia`
+- `expense_service.py` ya fue adaptado al modelo V2 multi-tenant
+- `expenses_repository.py` ya usa PostgreSQL y el esquema nuevo:
+  - registra `egreso` con `usuario_id`
+  - filtra por `lavanderia_id`
+  - alimenta listados, totales y desglose por categoría
+- `income_service.py` ya fue adaptado para operar sobre `venta + detalle_venta`
+- `incomes_repository.py` ya no depende de SQLite:
+  - crea ventas legacy de un solo ítem usando el modelo V2
+  - lista ingresos desde `ventas` y `detalles_venta`
+  - alimenta edición, exportación y reportes heredados
+  - resuelve cliente genérico, cliente facturable y usuario dentro de la `lavanderia`
 - `roles_repository.py`, `users_repository.py` y `role_permissions_repository.py` ya respetan el tenant actual por defecto
 - smoke real verificado para:
   - alta
@@ -315,12 +331,16 @@ Hoy el proyecto quedó en este estado:
   - activación/desactivación
   - eliminación
   sobre servicios, productos, categorías y tipos de vehículo dentro de la lavandería demo
+- smoke real verificado también para:
+  - alta y lectura de egresos por tenant
+  - alta y lectura de vehículos enlazados al esquema nuevo
+  - alta, lectura y borrado de ingresos legacy persistidos como `venta + detalle_venta`
 
 ## 12. Siguiente paso natural
 
 El siguiente paso recomendado ya está claro:
 
-1. seguir con adaptación de otros servicios heredados del MVP, especialmente `expense_service.py`, `vehicle_service.py` y piezas todavía atadas a `income`
+1. seguir con piezas todavía atadas a `income`, especialmente las vistas heredadas de ingresos
 2. continuar con la UI orientada al dominio nuevo de `venta + detalle_venta`
 3. más adelante mover la resolución de tenant desde el campo manual temporal hacia el host real de FastAPI
 
