@@ -21,6 +21,7 @@ PERMISSIONS = {
 VIEW_PERMISSIONS = {
     "Dashboard": "dashboard",
     "Registrar ingreso": "register_income",
+    "Registrar venta": "register_income",
     "Editar ingreso": "edit_income",
     "Gestionar ingresos": "void_income",
     "Registrar egreso": "register_expense",

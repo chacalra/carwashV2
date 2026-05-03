@@ -16,6 +16,7 @@ from ui.expenses_form import render_expense_form
 from ui.incomes_form import render_income_form
 from ui.login_view import render_login
 from ui.movements_view import render_movements_view
+from ui.sales_form import render_sales_form
 from ui.settings_view import render_settings_view
 from utils.notifications import show_notifications
 
@@ -81,6 +82,8 @@ def main():
         render_dashboard()
     elif current_view == "Registrar ingreso":
         render_income_form()
+    elif current_view == "Registrar venta":
+        render_sales_form()
     elif current_view == "Editar ingreso":
         render_edit_income_view()
     elif current_view == "Registrar egreso":
