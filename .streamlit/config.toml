@@ -1,0 +1,12 @@
+[server]
+headless = true
+enableCORS = false
+enableXsrfProtection = false
+maxMessageSize = 50
+maxUploadSize = 5
+
+[logger]
+level = "warning"
+
+[theme]
+primaryColor = "#1976D2"

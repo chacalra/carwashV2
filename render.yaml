@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: carwash-mvp
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: DATA_DIR
+        value: /data
+    disk:
+      name: carwash-data
+      mountPath: /data
+      sizeGB: 1
