@@ -1,4 +1,4 @@
-"""Servicios de reportes y resumen operativo."""
+"""Servicios de reportes y resumen operativo orientados a ventas."""
 
 from repositories.expenses_repository import (
     get_expense_total_by_period,
@@ -16,8 +16,8 @@ from repositories.incomes_repository import (
 )
 
 
-def get_income_total(start_date, end_date):
-    """Obtiene el total de ingresos para un periodo."""
+def get_sales_total(start_date, end_date):
+    """Obtiene el total vendido para un periodo."""
     return get_income_total_by_period(start_date, end_date)
 
 
@@ -28,13 +28,13 @@ def get_expense_total(start_date, end_date):
 
 def get_net_balance(start_date, end_date):
     """Calcula el balance neto del periodo."""
-    income_total = get_income_total(start_date, end_date)
+    sales_total = get_sales_total(start_date, end_date)
     expense_total = get_expense_total(start_date, end_date)
-    return income_total - expense_total
+    return sales_total - expense_total
 
 
-def get_income_breakdown(start_date, end_date):
-    """Devuelve el desglose de ingresos por servicio."""
+def get_sales_breakdown(start_date, end_date):
+    """Devuelve el desglose de ventas por item."""
     return get_income_grouped_by_service(start_date, end_date)
 
 
@@ -44,7 +44,7 @@ def get_expense_breakdown(start_date, end_date):
 
 
 def get_service_count(start_date, end_date):
-    """Cuenta cuantos lavados (servicios) se registraron en el periodo."""
+    """Cuenta cuantos servicios se registraron en el periodo."""
     return get_income_count_by_period(start_date, end_date)
 
 
@@ -54,7 +54,7 @@ def get_product_count(start_date, end_date):
 
 
 def get_payment_type_summary(start_date, end_date):
-    """Devuelve totales de ingresos separados por tipo de cobro."""
+    """Devuelve totales vendidos separados por tipo de cobro."""
     totals = get_income_total_by_payment_type(start_date, end_date)
     return {
         "contado": totals.get("Contado", 0),
@@ -85,21 +85,43 @@ def get_product_summary(start_date, end_date):
     }
 
 
-def get_summary(start_date, end_date):
-    """Construye un resumen operativo simple para la UI."""
-    income_total = get_income_total(start_date, end_date)
+def get_sales_summary(start_date, end_date):
+    """Construye un resumen operativo simple orientado a ventas."""
+    sales_total = get_sales_total(start_date, end_date)
     expense_total = get_expense_total(start_date, end_date)
+    service_sales_total = get_service_income_total(start_date, end_date)
+    sales_breakdown = get_sales_breakdown(start_date, end_date)
+    payment_breakdown = get_payment_type_summary(start_date, end_date)
 
     return {
         "start_date": start_date,
         "end_date": end_date,
-        "income_total": income_total,
+        "sales_total": sales_total,
         "expense_total": expense_total,
-        "net_balance": income_total - expense_total,
+        "net_balance": sales_total - expense_total,
         "service_count": get_service_count(start_date, end_date),
-        "service_income_total": get_service_income_total(start_date, end_date),
+        "service_sales_total": service_sales_total,
         "product_count": get_product_count(start_date, end_date),
-        "income_breakdown": get_income_breakdown(start_date, end_date),
+        "sales_breakdown": sales_breakdown,
         "expense_breakdown": get_expense_breakdown(start_date, end_date),
-        "payment_breakdown": get_payment_type_summary(start_date, end_date),
+        "payment_breakdown": payment_breakdown,
+        # Compatibilidad temporal con vistas heredadas que todavia esperan vocabulario income.
+        "income_total": sales_total,
+        "service_income_total": service_sales_total,
+        "income_breakdown": sales_breakdown,
     }
+
+
+def get_income_total(start_date, end_date):
+    """Compatibilidad temporal con pantallas heredadas."""
+    return get_sales_total(start_date, end_date)
+
+
+def get_income_breakdown(start_date, end_date):
+    """Compatibilidad temporal con pantallas heredadas."""
+    return get_sales_breakdown(start_date, end_date)
+
+
+def get_summary(start_date, end_date):
+    """Compatibilidad temporal con pantallas heredadas."""
+    return get_sales_summary(start_date, end_date)

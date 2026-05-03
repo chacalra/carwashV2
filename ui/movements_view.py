@@ -1,4 +1,4 @@
-"""Vista para consultar movimientos registrados."""
+"""Vista para consultar ventas y egresos registrados."""
 
 from datetime import date
 
@@ -10,7 +10,7 @@ from repositories.incomes_repository import get_incomes
 from utils.date_shortcuts import get_period_range
 from utils.formatters import format_number
 
-INCOMES_COLUMNS = {
+SALES_COLUMNS = {
     "date": "Fecha",
     "service": "Servicio",
     "license_plate": "Matricula",
@@ -45,10 +45,10 @@ def _render_period_selector():
 
 
 def render_incomes_table(start_date, end_date):
-    """Renderiza la tabla de ingresos para un periodo."""
+    """Renderiza la tabla legacy de ventas para un periodo."""
     incomes = get_incomes(str(start_date), str(end_date))
 
-    st.subheader("Ingresos")
+    st.subheader("Ventas")
 
     if incomes:
         razones = sorted({dict(r)["razon_social"] for r in incomes if dict(r).get("razon_social")})
@@ -83,8 +83,8 @@ def render_incomes_table(start_date, end_date):
 
     if incomes:
         incomes_df = pd.DataFrame([dict(row) for row in incomes])
-        display_cols = [c for c in INCOMES_COLUMNS if c in incomes_df.columns]
-        incomes_df = incomes_df[display_cols].rename(columns=INCOMES_COLUMNS)
+        display_cols = [c for c in SALES_COLUMNS if c in incomes_df.columns]
+        incomes_df = incomes_df[display_cols].rename(columns=SALES_COLUMNS)
 
         if search.strip():
             mask = pd.Series(False, index=incomes_df.index)
@@ -111,7 +111,7 @@ def render_incomes_table(start_date, end_date):
             col_r.metric("Registros", len(incomes_df))
             col_m.metric("Monto total", f"Gs. {format_number(incomes_df['Monto'].sum())}")
     else:
-        st.info("No hay ingresos en el rango seleccionado.")
+        st.info("No hay ventas en el rango seleccionado.")
 
 
 def render_expenses_table(start_date, end_date):
@@ -145,7 +145,7 @@ def render_expenses_table(start_date, end_date):
 def render_movements_view():
     """Renderiza la vista general de movimientos."""
     st.title("Movimientos")
-    st.write("Consulta los ingresos y egresos registrados por periodo.")
+    st.write("Consulta las ventas y egresos registrados por periodo.")
 
     start_date, end_date = _render_period_selector()
 
@@ -154,7 +154,7 @@ def render_movements_view():
     .stTabs [data-baseweb="tab"] { font-size: 1.1rem; font-weight: 600; padding: 10px 24px; }
     </style>
     """, unsafe_allow_html=True)
-    tab1, tab2 = st.tabs(["Ingresos", "Egresos"])
+    tab1, tab2 = st.tabs(["Ventas", "Egresos"])
 
     with tab1:
         render_incomes_table(start_date, end_date)

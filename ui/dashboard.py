@@ -7,7 +7,7 @@ import streamlit as st
 
 from repositories.incomes_repository import get_daily_incomes, get_income_detail_by_razon_social, get_income_grouped_by_razon_social
 from utils.formatters import is_company_name
-from services.report_service import get_customer_summary, get_product_summary, get_summary
+from services.report_service import get_customer_summary, get_product_summary, get_sales_summary
 from utils.date_shortcuts import get_period_range, previous_period
 from utils.formatters import format_currency, format_number
 
@@ -50,18 +50,18 @@ def _render_period_selector():
 def render_summary_cards(summary, prev_summary, payment_breakdown, show_delta=True):
     """Renderiza metricas principales agrupadas en containers con borde."""
     if show_delta:
-        income_delta = format_currency(summary["income_total"] - prev_summary["income_total"])
+        sales_delta = format_currency(summary["sales_total"] - prev_summary["sales_total"])
         expense_delta = format_currency(summary["expense_total"] - prev_summary["expense_total"])
         balance_delta = format_currency(summary["net_balance"] - prev_summary["net_balance"])
         count_delta = int(summary["service_count"] - prev_summary["service_count"])
         product_delta = int(summary["product_count"] - prev_summary["product_count"])
     else:
-        income_delta = expense_delta = balance_delta = count_delta = product_delta = None
+        sales_delta = expense_delta = balance_delta = count_delta = product_delta = None
 
     with st.container(border=True):
         _section_title("Resumen financiero", accent=True)
         col1, col2, col3 = st.columns(3)
-        col1.metric("Ingresos", format_currency(summary["income_total"]), delta=income_delta)
+        col1.metric("Ventas", format_currency(summary["sales_total"]), delta=sales_delta)
         col2.metric(
             "Egresos",
             format_currency(summary["expense_total"]),
@@ -78,29 +78,29 @@ def render_summary_cards(summary, prev_summary, payment_breakdown, show_delta=Tr
 
     with st.container(border=True):
         _section_title("Operaciones")
-        ticket_avg = summary["service_income_total"] / summary["service_count"] if summary["service_count"] > 0 else 0
-        product_income = summary["income_total"] - summary["service_income_total"]
+        ticket_avg = summary["service_sales_total"] / summary["service_count"] if summary["service_count"] > 0 else 0
+        product_income = summary["sales_total"] - summary["service_sales_total"]
         if show_delta:
-            prev_ticket = prev_summary["service_income_total"] / prev_summary["service_count"] if prev_summary["service_count"] > 0 else 0
+            prev_ticket = prev_summary["service_sales_total"] / prev_summary["service_count"] if prev_summary["service_count"] > 0 else 0
             ticket_delta = format_currency(ticket_avg - prev_ticket)
-            svc_income_delta = format_currency(summary["service_income_total"] - prev_summary["service_income_total"])
-            prev_product_income = prev_summary["income_total"] - prev_summary["service_income_total"]
+            svc_income_delta = format_currency(summary["service_sales_total"] - prev_summary["service_sales_total"])
+            prev_product_income = prev_summary["sales_total"] - prev_summary["service_sales_total"]
             prd_income_delta = format_currency(product_income - prev_product_income)
         else:
             ticket_delta = svc_income_delta = prd_income_delta = None
         col_svc, col_prd, col_ticket = st.columns(3)
         with col_svc:
             st.metric("Lavados realizados", format_number(summary["service_count"]), delta=count_delta)
-            st.metric("Ingresos servicios", format_currency(summary["service_income_total"]), delta=svc_income_delta)
+            st.metric("Ventas servicios", format_currency(summary["service_sales_total"]), delta=svc_income_delta)
         with col_prd:
             st.metric("Productos vendidos", format_number(summary["product_count"]), delta=product_delta)
-            st.metric("Ingresos productos", format_currency(product_income), delta=prd_income_delta)
+            st.metric("Ventas productos", format_currency(product_income), delta=prd_income_delta)
         with col_ticket:
             st.metric("Ticket promedio", format_currency(ticket_avg), delta=ticket_delta)
 
 
 def render_trend_section(start_date, end_date, period):
-    """Renderiza grafico de tendencia de ingresos diarios. Se omite para 'Hoy'."""
+    """Renderiza grafico de tendencia de ventas diarias. Se omite para 'Hoy'."""
     if period == "Hoy":
         return
     daily = get_daily_incomes(str(start_date), str(end_date))
@@ -108,9 +108,9 @@ def render_trend_section(start_date, end_date, period):
         return
     df = pd.DataFrame(daily)
     df["date"] = pd.to_datetime(df["date"])
-    df = df.rename(columns={"total": "Ingresos"})
+    df = df.rename(columns={"total": "Ventas"})
     with st.container(border=True):
-        st.subheader("Tendencia de ingresos")
+        st.subheader("Tendencia de ventas")
         st.vega_lite_chart(
             df,
             {
@@ -129,13 +129,13 @@ def render_trend_section(start_date, end_date, period):
                         "scale": {"paddingInner": 0.2},
                     },
                     "y": {
-                        "field": "Ingresos",
+                        "field": "Ventas",
                         "type": "quantitative",
                         "axis": {"title": None, "format": ",.0f"},
                     },
                     "tooltip": [
                         {"field": "date", "type": "temporal", "timeUnit": "yearmonthdate", "title": "Fecha", "format": "%d %b %Y"},
-                        {"field": "Ingresos", "type": "quantitative", "title": "Gs.", "format": ",.0f"},
+                        {"field": "Ventas", "type": "quantitative", "title": "Gs.", "format": ",.0f"},
                     ],
                 },
                 "config": {"view": {"stroke": "transparent"}},
@@ -230,7 +230,7 @@ def _render_empresa_subsection(grupos, start_str, end_str, key_suffix):
 
 
 def render_empresa_section(start_date, end_date):
-    """Renderiza secciones de ingresos por empresa separadas por servicios y productos."""
+    """Renderiza secciones de ventas por empresa separadas por servicios y productos."""
     start_str = str(start_date)
     end_str = str(end_date)
     key = f"{start_str}_{end_str}"
@@ -243,12 +243,12 @@ def render_empresa_section(start_date, end_date):
 
     if servicios:
         with st.container(border=True):
-            st.subheader("Ingresos servicios por empresa")
+            st.subheader("Ventas servicios por empresa")
             _render_empresa_subsection(servicios, start_str, end_str, f"svc_{key}")
 
     if productos:
         with st.container(border=True):
-            st.subheader("Ingresos productos por empresa")
+            st.subheader("Ventas productos por empresa")
             _render_empresa_subsection(productos, start_str, end_str, f"prd_{key}")
 
 
@@ -279,12 +279,12 @@ def _donut_chart(df, tooltip_label):
 
 
 def render_breakdown_charts(incomes_df, expenses_df):
-    """Renderiza graficos de torta para ingresos y egresos con tabla de detalle en expander."""
+    """Renderiza graficos de torta para ventas y egresos con tabla de detalle en expander."""
     with st.container(border=True):
         left_col, right_col = st.columns(2)
 
         with left_col:
-            st.subheader("Ingresos por servicio")
+            st.subheader("Ventas por item")
             if not incomes_df.empty:
                 df, spec = _donut_chart(incomes_df, "Servicio")
                 st.vega_lite_chart(df, spec, use_container_width=True)
@@ -300,7 +300,7 @@ def render_breakdown_charts(incomes_df, expenses_df):
                         hide_index=True,
                     )
             else:
-                st.info("No hay ingresos para graficar.")
+                st.info("No hay ventas para graficar.")
 
         with right_col:
             st.subheader("Egresos por categoria")
@@ -329,11 +329,11 @@ def render_dashboard():
     with st.container(border=True):
         period, start_date, end_date = _render_period_selector()
 
-    summary = get_summary(str(start_date), str(end_date))
+    summary = get_sales_summary(str(start_date), str(end_date))
     prev_start, prev_end = previous_period(start_date, end_date)
-    prev_summary = get_summary(str(prev_start), str(prev_end))
+    prev_summary = get_sales_summary(str(prev_start), str(prev_end))
 
-    incomes_df = pd.DataFrame([dict(row) for row in summary["income_breakdown"]])
+    incomes_df = pd.DataFrame([dict(row) for row in summary["sales_breakdown"]])
     expenses_df = pd.DataFrame([dict(row) for row in summary["expense_breakdown"]])
 
     render_summary_cards(summary, prev_summary, summary["payment_breakdown"], show_delta=(period != "Personalizado"))
