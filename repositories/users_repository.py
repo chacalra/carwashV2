@@ -4,6 +4,7 @@ from sqlalchemy import select
 
 from database.connection import SessionLocal
 from database.schema import Lavanderia, Rol, Usuario
+from utils.tenant_context import resolve_lavanderia_id
 
 
 def _serialize_user(user, role=None, lavanderia=None):
@@ -56,6 +57,8 @@ def _resolve_role(session, role_id=None, role_name=None, lavanderia_id=None):
 
 def get_all_users(lavanderia_id=None):
     """Devuelve usuarios ordenados por nombre, opcionalmente filtrados por lavanderia."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         query = (
             select(Usuario, Rol, Lavanderia)
@@ -64,8 +67,8 @@ def get_all_users(lavanderia_id=None):
             .order_by(Usuario.nombre_usuario.asc())
         )
 
-        if lavanderia_id is not None:
-            query = query.where(Usuario.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Usuario.lavanderia_id == resolved_lavanderia_id)
 
         rows = session.execute(query).all()
         return [_serialize_user(user, role, lavanderia) for user, role, lavanderia in rows]
@@ -94,6 +97,7 @@ def get_user_by_name(name, lavanderia_id=None):
     clean_name = str(name).strip()
     if not clean_name:
         return None
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
 
     with SessionLocal() as session:
         query = (
@@ -103,8 +107,8 @@ def get_user_by_name(name, lavanderia_id=None):
             .where(Usuario.nombre_usuario == clean_name)
         )
 
-        if lavanderia_id is not None:
-            query = query.where(Usuario.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Usuario.lavanderia_id == resolved_lavanderia_id)
 
         row = session.execute(query.order_by(Usuario.id.asc())).first()
         if row is None:
@@ -116,6 +120,8 @@ def get_user_by_name(name, lavanderia_id=None):
 
 def get_user_by_id(user_id, lavanderia_id=None):
     """Busca un usuario por id, opcionalmente validando lavanderia."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         query = (
             select(Usuario, Rol, Lavanderia)
@@ -124,8 +130,8 @@ def get_user_by_id(user_id, lavanderia_id=None):
             .where(Usuario.id == user_id)
         )
 
-        if lavanderia_id is not None:
-            query = query.where(Usuario.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Usuario.lavanderia_id == resolved_lavanderia_id)
 
         row = session.execute(query).first()
         if row is None:
@@ -143,14 +149,16 @@ def create_user(name, role=None, password_hash=None, lavanderia_id=None, role_id
     if not password_hash:
         raise ValueError("La contrasena del usuario es obligatoria.")
 
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         resolved_role = _resolve_role(
             session,
             role_id=role_id,
             role_name=role,
-            lavanderia_id=lavanderia_id,
+            lavanderia_id=resolved_lavanderia_id,
         )
-        target_lavanderia_id = lavanderia_id or resolved_role.lavanderia_id
+        target_lavanderia_id = resolved_lavanderia_id or resolved_role.lavanderia_id
 
         user = Usuario(
             nombre_usuario=clean_name,
@@ -170,11 +178,13 @@ def update_user(user_id, name, role=None, lavanderia_id=None, role_id=None):
     if not clean_name:
         raise ValueError("El nombre del usuario es obligatorio.")
 
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         user = session.get(Usuario, user_id)
         if user is None:
             raise ValueError("El usuario indicado no existe.")
-        if lavanderia_id is not None and user.lavanderia_id != lavanderia_id:
+        if resolved_lavanderia_id is not None and user.lavanderia_id != resolved_lavanderia_id:
             raise ValueError("El usuario no pertenece a esa lavanderia.")
 
         resolved_role = _resolve_role(
@@ -194,11 +204,13 @@ def update_user_password(user_id, password_hash, lavanderia_id=None):
     if not password_hash:
         raise ValueError("La contrasena hasheada es obligatoria.")
 
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         user = session.get(Usuario, user_id)
         if user is None:
             raise ValueError("El usuario indicado no existe.")
-        if lavanderia_id is not None and user.lavanderia_id != lavanderia_id:
+        if resolved_lavanderia_id is not None and user.lavanderia_id != resolved_lavanderia_id:
             raise ValueError("El usuario no pertenece a esa lavanderia.")
 
         user.password_hash = password_hash
@@ -207,11 +219,13 @@ def update_user_password(user_id, password_hash, lavanderia_id=None):
 
 def toggle_user(user_id, lavanderia_id=None):
     """Activa o desactiva un usuario."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         user = session.get(Usuario, user_id)
         if user is None:
             raise ValueError("El usuario indicado no existe.")
-        if lavanderia_id is not None and user.lavanderia_id != lavanderia_id:
+        if resolved_lavanderia_id is not None and user.lavanderia_id != resolved_lavanderia_id:
             raise ValueError("El usuario no pertenece a esa lavanderia.")
 
         user.estado = not user.estado

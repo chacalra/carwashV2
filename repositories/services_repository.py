@@ -1,136 +1,170 @@
-"""Acceso a datos del catalogo de servicios."""
+"""Acceso a datos del catalogo de servicios para la V2."""
 
-from datetime import datetime
+from sqlalchemy import select
 
-import streamlit as st
+from database.connection import SessionLocal
+from database.schema import DetalleVenta, Servicio
+from utils.tenant_context import resolve_lavanderia_id
 
-from database.connection import get_connection
-
-
-def get_all_services():
-    """Devuelve todos los servicios ordenados por nombre."""
-    connection = get_connection()
-
-    try:
-        rows = connection.execute(
-            """
-            SELECT id, name, is_active, created_at
-            FROM services
-            ORDER BY name ASC;
-            """
-        ).fetchall()
-        return rows
-    finally:
-        connection.close()
+try:
+    import streamlit as st
+except Exception:  # pragma: no cover - streamlit no siempre esta disponible en tests
+    st = None
 
 
-@st.cache_data(ttl=60)
-def get_active_services():
-    """Devuelve solo los servicios activos ordenados por nombre."""
-    connection = get_connection()
-
-    try:
-        rows = connection.execute(
-            """
-            SELECT id, name, is_active, created_at
-            FROM services
-            WHERE is_active = 1
-            ORDER BY name ASC;
-            """
-        ).fetchall()
-        return [dict(row) for row in rows]
-    finally:
-        connection.close()
+def _serialize_service(service):
+    """Convierte una entidad Servicio a un diccionario compatible con la UI actual."""
+    return {
+        "id": service.id,
+        "name": service.nombre_servicio,
+        "nombre_servicio": service.nombre_servicio,
+        "price": service.precio,
+        "precio": service.precio,
+        "is_active": 1 if service.estado else 0,
+        "estado": service.estado,
+        "created_at": service.created_at,
+        "lavanderia_id": service.lavanderia_id,
+    }
 
 
-def get_service_by_id(service_id):
-    """Busca un servicio por su id."""
-    connection = get_connection()
+def get_all_services(lavanderia_id=None):
+    """Devuelve todos los servicios del tenant actual ordenados por nombre."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
 
-    try:
-        row = connection.execute(
-            """
-            SELECT id, name, is_active, created_at
-            FROM services
-            WHERE id = ?;
-            """,
-            (service_id,),
-        ).fetchone()
-        return row
-    finally:
-        connection.close()
+    with SessionLocal() as session:
+        query = (
+            select(Servicio)
+            .where(Servicio.lavanderia_id == resolved_lavanderia_id)
+            .order_by(Servicio.nombre_servicio.asc())
+        )
+        return [_serialize_service(service) for service in session.scalars(query).all()]
 
 
-def create_service(name):
+if st is not None:
+    @st.cache_data(ttl=60)
+    def get_active_services(lavanderia_id=None):
+        """Devuelve solo los servicios activos del tenant actual."""
+        resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
+
+        with SessionLocal() as session:
+            query = (
+                select(Servicio)
+                .where(
+                    Servicio.lavanderia_id == resolved_lavanderia_id,
+                    Servicio.estado.is_(True),
+                )
+                .order_by(Servicio.nombre_servicio.asc())
+            )
+            return [_serialize_service(service) for service in session.scalars(query).all()]
+else:
+    def get_active_services(lavanderia_id=None):
+        """Devuelve solo los servicios activos del tenant actual."""
+        resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
+
+        with SessionLocal() as session:
+            query = (
+                select(Servicio)
+                .where(
+                    Servicio.lavanderia_id == resolved_lavanderia_id,
+                    Servicio.estado.is_(True),
+                )
+                .order_by(Servicio.nombre_servicio.asc())
+            )
+            return [_serialize_service(service) for service in session.scalars(query).all()]
+
+
+def get_service_by_id(service_id, lavanderia_id=None):
+    """Busca un servicio por id dentro del tenant actual."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
+
+    with SessionLocal() as session:
+        query = select(Servicio).where(
+            Servicio.id == service_id,
+            Servicio.lavanderia_id == resolved_lavanderia_id,
+        )
+        service = session.scalar(query)
+        return _serialize_service(service) if service is not None else None
+
+
+def create_service(name, lavanderia_id, price=0):
     """Inserta un nuevo servicio y devuelve su id."""
-    connection = get_connection()
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
 
-    try:
-        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        cursor = connection.execute(
-            """
-            INSERT INTO services (name, is_active, created_at)
-            VALUES (?, 1, ?);
-            """,
-            (name, created_at),
+    with SessionLocal() as session:
+        service = Servicio(
+            nombre_servicio=name,
+            precio=price,
+            estado=True,
+            lavanderia_id=resolved_lavanderia_id,
         )
-        connection.commit()
-        return cursor.lastrowid
-    finally:
-        connection.close()
+        session.add(service)
+        session.commit()
+        return service.id
 
 
-def update_service_name(service_id, name):
+def update_service_name(service_id, name, lavanderia_id=None):
     """Actualiza el nombre de un servicio."""
-    connection = get_connection()
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
 
-    try:
-        connection.execute(
-            """
-            UPDATE services SET name = ? WHERE id = ?;
-            """,
-            (name, service_id),
+    with SessionLocal() as session:
+        query = select(Servicio).where(
+            Servicio.id == service_id,
+            Servicio.lavanderia_id == resolved_lavanderia_id,
         )
-        connection.commit()
-    finally:
-        connection.close()
+        service = session.scalar(query)
+        if service is None:
+            raise ValueError("El servicio indicado no existe.")
+
+        service.nombre_servicio = name
+        session.commit()
 
 
-def is_service_in_use(service_id):
-    """Devuelve True si algun ingreso referencia este servicio."""
-    connection = get_connection()
-    try:
-        row = connection.execute(
-            "SELECT COUNT(*) AS c FROM incomes WHERE service_id = ?;", (service_id,)
-        ).fetchone()
-        return row["c"] > 0
-    finally:
-        connection.close()
+def is_service_in_use(service_id, lavanderia_id=None):
+    """Devuelve True si algun detalle de venta referencia este servicio."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
+
+    with SessionLocal() as session:
+        query = (
+            select(DetalleVenta.id)
+            .join(Servicio, Servicio.id == DetalleVenta.servicio_id)
+            .where(
+                DetalleVenta.servicio_id == service_id,
+                Servicio.lavanderia_id == resolved_lavanderia_id,
+            )
+            .limit(1)
+        )
+        return session.scalar(query) is not None
 
 
-def delete_service(service_id):
+def delete_service(service_id, lavanderia_id=None):
     """Elimina un servicio permanentemente."""
-    connection = get_connection()
-    try:
-        connection.execute("DELETE FROM services WHERE id = ?;", (service_id,))
-        connection.commit()
-    finally:
-        connection.close()
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
 
-
-def toggle_service(service_id):
-    """Activa o desactiva un servicio."""
-    connection = get_connection()
-
-    try:
-        connection.execute(
-            """
-            UPDATE services
-            SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END
-            WHERE id = ?;
-            """,
-            (service_id,),
+    with SessionLocal() as session:
+        query = select(Servicio).where(
+            Servicio.id == service_id,
+            Servicio.lavanderia_id == resolved_lavanderia_id,
         )
-        connection.commit()
-    finally:
-        connection.close()
+        service = session.scalar(query)
+        if service is None:
+            raise ValueError("El servicio indicado no existe.")
+
+        session.delete(service)
+        session.commit()
+
+
+def toggle_service(service_id, lavanderia_id=None):
+    """Activa o desactiva un servicio."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
+
+    with SessionLocal() as session:
+        query = select(Servicio).where(
+            Servicio.id == service_id,
+            Servicio.lavanderia_id == resolved_lavanderia_id,
+        )
+        service = session.scalar(query)
+        if service is None:
+            raise ValueError("El servicio indicado no existe.")
+
+        service.estado = not service.estado
+        session.commit()

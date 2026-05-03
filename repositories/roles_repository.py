@@ -4,6 +4,7 @@ from sqlalchemy import select
 
 from database.connection import SessionLocal
 from database.schema import Rol
+from utils.tenant_context import resolve_lavanderia_id
 
 
 def _serialize_role(role):
@@ -21,28 +22,34 @@ def _serialize_role(role):
 
 def get_all_roles(lavanderia_id=None):
     """Devuelve roles ordenados por nombre, opcionalmente filtrados por lavanderia."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         query = select(Rol).order_by(Rol.nombre.asc())
-        if lavanderia_id is not None:
-            query = query.where(Rol.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Rol.lavanderia_id == resolved_lavanderia_id)
         return [_serialize_role(role) for role in session.scalars(query).all()]
 
 
 def get_active_roles(lavanderia_id=None):
     """Devuelve solo los roles activos."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         query = select(Rol).where(Rol.estado.is_(True)).order_by(Rol.nombre.asc())
-        if lavanderia_id is not None:
-            query = query.where(Rol.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Rol.lavanderia_id == resolved_lavanderia_id)
         return [_serialize_role(role) for role in session.scalars(query).all()]
 
 
 def get_role_by_id(role_id, lavanderia_id=None):
     """Busca un rol por id, opcionalmente validando lavanderia."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         query = select(Rol).where(Rol.id == role_id)
-        if lavanderia_id is not None:
-            query = query.where(Rol.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Rol.lavanderia_id == resolved_lavanderia_id)
         role = session.scalar(query)
         return _serialize_role(role) if role is not None else None
 
@@ -52,11 +59,12 @@ def get_role_by_name(name, lavanderia_id=None):
     clean_name = str(name).strip()
     if not clean_name:
         return None
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
 
     with SessionLocal() as session:
         query = select(Rol).where(Rol.nombre == clean_name)
-        if lavanderia_id is not None:
-            query = query.where(Rol.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Rol.lavanderia_id == resolved_lavanderia_id)
         role = session.scalar(query.order_by(Rol.id.asc()))
         return _serialize_role(role) if role is not None else None
 
@@ -66,12 +74,13 @@ def create_role(name, lavanderia_id):
     clean_name = str(name).strip()
     if not clean_name:
         raise ValueError("El nombre del rol es obligatorio.")
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
 
     with SessionLocal() as session:
         role = Rol(
             nombre=clean_name,
             estado=True,
-            lavanderia_id=lavanderia_id,
+            lavanderia_id=resolved_lavanderia_id,
         )
         session.add(role)
         session.commit()
@@ -80,10 +89,12 @@ def create_role(name, lavanderia_id):
 
 def toggle_role(role_id, lavanderia_id=None):
     """Activa o desactiva un rol."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     with SessionLocal() as session:
         query = select(Rol).where(Rol.id == role_id)
-        if lavanderia_id is not None:
-            query = query.where(Rol.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Rol.lavanderia_id == resolved_lavanderia_id)
         role = session.scalar(query)
         if role is None:
             raise ValueError("El rol indicado no existe.")

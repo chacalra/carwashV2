@@ -4,14 +4,17 @@ from sqlalchemy import select
 
 from database.connection import SessionLocal
 from database.schema import Permiso, Rol, RolPermiso
+from utils.tenant_context import resolve_lavanderia_id
 
 
 def _resolve_role(session, role_ref, lavanderia_id=None):
     """Resuelve un rol a partir de id o nombre."""
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id)
+
     if isinstance(role_ref, int):
         query = select(Rol).where(Rol.id == role_ref)
-        if lavanderia_id is not None:
-            query = query.where(Rol.lavanderia_id == lavanderia_id)
+        if resolved_lavanderia_id is not None:
+            query = query.where(Rol.lavanderia_id == resolved_lavanderia_id)
         role = session.scalar(query)
         if role is None:
             raise ValueError("El rol indicado no existe.")
@@ -19,8 +22,8 @@ def _resolve_role(session, role_ref, lavanderia_id=None):
 
     clean_name = str(role_ref).strip()
     query = select(Rol).where(Rol.nombre == clean_name)
-    if lavanderia_id is not None:
-        query = query.where(Rol.lavanderia_id == lavanderia_id)
+    if resolved_lavanderia_id is not None:
+        query = query.where(Rol.lavanderia_id == resolved_lavanderia_id)
 
     roles = session.scalars(query).all()
     if not roles:
@@ -72,8 +75,9 @@ def set_permissions_for_role(role_ref, permissions, lavanderia_id=None):
         ).all()
         for link in current_links:
             session.delete(link)
+        session.flush()
 
-        for code in requested_codes:
+        for code in dict.fromkeys(requested_codes):
             session.add(
                 RolPermiso(
                     rol_id=role.id,

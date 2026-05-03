@@ -266,9 +266,7 @@ Datos confirmados:
 Todavía falta:
 
 - rediseñar UI orientada a `venta + detalle_venta`
-- agregar campo técnico de tenant en `lavanderias`, por ejemplo `subdominio`
-- ajustar auth para resolución definitiva por host/subdominio en vez de la heurística temporal actual
-- adaptar `catalog_service.py` y otros servicios heredados del MVP
+- adaptar otros servicios heredados del MVP que siguen en SQLite o `income`
 - reemplazar definitivamente el corazón del MVP basado en `income`
 
 ## 11. Punto exacto donde quedó el proyecto
@@ -296,20 +294,35 @@ Hoy el proyecto quedó en este estado:
   - `tenant_service`
   - `client_service`
   - `sale_service`
-- `auth_service` ya adaptado al esquema multi-tenant actual
-- el login quedó con una heurística temporal:
-  - si el usuario existe una sola vez, entra
-  - si existe en varias lavanderías, exige contexto de tenant
-- esa heurística será reemplazada por resolución de tenant vía subdominio
+- `lavanderias` ya quedó con `subdominio` como identificador técnico de tenant
+- se generó y aplicó la migración para `subdominio`
+- `tenant_service` ya resuelve lavandería por `subdominio` y por `host`
+- `auth_service` ya quedó alineado a resolución de tenant por host/subdominio
+- la vista de login local quedó adaptada como puente para pedir `subdominio` o `host`
+- login real verificado con:
+  - `demo`
+  - `demo.mukusoft.com`
+- `catalog_service.py` ya fue adaptado al modelo V2 multi-tenant
+- repositories de catálogos adaptados a PostgreSQL y `lavanderia_id`:
+  - `services_repository.py`
+  - `products_repository.py`
+  - `vehicle_types_repository.py`
+  - `expense_categories_repository.py`
+- `roles_repository.py`, `users_repository.py` y `role_permissions_repository.py` ya respetan el tenant actual por defecto
+- smoke real verificado para:
+  - alta
+  - listado
+  - activación/desactivación
+  - eliminación
+  sobre servicios, productos, categorías y tipos de vehículo dentro de la lavandería demo
 
 ## 12. Siguiente paso natural
 
 El siguiente paso recomendado ya está claro:
 
-1. incorporar `subdominio` o campo equivalente en `lavanderias`
-2. generar migración para esa decisión
-3. alinear auth y login al modelo de tenant por URL
-4. después seguir con adaptación de servicios heredados, UI y tests
+1. seguir con adaptación de otros servicios heredados del MVP, especialmente `expense_service.py`, `vehicle_service.py` y piezas todavía atadas a `income`
+2. continuar con la UI orientada al dominio nuevo de `venta + detalle_venta`
+3. más adelante mover la resolución de tenant desde el campo manual temporal hacia el host real de FastAPI
 
 ## 13. Dirección del proyecto
 
