@@ -318,8 +318,11 @@ La V2 debe registrar ventas con uno o muchos detalles.
 
 ### Estado actual
 
-- siguen pendientes de adaptación completa
-- hoy consumen un `incomes_repository.py` puente montado sobre `venta + detalle_venta`
+- ya quedaron alineadas al puente V2 actual
+- `incomes_form.py` ya registra servicio o producto usando `income_service.py`
+- `edit_income_view.py` ya soporta editar ingresos legacy tanto de servicios como de productos
+- `void_incomes_view.py` ya opera respetando el `lavanderia_id` activo
+- siguen siendo vistas heredadas del MVP, por lo que a futuro conviene reemplazarlas por una UI nativa de ventas
 
 ## 7.3 Vistas nuevas probables
 
@@ -394,7 +397,7 @@ Si hubiera que empezar ya, el primer bloque de trabajo sería:
 ### Estado actual
 
 - este primer sprint ya quedó básicamente cumplido
-- el siguiente bloque natural ahora es seguir con `incomes_form.py`, `edit_income_view.py`, `void_incomes_view.py` y la UI nueva orientada a ventas
+- el siguiente bloque natural ahora es seguir con la UI nueva orientada a ventas y revisar reportes/exportaciones que todavía hablan en términos de `income`
 
 ## 11. Prioridad por impacto
 

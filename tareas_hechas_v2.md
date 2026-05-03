@@ -324,6 +324,10 @@ Hoy el proyecto quedó en este estado:
   - lista ingresos desde `ventas` y `detalles_venta`
   - alimenta edición, exportación y reportes heredados
   - resuelve cliente genérico, cliente facturable y usuario dentro de la `lavanderia`
+- las vistas heredadas de ingresos ya quedaron alineadas al puente V2 actual:
+  - `incomes_form.py` ya registra servicio o producto
+  - `edit_income_view.py` ya permite editar ingresos legacy de servicio o producto
+  - `void_incomes_view.py` ya actualiza tipo de cobro y anula respetando el tenant activo
 - `roles_repository.py`, `users_repository.py` y `role_permissions_repository.py` ya respetan el tenant actual por defecto
 - smoke real verificado para:
   - alta
@@ -342,7 +346,8 @@ El siguiente paso recomendado ya está claro:
 
 1. seguir con piezas todavía atadas a `income`, especialmente las vistas heredadas de ingresos
 2. continuar con la UI orientada al dominio nuevo de `venta + detalle_venta`
-3. más adelante mover la resolución de tenant desde el campo manual temporal hacia el host real de FastAPI
+3. revisar reportes/exportaciones y otras pantallas heredadas que todavía usan el vocabulario `income`
+4. más adelante mover la resolución de tenant desde el campo manual temporal hacia el host real de FastAPI
 
 ## 13. Dirección del proyecto
 
