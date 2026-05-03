@@ -220,6 +220,7 @@ def render_income_form():
                     ruc_ci=ruc_ci,
                     razon_social=razon_social,
                     created_by=st.session_state.get("user_name"),
+                    user_id=st.session_state.get("user_id"),
                 )
             tipo = "credito" if payment_type == "Credito" else "contado"
             label = normalize_plate(license_plate) if license_plate else "Producto"

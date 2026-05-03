@@ -89,7 +89,11 @@ def render_void_incomes_view():
         st.info(f"{len(changed_ids)} registro(s) con tipo de cobro modificado.")
         if st.button("Guardar cambios", type="primary"):
             for income_id, payment_type in zip(changed_ids, changed_types):
-                update_income_payment_type(income_id, payment_type)
+                update_income_payment_type(
+                    income_id,
+                    payment_type,
+                    lavanderia_id=st.session_state.get("lavanderia_id"),
+                )
             st.success(f"{len(changed_ids)} registro(s) actualizado(s).")
             st.rerun()
 
@@ -109,7 +113,10 @@ def render_void_incomes_view():
         with col1:
             if st.button("Si, anular", type="primary"):
                 for income_id in selected_ids:
-                    remove_income(income_id)
+                    remove_income(
+                        income_id,
+                        lavanderia_id=st.session_state.get("lavanderia_id"),
+                    )
                 st.session_state.pop(confirm_key, None)
                 st.success(f"{len(selected_ids)} ingreso(s) anulado(s) correctamente.")
                 st.rerun()
