@@ -121,6 +121,12 @@ Implementar el modelo nuevo:
 
 Esquema físico inicial de PostgreSQL alineado con el modelo aprobado.
 
+### Estado actual
+
+- ya implementado en `database/schema.py`
+- `subdominio` ya incorporado en `lavanderias`
+- ya existe migración incremental para ese cambio
+
 ## 4.3 `database/seed.py`
 
 ### Estado
@@ -142,6 +148,11 @@ Sembrar datos base mínimos para que el sistema arranque.
 
 Sistema arrancable sin depender de carga manual total.
 
+### Estado actual
+
+- ya implementado
+- hoy siembra permisos, lavandería demo, rol admin, usuario admin y cliente genérico
+
 ## 4.4 `alembic/`
 
 ### Estado
@@ -162,6 +173,12 @@ Gestionar el esquema y sus cambios de forma versionada.
 ### Resultado esperado
 
 Migraciones repetibles, auditables y alineadas con el modelo nuevo.
+
+### Estado actual
+
+- ya implementado
+- migración base aplicada
+- migración de `subdominio` aplicada
 
 ## 5. Plan de repositories
 
@@ -186,6 +203,12 @@ La idea de acceso a datos sigue siendo útil, pero debe cambiar para trabajar:
 - con el nuevo modelo relacional
 - y, en el caso de `lavanderias_repository.py`, con resolución por subdominio
 
+### Estado actual
+
+- `users_repository.py`, `roles_repository.py` y `role_permissions_repository.py` ya quedaron adaptados
+- `products_repository.py`, `services_repository.py`, `vehicle_types_repository.py` y `expense_categories_repository.py` ya quedaron adaptados
+- `lavanderias_repository.py` ya resuelve por `subdominio`
+
 ## 5.2 Repositories a crear o rediseñar
 
 - `lavanderias_repository.py`
@@ -197,6 +220,10 @@ La idea de acceso a datos sigue siendo útil, pero debe cambiar para trabajar:
 ### Motivo
 
 La V2 necesita repositorios nuevos para el corazón del dominio.
+
+### Estado actual
+
+- `lavanderias_repository.py`, `clients_repository.py`, `sales_repository.py` y `sale_items_repository.py` ya existen
 
 ## 5.3 Repositories a reemplazar
 
@@ -225,6 +252,11 @@ Caso particular:
 
 - `auth_service.py` debe asumir resolución previa de tenant por subdominio.
 
+### Estado actual
+
+- `auth_service.py` ya quedó adaptado a resolución por `subdominio` o `host`
+- `catalog_service.py` ya quedó adaptado al esquema multi-tenant nuevo
+
 ## 6.2 Services a crear o rediseñar
 
 - `sale_service.py`
@@ -234,6 +266,10 @@ Caso particular:
 ### Motivo
 
 La lógica central ya no debe girar en torno a `income`, sino a `venta`.
+
+### Estado actual
+
+- `sale_service.py`, `client_service.py` y `tenant_service.py` ya existen
 
 ## 6.3 Services a reemplazar
 
@@ -318,6 +354,11 @@ Mantener la carpeta y rediseñar casos.
 
 La V2 debe crecer con tests acordes a las nuevas reglas del dominio.
 
+### Estado actual
+
+- tests de auth ya adaptados al flujo por tenant
+- falta ampliar cobertura de catálogos, ventas, egresos y multi-tenant completo
+
 ## 10. Primer sprint recomendado
 
 Si hubiera que empezar ya, el primer bloque de trabajo sería:
@@ -335,6 +376,11 @@ Si hubiera que empezar ya, el primer bloque de trabajo sería:
    - `sale_service.py`
    - `client_service.py`
 7. dejar para después la UI nueva
+
+### Estado actual
+
+- este primer sprint ya quedó básicamente cumplido
+- el siguiente bloque natural ahora es seguir con `expense_service.py`, `vehicle_service.py` y la UI nueva orientada a ventas
 
 ## 11. Prioridad por impacto
 
