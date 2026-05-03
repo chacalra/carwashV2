@@ -43,6 +43,7 @@ def render_expense_form():
                     amount=float(amount),
                     description=description,
                     created_by=st.session_state.get("user_name"),
+                    user_id=st.session_state.get("user_id"),
                     has_iva=has_iva,
                 )
             notify(f"Guardado: {selected_category} — {format_currency(amount)}")
