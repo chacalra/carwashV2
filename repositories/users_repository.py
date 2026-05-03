@@ -1,82 +1,218 @@
-"""Acceso a datos de usuarios del sistema."""
+"""Acceso a datos de usuarios del sistema para la V2."""
 
-from datetime import datetime
+from sqlalchemy import select
 
-from database.connection import get_connection
-
-
-def get_all_users():
-    """Devuelve todos los usuarios ordenados por nombre."""
-    connection = get_connection()
-    try:
-        return connection.execute(
-            "SELECT id, name, role, is_active, created_at FROM users ORDER BY name ASC;"
-        ).fetchall()
-    finally:
-        connection.close()
+from database.connection import SessionLocal
+from database.schema import Lavanderia, Rol, Usuario
 
 
-def get_user_by_name(name):
-    """Busca un usuario por nombre (para login). Incluye password_hash."""
-    connection = get_connection()
-    try:
-        return connection.execute(
-            "SELECT id, name, role, password_hash, is_active, created_at FROM users WHERE name = ?;",
-            (name,),
-        ).fetchone()
-    finally:
-        connection.close()
+def _serialize_user(user, role=None, lavanderia=None):
+    """Convierte una entidad Usuario en un diccionario amigable para UI y servicios."""
+    role_name = role.nombre if role is not None else None
+    lavanderia_name = lavanderia.nombre_local if lavanderia is not None else None
+
+    return {
+        "id": user.id,
+        "name": user.nombre_usuario,
+        "nombre_usuario": user.nombre_usuario,
+        "role": role_name,
+        "role_id": user.rol_id,
+        "is_active": 1 if user.estado else 0,
+        "estado": user.estado,
+        "password_hash": user.password_hash,
+        "created_at": user.created_at,
+        "lavanderia_id": user.lavanderia_id,
+        "lavanderia_name": lavanderia_name,
+    }
 
 
-def create_user(name, role, password_hash):
+def _resolve_role(session, role_id=None, role_name=None, lavanderia_id=None):
+    """Busca un rol por id o por nombre y devuelve la entidad."""
+    if role_id is not None:
+        role = session.get(Rol, role_id)
+        if role is None:
+            raise ValueError("El rol indicado no existe.")
+        if lavanderia_id is not None and role.lavanderia_id != lavanderia_id:
+            raise ValueError("El rol indicado no pertenece a esa lavanderia.")
+        return role
+
+    if role_name is None or not str(role_name).strip():
+        raise ValueError("El rol es obligatorio.")
+
+    query = select(Rol).where(Rol.nombre == str(role_name).strip())
+    if lavanderia_id is not None:
+        query = query.where(Rol.lavanderia_id == lavanderia_id)
+
+    roles = session.scalars(query).all()
+    if not roles:
+        raise ValueError("El rol indicado no existe.")
+    if len(roles) > 1:
+        raise ValueError(
+            "El rol indicado existe en varias lavanderias. Hace falta especificar la lavanderia."
+        )
+
+    return roles[0]
+
+
+def get_all_users(lavanderia_id=None):
+    """Devuelve usuarios ordenados por nombre, opcionalmente filtrados por lavanderia."""
+    with SessionLocal() as session:
+        query = (
+            select(Usuario, Rol, Lavanderia)
+            .join(Rol, Usuario.rol_id == Rol.id)
+            .join(Lavanderia, Usuario.lavanderia_id == Lavanderia.id)
+            .order_by(Usuario.nombre_usuario.asc())
+        )
+
+        if lavanderia_id is not None:
+            query = query.where(Usuario.lavanderia_id == lavanderia_id)
+
+        rows = session.execute(query).all()
+        return [_serialize_user(user, role, lavanderia) for user, role, lavanderia in rows]
+
+
+def get_users_by_name(name):
+    """Busca todos los usuarios que comparten un nombre de usuario."""
+    clean_name = str(name).strip()
+    if not clean_name:
+        return []
+
+    with SessionLocal() as session:
+        query = (
+            select(Usuario, Rol, Lavanderia)
+            .join(Rol, Usuario.rol_id == Rol.id)
+            .join(Lavanderia, Usuario.lavanderia_id == Lavanderia.id)
+            .where(Usuario.nombre_usuario == clean_name)
+            .order_by(Usuario.id.asc())
+        )
+        rows = session.execute(query).all()
+        return [_serialize_user(user, role, lavanderia) for user, role, lavanderia in rows]
+
+
+def get_user_by_name(name, lavanderia_id=None):
+    """Busca un usuario por nombre, opcionalmente dentro de una lavanderia."""
+    clean_name = str(name).strip()
+    if not clean_name:
+        return None
+
+    with SessionLocal() as session:
+        query = (
+            select(Usuario, Rol, Lavanderia)
+            .join(Rol, Usuario.rol_id == Rol.id)
+            .join(Lavanderia, Usuario.lavanderia_id == Lavanderia.id)
+            .where(Usuario.nombre_usuario == clean_name)
+        )
+
+        if lavanderia_id is not None:
+            query = query.where(Usuario.lavanderia_id == lavanderia_id)
+
+        row = session.execute(query.order_by(Usuario.id.asc())).first()
+        if row is None:
+            return None
+
+        user, role, lavanderia = row
+        return _serialize_user(user, role, lavanderia)
+
+
+def get_user_by_id(user_id, lavanderia_id=None):
+    """Busca un usuario por id, opcionalmente validando lavanderia."""
+    with SessionLocal() as session:
+        query = (
+            select(Usuario, Rol, Lavanderia)
+            .join(Rol, Usuario.rol_id == Rol.id)
+            .join(Lavanderia, Usuario.lavanderia_id == Lavanderia.id)
+            .where(Usuario.id == user_id)
+        )
+
+        if lavanderia_id is not None:
+            query = query.where(Usuario.lavanderia_id == lavanderia_id)
+
+        row = session.execute(query).first()
+        if row is None:
+            return None
+
+        user, role, lavanderia = row
+        return _serialize_user(user, role, lavanderia)
+
+
+def create_user(name, role=None, password_hash=None, lavanderia_id=None, role_id=None):
     """Inserta un nuevo usuario con contrasena hasheada y devuelve su id."""
-    connection = get_connection()
-    try:
-        created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        cursor = connection.execute(
-            "INSERT INTO users (name, role, password_hash, is_active, created_at) VALUES (?, ?, ?, 1, ?);",
-            (name, role, password_hash, created_at),
+    clean_name = str(name).strip()
+    if not clean_name:
+        raise ValueError("El nombre del usuario es obligatorio.")
+    if not password_hash:
+        raise ValueError("La contrasena del usuario es obligatoria.")
+
+    with SessionLocal() as session:
+        resolved_role = _resolve_role(
+            session,
+            role_id=role_id,
+            role_name=role,
+            lavanderia_id=lavanderia_id,
         )
-        connection.commit()
-        return cursor.lastrowid
-    finally:
-        connection.close()
+        target_lavanderia_id = lavanderia_id or resolved_role.lavanderia_id
+
+        user = Usuario(
+            nombre_usuario=clean_name,
+            password_hash=password_hash,
+            estado=True,
+            lavanderia_id=target_lavanderia_id,
+            rol_id=resolved_role.id,
+        )
+        session.add(user)
+        session.commit()
+        return user.id
 
 
-def update_user(user_id, name, role):
+def update_user(user_id, name, role=None, lavanderia_id=None, role_id=None):
     """Actualiza nombre y rol de un usuario."""
-    connection = get_connection()
-    try:
-        connection.execute(
-            "UPDATE users SET name = ?, role = ? WHERE id = ?;",
-            (name, role, user_id),
+    clean_name = str(name).strip()
+    if not clean_name:
+        raise ValueError("El nombre del usuario es obligatorio.")
+
+    with SessionLocal() as session:
+        user = session.get(Usuario, user_id)
+        if user is None:
+            raise ValueError("El usuario indicado no existe.")
+        if lavanderia_id is not None and user.lavanderia_id != lavanderia_id:
+            raise ValueError("El usuario no pertenece a esa lavanderia.")
+
+        resolved_role = _resolve_role(
+            session,
+            role_id=role_id,
+            role_name=role,
+            lavanderia_id=user.lavanderia_id,
         )
-        connection.commit()
-    finally:
-        connection.close()
+
+        user.nombre_usuario = clean_name
+        user.rol_id = resolved_role.id
+        session.commit()
 
 
-def update_user_password(user_id, password_hash):
+def update_user_password(user_id, password_hash, lavanderia_id=None):
     """Actualiza la contrasena de un usuario."""
-    connection = get_connection()
-    try:
-        connection.execute(
-            "UPDATE users SET password_hash = ? WHERE id = ?;",
-            (password_hash, user_id),
-        )
-        connection.commit()
-    finally:
-        connection.close()
+    if not password_hash:
+        raise ValueError("La contrasena hasheada es obligatoria.")
+
+    with SessionLocal() as session:
+        user = session.get(Usuario, user_id)
+        if user is None:
+            raise ValueError("El usuario indicado no existe.")
+        if lavanderia_id is not None and user.lavanderia_id != lavanderia_id:
+            raise ValueError("El usuario no pertenece a esa lavanderia.")
+
+        user.password_hash = password_hash
+        session.commit()
 
 
-def toggle_user(user_id):
+def toggle_user(user_id, lavanderia_id=None):
     """Activa o desactiva un usuario."""
-    connection = get_connection()
-    try:
-        connection.execute(
-            "UPDATE users SET is_active = CASE WHEN is_active = 1 THEN 0 ELSE 1 END WHERE id = ?;",
-            (user_id,),
-        )
-        connection.commit()
-    finally:
-        connection.close()
+    with SessionLocal() as session:
+        user = session.get(Usuario, user_id)
+        if user is None:
+            raise ValueError("El usuario indicado no existe.")
+        if lavanderia_id is not None and user.lavanderia_id != lavanderia_id:
+            raise ValueError("El usuario no pertenece a esa lavanderia.")
+
+        user.estado = not user.estado
+        session.commit()

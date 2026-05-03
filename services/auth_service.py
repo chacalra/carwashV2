@@ -1,7 +1,7 @@
 """Autenticacion y control de acceso."""
 
 from repositories.role_permissions_repository import get_permissions_for_role
-from repositories.users_repository import get_user_by_name
+from repositories.users_repository import get_user_by_name, get_users_by_name
 from utils.security import verify_password
 
 # Permisos disponibles en el sistema. Clave = identificador interno, valor = etiqueta UI.
@@ -29,7 +29,22 @@ VIEW_PERMISSIONS = {
 }
 
 
-def login(name, password):
+def _resolve_login_user(name, lavanderia_id=None):
+    """Resuelve el usuario de login respetando el modelo multi-tenant."""
+    if lavanderia_id is not None:
+        return get_user_by_name(name, lavanderia_id=lavanderia_id)
+
+    users = get_users_by_name(name)
+    if not users:
+        return None
+    if len(users) > 1:
+        raise ValueError(
+            "Ese usuario existe en varias lavanderias. Hace falta indicar la lavanderia para iniciar sesion."
+        )
+    return users[0]
+
+
+def login(name, password, lavanderia_id=None):
     """
     Autentica un usuario por nombre y contrasena.
     Devuelve (user_row, permissions_list) o lanza ValueError.
@@ -39,7 +54,7 @@ def login(name, password):
     if not password:
         raise ValueError("La contrasena es obligatoria.")
 
-    user = get_user_by_name(name.strip())
+    user = _resolve_login_user(name.strip(), lavanderia_id=lavanderia_id)
 
     if user is None or not user["is_active"]:
         raise ValueError("Usuario o contrasena incorrectos.")
@@ -50,7 +65,7 @@ def login(name, password):
     if not verify_password(password, user["password_hash"]):
         raise ValueError("Usuario o contrasena incorrectos.")
 
-    permissions = get_permissions_for_role(user["role"])
+    permissions = get_permissions_for_role(user["role_id"])
     return user, permissions
 
 
