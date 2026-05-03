@@ -240,12 +240,12 @@ Se mantiene:
 - la base PostgreSQL y Alembic
 - repositories y services ya creados para tenant, clientes y ventas
 
-Se deberá ajustar:
+Ya quedó ajustado en esta línea:
 
-- `lavanderias` para incluir un identificador único de acceso, por ejemplo `subdominio`
-- repositories de lavandería para resolver por subdominio
-- `auth_service` para consumir tenant resuelto por host en vez de depender de heurísticas temporales
-- la UI o API de login para asumir que el tenant ya viene determinado por la URL
+- `lavanderias` ahora incluye `subdominio`
+- repositories y `tenant_service` ya resuelven tenant por subdominio y por host
+- `auth_service` ya consume tenant resuelto por host o subdominio en vez de depender de heurísticas temporales
+- la UI local de login ya acepta `subdominio` o host como puente hasta la entrada definitiva por URL
 
 ## 9. Conclusión
 

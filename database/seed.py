@@ -27,6 +27,7 @@ DEFAULT_PERMISSIONS = {
 
 DEFAULT_TENANT = {
     "nombre_local": "Lavanderia Demo",
+    "subdominio": "demo",
     "nombre_responsable": "Administrador",
     "email": "demo@carwash.local",
     "telefono": "000000000",
@@ -70,10 +71,21 @@ def seed_default_lavanderia(session):
         )
     )
     if existing is not None:
+        if existing.subdominio != DEFAULT_TENANT["subdominio"]:
+            conflict = session.scalar(
+                select(Lavanderia).where(
+                    Lavanderia.subdominio == DEFAULT_TENANT["subdominio"],
+                    Lavanderia.id != existing.id,
+                )
+            )
+            if conflict is None:
+                existing.subdominio = DEFAULT_TENANT["subdominio"]
+                session.flush()
         return existing
 
     lavanderia = Lavanderia(
         nombre_local=DEFAULT_TENANT["nombre_local"],
+        subdominio=DEFAULT_TENANT["subdominio"],
         nombre_responsable=DEFAULT_TENANT["nombre_responsable"],
         email=DEFAULT_TENANT["email"],
         telefono=DEFAULT_TENANT["telefono"],

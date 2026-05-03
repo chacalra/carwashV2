@@ -27,10 +27,17 @@ def get_lavanderia_by_nombre_local(session, nombre_local):
     return session.scalar(query)
 
 
+def get_lavanderia_by_subdominio(session, subdominio):
+    """Busca una lavanderia por subdominio."""
+    query = select(Lavanderia).where(Lavanderia.subdominio == subdominio)
+    return session.scalar(query)
+
+
 def create_lavanderia(
     session,
     *,
     nombre_local,
+    subdominio,
     nombre_responsable,
     email=None,
     telefono=None,
@@ -39,6 +46,7 @@ def create_lavanderia(
     """Crea una lavanderia y devuelve la entidad persistida."""
     lavanderia = Lavanderia(
         nombre_local=nombre_local,
+        subdominio=subdominio,
         nombre_responsable=nombre_responsable,
         email=email,
         telefono=telefono,
@@ -54,12 +62,14 @@ def update_lavanderia(
     lavanderia,
     *,
     nombre_local,
+    subdominio,
     nombre_responsable,
     email=None,
     telefono=None,
 ):
     """Actualiza los datos principales de una lavanderia."""
     lavanderia.nombre_local = nombre_local
+    lavanderia.subdominio = subdominio
     lavanderia.nombre_responsable = nombre_responsable
     lavanderia.email = email
     lavanderia.telefono = telefono

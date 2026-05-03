@@ -33,7 +33,15 @@ def render_sidebar():
     st.sidebar.caption(f"Usuario: **{st.session_state['user_name']}** ({st.session_state['user_role']})")
 
     if st.sidebar.button("Cerrar sesion", width='stretch'):
-        for key in ["logged_in", "user_id", "user_name", "user_role", "permissions"]:
+        for key in [
+            "logged_in",
+            "user_id",
+            "user_name",
+            "user_role",
+            "permissions",
+            "lavanderia_id",
+            "lavanderia_name",
+        ]:
             st.session_state.pop(key, None)
         st.rerun()
 

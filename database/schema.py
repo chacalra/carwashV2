@@ -28,9 +28,14 @@ class Base(DeclarativeBase):
 
 class Lavanderia(Base):
     __tablename__ = "lavanderias"
+    __table_args__ = (
+        UniqueConstraint("subdominio", name="uq_lavanderias_subdominio"),
+        Index("ix_lavanderias_subdominio", "subdominio"),
+    )
 
     id: Mapped[int] = mapped_column(primary_key=True)
     nombre_local: Mapped[str] = mapped_column(String(150), nullable=False)
+    subdominio: Mapped[str] = mapped_column(String(100), nullable=False)
     nombre_responsable: Mapped[str] = mapped_column(String(150), nullable=False)
     email: Mapped[Optional[str]] = mapped_column(String(255))
     telefono: Mapped[Optional[str]] = mapped_column(String(50))

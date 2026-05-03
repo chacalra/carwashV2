@@ -1,7 +1,8 @@
 """Autenticacion y control de acceso."""
 
 from repositories.role_permissions_repository import get_permissions_for_role
-from repositories.users_repository import get_user_by_name, get_users_by_name
+from repositories.users_repository import get_user_by_name
+from services.tenant_service import get_tenant_by_host, get_tenant_by_id, get_tenant_by_subdominio
 from utils.security import verify_password
 
 # Permisos disponibles en el sistema. Clave = identificador interno, valor = etiqueta UI.
@@ -29,22 +30,36 @@ VIEW_PERMISSIONS = {
 }
 
 
-def _resolve_login_user(name, lavanderia_id=None):
-    """Resuelve el usuario de login respetando el modelo multi-tenant."""
-    if lavanderia_id is not None:
-        return get_user_by_name(name, lavanderia_id=lavanderia_id)
-
-    users = get_users_by_name(name)
-    if not users:
-        return None
-    if len(users) > 1:
+def _resolve_login_tenant(*, lavanderia_id=None, subdominio=None, host=None):
+    """Resuelve la lavanderia de autenticacion antes de buscar el usuario."""
+    if host is not None:
+        lavanderia = get_tenant_by_host(host)
+    elif subdominio is not None:
+        lavanderia = get_tenant_by_subdominio(subdominio)
+    elif lavanderia_id is not None:
+        lavanderia = get_tenant_by_id(lavanderia_id)
+    else:
         raise ValueError(
-            "Ese usuario existe en varias lavanderias. Hace falta indicar la lavanderia para iniciar sesion."
+            "Hace falta indicar el host o subdominio de la lavanderia para iniciar sesion."
         )
-    return users[0]
+
+    if not lavanderia.estado:
+        raise ValueError("La lavanderia indicada no esta activa.")
+
+    return lavanderia
 
 
-def login(name, password, lavanderia_id=None):
+def _resolve_login_user(name, *, lavanderia_id=None, subdominio=None, host=None):
+    """Resuelve el usuario de login dentro de una lavanderia ya identificada."""
+    lavanderia = _resolve_login_tenant(
+        lavanderia_id=lavanderia_id,
+        subdominio=subdominio,
+        host=host,
+    )
+    return get_user_by_name(name, lavanderia_id=lavanderia.id)
+
+
+def login(name, password, lavanderia_id=None, subdominio=None, host=None):
     """
     Autentica un usuario por nombre y contrasena.
     Devuelve (user_row, permissions_list) o lanza ValueError.
@@ -54,7 +69,12 @@ def login(name, password, lavanderia_id=None):
     if not password:
         raise ValueError("La contrasena es obligatoria.")
 
-    user = _resolve_login_user(name.strip(), lavanderia_id=lavanderia_id)
+    user = _resolve_login_user(
+        name.strip(),
+        lavanderia_id=lavanderia_id,
+        subdominio=subdominio,
+        host=host,
+    )
 
     if user is None or not user["is_active"]:
         raise ValueError("Usuario o contrasena incorrectos.")

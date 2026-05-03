@@ -14,19 +14,21 @@ def render_login():
         st.subheader("Iniciar sesion")
 
         with st.form("login_form"):
+            tenant_host = st.text_input("Subdominio o host", help="Ejemplo: autocare o autocare.mukusoft.com")
             name = st.text_input("Usuario")
             password = st.text_input("Contrasena", type="password")
             submitted = st.form_submit_button("Ingresar", width='stretch')
 
         if submitted:
             try:
-                user, permissions = login(name, password)
+                user, permissions = login(name, password, host=tenant_host)
                 st.session_state["logged_in"] = True
                 st.session_state["user_id"] = user["id"]
                 st.session_state["user_name"] = user["name"]
                 st.session_state["user_role"] = user["role"]
+                st.session_state["lavanderia_id"] = user["lavanderia_id"]
+                st.session_state["lavanderia_name"] = user["lavanderia_name"]
                 st.session_state["permissions"] = permissions
                 st.rerun()
             except ValueError as error:
                 st.error(str(error))
-
