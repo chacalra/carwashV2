@@ -265,9 +265,9 @@ Datos confirmados:
 
 Todavía falta:
 
-- rediseñar UI orientada a `venta + detalle_venta`
-- adaptar otros servicios heredados del MVP que siguen en SQLite o `income`
-- reemplazar definitivamente el corazón del MVP basado en `income`
+- ampliar la UI nueva orientada a `venta + detalle_venta`
+- migrar reportes y exportaciones para dejar de depender del puente legacy de `income`
+- decidir luego la estructura final de exportación cuando el cliente la defina
 
 ## 11. Punto exacto donde quedó el proyecto
 
@@ -328,6 +328,11 @@ Hoy el proyecto quedó en este estado:
   - `incomes_form.py` ya registra servicio o producto
   - `edit_income_view.py` ya permite editar ingresos legacy de servicio o producto
   - `void_incomes_view.py` ya actualiza tipo de cobro y anula respetando el tenant activo
+- ya existe una primera vista nativa de ventas:
+  - `sales_form.py`
+  - registra ventas nuevas usando `sale_service.py`
+  - permite cargar múltiples líneas de servicio o producto
+  - reutiliza el tenant activo y el `user_id` autenticado
 - `roles_repository.py`, `users_repository.py` y `role_permissions_repository.py` ya respetan el tenant actual por defecto
 - smoke real verificado para:
   - alta
@@ -339,13 +344,18 @@ Hoy el proyecto quedó en este estado:
   - alta y lectura de egresos por tenant
   - alta y lectura de vehículos enlazados al esquema nuevo
   - alta, lectura y borrado de ingresos legacy persistidos como `venta + detalle_venta`
+- el barrido de tests viejos ya dejó el suite alineado con V2:
+  - se retiró el viejo `tests/test_repositories.py` basado en SQLite
+  - se creó `tests/test_sales_repositories.py` para repositories del dominio nuevo
+  - `tests/test_catalog_service.py` ya quedó adaptado al flujo multi-tenant
+  - `uv run pytest` ya vuelve a pasar completo con `113 passed`
 
 ## 12. Siguiente paso natural
 
 El siguiente paso recomendado ya está claro:
 
 1. seguir con piezas todavía atadas a `income`, especialmente las vistas heredadas de ingresos
-2. continuar con la UI orientada al dominio nuevo de `venta + detalle_venta`
+2. continuar ampliando la UI orientada al dominio nuevo de `venta + detalle_venta`
 3. revisar reportes/exportaciones y otras pantallas heredadas que todavía usan el vocabulario `income`
 4. más adelante mover la resolución de tenant desde el campo manual temporal hacia el host real de FastAPI
 

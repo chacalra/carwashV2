@@ -334,6 +334,12 @@ La V2 debe registrar ventas con uno o muchos detalles.
 
 El nuevo dominio va a pedir UI específica para ventas y clientes.
 
+### Estado actual
+
+- `sales_form.py` ya existe como primera vista nativa de ventas
+- hoy permite registrar ventas con múltiples líneas de servicio o producto
+- sigue faltando completar edición nativa de ventas y más mantenimiento orientado al flujo nuevo
+
 ## 8. Plan de utils
 
 ## Estado
@@ -373,8 +379,11 @@ La V2 debe crecer con tests acordes a las nuevas reglas del dominio.
 ### Estado actual
 
 - tests de auth ya adaptados al flujo por tenant
+- `tests/test_catalog_service.py` ya quedó adaptado al flujo multi-tenant
 - `tests/test_income_service.py` ya volvió a pasar sobre el nuevo puente V2
-- falta ampliar cobertura de catálogos, ventas, egresos y multi-tenant completo
+- el viejo `tests/test_repositories.py` de SQLite ya fue reemplazado por `tests/test_sales_repositories.py`
+- `uv run pytest` ya vuelve a pasar completo sobre la base actual
+- falta ampliar cobertura de ventas, egresos y multi-tenant completo
 
 ## 10. Primer sprint recomendado
 
@@ -397,7 +406,7 @@ Si hubiera que empezar ya, el primer bloque de trabajo sería:
 ### Estado actual
 
 - este primer sprint ya quedó básicamente cumplido
-- el siguiente bloque natural ahora es seguir con la UI nueva orientada a ventas y revisar reportes/exportaciones que todavía hablan en términos de `income`
+- el siguiente bloque natural ahora es ampliar la UI nueva orientada a ventas y revisar reportes/exportaciones que todavía hablan en términos de `income`
 
 ## 11. Prioridad por impacto
 
