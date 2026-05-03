@@ -1,7 +1,5 @@
 """Reglas de negocio para ingresos."""
 
-from datetime import datetime
-
 from repositories.incomes_repository import (
     create_income,
     delete_income,
@@ -12,6 +10,7 @@ from utils.formatters import normalize_razon_social
 from repositories.products_repository import get_product_by_id
 from repositories.services_repository import get_service_by_id
 from services.vehicle_service import find_or_create_vehicle, normalize_plate
+from utils.tenant_context import resolve_lavanderia_id
 
 VALID_PAYMENT_TYPES = ("Contado", "Credito")
 
@@ -20,6 +19,7 @@ def validate_income_data(
     date, service_id, amount, payment_method, notes,
     payment_type="Contado", requires_invoice=False, ruc_ci=None, razon_social=None,
     product_id=None,
+    lavanderia_id=None,
 ):
     """Valida y normaliza los datos de un ingreso."""
     normalized_date = date.strip() if isinstance(date, str) else ""
@@ -40,15 +40,20 @@ def validate_income_data(
     if service_id is None and product_id is None:
         raise ValueError("Se debe seleccionar un servicio o producto.")
 
+    if service_id is not None and product_id is not None:
+        raise ValueError("No se puede registrar un ingreso con servicio y producto al mismo tiempo.")
+
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
+
     if service_id is not None:
-        service = get_service_by_id(service_id)
+        service = get_service_by_id(service_id, lavanderia_id=resolved_lavanderia_id)
         if service is None:
             raise ValueError("El servicio seleccionado no existe.")
         if service["is_active"] != 1:
             raise ValueError("No se puede registrar un ingreso con un servicio inactivo.")
 
     if product_id is not None:
-        product = get_product_by_id(product_id)
+        product = get_product_by_id(product_id, lavanderia_id=resolved_lavanderia_id)
         if product is None:
             raise ValueError("El producto seleccionado no existe.")
         if product["is_active"] != 1:
@@ -65,11 +70,15 @@ def validate_income_data(
             raise ValueError("El RUC/CI es obligatorio cuando se genera factura.")
         if not normalized_razon_social:
             raise ValueError("La razon social es obligatoria cuando se genera factura.")
-        existing_razon_social = get_razon_social_by_ruc_ci(normalized_ruc_ci)
+        existing_razon_social = get_razon_social_by_ruc_ci(
+            normalized_ruc_ci,
+            lavanderia_id=resolved_lavanderia_id,
+        )
         if existing_razon_social:
             normalized_razon_social = existing_razon_social
 
     return {
+        "lavanderia_id": resolved_lavanderia_id,
         "date": normalized_date,
         "service_id": service_id,
         "product_id": product_id,
@@ -99,12 +108,15 @@ def register_income(
     razon_social=None,
     created_by=None,
     product_id=None,
+    user_id=None,
+    lavanderia_id=None,
 ):
     """Valida y registra un nuevo ingreso, opcionalmente asociado a un vehiculo o producto."""
     validated_data = validate_income_data(
         date, service_id, amount, payment_method, notes,
         payment_type, requires_invoice, ruc_ci, razon_social,
         product_id=product_id,
+        lavanderia_id=lavanderia_id,
     )
 
     vehicle_id = None
@@ -116,9 +128,8 @@ def register_income(
             vehicle_type_id,
             owner_name,
             phone,
+            lavanderia_id=validated_data["lavanderia_id"],
         )
-
-    created_at = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     return create_income(
         validated_data["date"],
@@ -127,13 +138,14 @@ def register_income(
         validated_data["payment_method"],
         validated_data["notes"],
         vehicle_id,
-        created_at,
         payment_type=validated_data["payment_type"],
         requires_invoice=validated_data["requires_invoice"],
         ruc_ci=validated_data["ruc_ci"],
         razon_social=validated_data["razon_social"],
         created_by=created_by,
         product_id=validated_data["product_id"],
+        user_id=user_id,
+        lavanderia_id=validated_data["lavanderia_id"],
     )
 
 
@@ -153,12 +165,14 @@ def edit_income(
     ruc_ci=None,
     razon_social=None,
     product_id=None,
+    lavanderia_id=None,
 ):
     """Valida y actualiza un ingreso existente."""
     validated_data = validate_income_data(
         date, service_id, amount, payment_method, notes,
         payment_type, requires_invoice, ruc_ci, razon_social,
         product_id=product_id,
+        lavanderia_id=lavanderia_id,
     )
 
     vehicle_id = None
@@ -170,6 +184,7 @@ def edit_income(
             vehicle_type_id,
             owner_name,
             phone,
+            lavanderia_id=validated_data["lavanderia_id"],
         )
 
     update_income(
@@ -185,9 +200,11 @@ def edit_income(
         ruc_ci=validated_data["ruc_ci"],
         razon_social=validated_data["razon_social"],
         product_id=validated_data["product_id"],
+        lavanderia_id=validated_data["lavanderia_id"],
     )
 
 
-def remove_income(income_id):
+def remove_income(income_id, lavanderia_id=None):
     """Elimina un ingreso existente."""
-    delete_income(income_id)
+    resolved_lavanderia_id = resolve_lavanderia_id(lavanderia_id, required=True)
+    delete_income(income_id, lavanderia_id=resolved_lavanderia_id)
