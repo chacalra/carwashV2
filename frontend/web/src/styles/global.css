@@ -1,0 +1,377 @@
+/*
+ * Carwash design tokens — derivados del DS Mukusoft.
+ * Tailwind v4 inicializa los tokens con @theme; las clases
+ * `bg-bg-app`, `text-text-primary`, `text-pos`, etc. se generan automáticamente.
+ */
+
+@import "tailwindcss";
+
+/*
+ ---break---
+ */
+
+@custom-variant dark (&:is(.dark *));
+
+/*
+ * Hover sin gate `@media (hover: hover)`.
+ *
+ * Tailwind v4 envuelve `hover:` en `@media (hover: hover)`, lo cual hace
+ * que el efecto no se aplique en navegadores/dispositivos donde la
+ * detección del input primario falla (algunos Firefox + drivers, displays
+ * táctil-capable con mouse, etc.). Para feedback visual crítico (tiles
+ * clickeables, chips de selección) usamos `hover-any:` que aplica el
+ * estilo en cualquier dispositivo con `:hover`.
+ */
+@custom-variant hover-any (&:hover);
+
+/* === Fuentes === */
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Variable.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+/*
+ * Defaults Mukusoft. Definimos primero los hex en `:root` para que el
+ * branding por tenant pueda sobreescribirlos en runtime con
+ * `style.setProperty(--brand-...)`. El bloque `@theme` luego apunta los
+ * tokens de Tailwind a estas vars con `var()` — así las utilidades con
+ * opacity (ej. `bg-brand-mint/10`) usan siempre la versión actual.
+ */
+:root {
+  --brand-deep: #0F4C4C;
+  --brand-sky: #5FB6E5;
+  --brand-mint: #3DA89F;
+}
+
+@theme {
+  /* === Marca (referencial: lee de :root) === */
+  --color-brand-deep: var(--brand-deep);
+  --color-brand-sky: var(--brand-sky);
+  --color-brand-mint: var(--brand-mint);
+
+  /* === Surface === */
+  --color-bg-app: #FAFAF9;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-sunken: #F4F4F2;
+
+  /* === Text === */
+  --color-text-primary: #0A0A0A;
+  --color-text-secondary: #525252;
+  --color-text-tertiary: #737373;
+  --color-text-disabled: #A3A3A3;
+
+  /* === Borders === */
+  --color-border-subtle: #EDEDEA;
+  --color-border-default: #E4E4E0;
+  --color-border-strong: #D4D4D0;
+
+  /* === Accent (referencial: cae a brand-deep, así sigue el branding del tenant) === */
+  --color-accent: var(--brand-deep);
+  --color-accent-hover: #0A3838;
+  --color-accent-soft: color-mix(in oklab, var(--brand-deep) 12%, transparent);
+
+  /* === Estado financiero === */
+  --color-pos: #0E806F;
+  --color-pos-soft: #E6F7F4;
+  --color-pos-fg: #0E806F;
+  --color-neg: #DC2626;
+  --color-neg-soft: #FEF2F2;
+  --color-neg-fg: #DC2626;
+  --color-warn: #D97706;
+  --color-warn-soft: #FFFBEB;
+  --color-warn-fg: #D97706;
+
+  /* === Overlays / glass === */
+  --color-bg-overlay: rgba(255, 255, 255, 0.72);
+
+  /* === Tipografía === */
+  --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "Cascadia Code", monospace;
+
+  /* === Radii === */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* === Sombras (planas, estilo Linear/Vercel) === */
+  --shadow-xs: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 10px 20px -4px rgb(0 0 0 / 0.10), 0 4px 8px -4px rgb(0 0 0 / 0.06);
+  --shadow-glass: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 16px 40px -8px rgb(15 76 76 / 0.18), 0 4px 12px -4px rgb(0 0 0 / 0.10);
+
+  /* === Compat shadcn/ui (mapeo a tokens Mukusoft) === */
+  --color-background: #FAFAF9;
+  --color-foreground: #0A0A0A;
+  --color-card: #FFFFFF;
+  --color-card-foreground: #0A0A0A;
+  --color-popover: #FFFFFF;
+  --color-popover-foreground: #0A0A0A;
+  --color-primary: #0F4C4C;
+  --color-primary-foreground: #FFFFFF;
+  --color-secondary: #F4F4F2;
+  --color-secondary-foreground: #0A0A0A;
+  --color-muted: #F4F4F2;
+  --color-muted-foreground: #525252;
+  --color-accent-foreground: #0F4C4C;
+  --color-destructive: #DC2626;
+  --color-destructive-foreground: #FFFFFF;
+  --color-border: #E4E4E0;
+  --color-input: #E4E4E0;
+  --color-ring: #0F4C4C;
+  /* Chart 1/2/3 siguen el branding (tenant). 4/5 quedan fijos pos/warn. */
+  --color-chart-1: var(--brand-deep);
+  --color-chart-2: var(--brand-sky);
+  --color-chart-3: var(--brand-mint);
+  --color-chart-4: #0E806F;
+  --color-chart-5: #D97706;
+
+  --radius: 0.5rem;
+  --radius-sm-shadcn: calc(var(--radius) - 4px);
+  --radius-md-shadcn: calc(var(--radius) - 2px);
+  --radius-lg-shadcn: var(--radius);
+  --radius-xl-shadcn: calc(var(--radius) + 4px);
+}
+
+/* === Base === */
+html, body {
+  background-color: var(--color-bg-app);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  font-feature-settings: "ss01", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/*
+ * Sutil glow de marca en el fondo. Solo se nota en pantallas grandes;
+ * en una vista densa (dashboard, listados) prácticamente desaparece debajo del contenido.
+ */
+body {
+  background-image:
+    radial-gradient(60rem 40rem at 100% -10%, color-mix(in oklab, var(--color-brand-sky) 7%, transparent), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 100%, color-mix(in oklab, var(--color-brand-deep) 5%, transparent), transparent 55%);
+  background-attachment: fixed;
+}
+
+/* Números financieros con tabular numbers para que columnen prolijos. */
+.font-mono,
+[class*="font-mono"] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* === Animaciones === */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 600ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+}
+
+/* Sombra "premium" para hero cards: combina depth suave con un halo brand. */
+.shadow-elevated {
+  box-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 8px 24px -8px rgb(15 76 76 / 0.10),
+    0 24px 60px -20px rgb(15 76 76 / 0.08);
+}
+
+.shadow-card {
+  box-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 1px 3px 0 rgb(0 0 0 / 0.04);
+}
+
+.shadow-card-hover {
+  box-shadow:
+    0 1px 2px 0 rgb(0 0 0 / 0.04),
+    0 8px 16px -4px rgb(15 76 76 / 0.08),
+    0 4px 8px -4px rgb(0 0 0 / 0.04);
+}
+
+/*
+ * Glow del color medio del branding (var --brand-mint). Usamos color-mix
+ * con transparent para aplicar opacidades sobre la var, así el glow se
+ * adapta automáticamente al color del tenant (mint Mukusoft o el que sea).
+ *
+ * Definidas con `@utility` para que Tailwind las reconozca como utilidades
+ * propias y permita combinarlas con variants (`hover-any:`, `focus-visible:`).
+ */
+@utility shadow-glow-mint {
+  box-shadow:
+    0 0 0 1.5px color-mix(in oklab, var(--brand-mint) 65%, transparent),
+    0 0 24px 0 color-mix(in oklab, var(--brand-mint) 45%, transparent),
+    0 8px 24px -4px color-mix(in oklab, var(--brand-mint) 40%, transparent),
+    0 2px 6px -2px rgb(0 0 0 / 0.08);
+}
+
+@utility shadow-glow-mint-active {
+  box-shadow:
+    0 0 0 1.5px color-mix(in oklab, var(--brand-mint) 85%, transparent),
+    0 0 16px 0 color-mix(in oklab, var(--brand-mint) 40%, transparent),
+    0 4px 14px -2px color-mix(in oklab, var(--brand-mint) 35%, transparent),
+    0 1px 3px -1px rgb(0 0 0 / 0.06);
+}
+
+/* Glow tenue, para hover de chips/segmented que NO son CTA principal. */
+@utility shadow-glow-mint-soft {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--brand-mint) 50%, transparent),
+    0 0 14px 0 color-mix(in oklab, var(--brand-mint) 28%, transparent),
+    0 1px 3px -1px rgb(0 0 0 / 0.06);
+}
+
+.dark .shadow-glow-mint {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--brand-mint) 50%, transparent),
+    0 8px 24px -4px color-mix(in oklab, var(--brand-mint) 40%, transparent),
+    0 2px 6px -2px rgb(0 0 0 / 0.40);
+}
+
+.dark .shadow-glow-mint-active {
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--brand-mint) 70%, transparent),
+    0 6px 16px -2px color-mix(in oklab, var(--brand-mint) 30%, transparent),
+    0 1px 3px -1px rgb(0 0 0 / 0.40);
+}
+
+/*
+ ---break---
+ */
+
+:root {
+  /* Mapeo a tokens Mukusoft */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0A0A0A;
+  --sidebar-primary: #0F4C4C;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F4F4F2;
+  --sidebar-accent-foreground: #0A0A0A;
+  --sidebar-border: #EDEDEA;
+  --sidebar-ring: #0F4C4C;
+}
+
+/*
+ ---break---
+ */
+
+/*
+ * Tema oscuro — paleta del DS (ds-foundations dark) con accent en mint Mukusoft
+ * en lugar del azul genérico, para mantener la marca.
+ * Sobrescribe las custom properties que `@theme` registró: las clases
+ * Tailwind generadas siguen funcionando porque resuelven la var en runtime.
+ */
+.dark {
+  /* Surface */
+  --color-bg-app: #0A0A0A;
+  --color-bg-surface: #141414;
+  --color-bg-sunken: #0F0F0F;
+
+  /* Text */
+  --color-text-primary: #FAFAFA;
+  --color-text-secondary: #A3A3A3;
+  --color-text-tertiary: #737373;
+  --color-text-disabled: #525252;
+
+  /* Borders */
+  --color-border-subtle: #1F1F1F;
+  --color-border-default: #262626;
+  --color-border-strong: #333333;
+
+  /* Accent: mint Mukusoft luminoso sobre fondo oscuro */
+  --color-accent: #3DA89F;
+  --color-accent-hover: #5FB6E5;
+  --color-accent-soft: rgba(61, 168, 159, 0.16);
+
+  /* Estado financiero */
+  --color-pos: #10B981;
+  --color-pos-soft: rgba(16, 185, 129, 0.14);
+  --color-pos-fg: #34D399;
+  --color-neg: #EF4444;
+  --color-neg-soft: rgba(239, 68, 68, 0.14);
+  --color-neg-fg: #F87171;
+  --color-warn: #F59E0B;
+  --color-warn-soft: rgba(245, 158, 11, 0.14);
+  --color-warn-fg: #FBBF24;
+
+  /* Overlay glass más oscuro */
+  --color-bg-overlay: rgba(20, 20, 20, 0.72);
+
+  /* Compat shadcn (mismos tokens en versión dark) */
+  --color-background: #0A0A0A;
+  --color-foreground: #FAFAFA;
+  --color-card: #141414;
+  --color-card-foreground: #FAFAFA;
+  --color-popover: #141414;
+  --color-popover-foreground: #FAFAFA;
+  --color-primary: #3DA89F;
+  --color-primary-foreground: #0A0A0A;
+  --color-secondary: #1F1F1F;
+  --color-secondary-foreground: #FAFAFA;
+  --color-muted: #1F1F1F;
+  --color-muted-foreground: #A3A3A3;
+  --color-accent-foreground: #FAFAFA;
+  --color-destructive: #EF4444;
+  --color-destructive-foreground: #FAFAFA;
+  --color-border: #262626;
+  --color-input: #262626;
+  --color-ring: #3DA89F;
+
+  /* Sidebar coherente con la paleta dark */
+  --sidebar: #141414;
+  --sidebar-foreground: #FAFAFA;
+  --sidebar-primary: #3DA89F;
+  --sidebar-primary-foreground: #0A0A0A;
+  --sidebar-accent: #1F1F1F;
+  --sidebar-accent-foreground: #FAFAFA;
+  --sidebar-border: #1F1F1F;
+  --sidebar-ring: #3DA89F;
+}
+
+/* En dark, el halo radial del body usa los brand más saturados para no perderse. */
+.dark body {
+  background-image:
+    radial-gradient(60rem 40rem at 100% -10%, color-mix(in oklab, var(--color-brand-mint) 10%, transparent), transparent 60%),
+    radial-gradient(50rem 30rem at -10% 100%, color-mix(in oklab, var(--color-brand-deep) 14%, transparent), transparent 55%);
+}
+
+/* Glass shadow ajustado para dark (sin highlight blanco interno). */
+.dark {
+  --shadow-glass: 0 16px 40px -8px rgb(0 0 0 / 0.55), 0 4px 12px -4px rgb(0 0 0 / 0.40);
+}
+
+/*
+ ---break---
+ */
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}

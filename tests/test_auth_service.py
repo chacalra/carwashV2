@@ -3,8 +3,8 @@
 import pytest
 from types import SimpleNamespace
 from unittest.mock import patch
-from utils.security import hash_password
-from services.auth_service import get_allowed_views, login, PERMISSIONS, VIEW_PERMISSIONS
+from backend.utils.security import hash_password
+from backend.services.auth_service import get_allowed_views, login, PERMISSIONS, VIEW_PERMISSIONS
 
 
 # --- get_allowed_views ---
@@ -52,23 +52,23 @@ def test_login_sin_contexto_de_tenant():
 
 def test_login_usuario_no_encontrado():
     fake_tenant = SimpleNamespace(id=1, estado=True)
-    with patch("services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
-        with patch("services.auth_service.get_user_by_name", return_value=None):
+    with patch("backend.services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
+        with patch("backend.services.auth_service.get_user_by_name", return_value=None):
             with pytest.raises(ValueError, match="incorrectos"):
                 login("noexiste", "pass", subdominio="demo")
 
 
 def test_login_lavanderia_inactiva():
     fake_tenant = SimpleNamespace(id=1, estado=False)
-    with patch("services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
+    with patch("backend.services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
         with pytest.raises(ValueError, match="no esta activa"):
             login("admin", "pass", subdominio="demo")
 
 
 def test_login_usuario_no_encontrado_por_host():
     fake_tenant = SimpleNamespace(id=1, estado=True)
-    with patch("services.auth_service.get_tenant_by_host", return_value=fake_tenant):
-        with patch("services.auth_service.get_user_by_name", return_value=None):
+    with patch("backend.services.auth_service.get_tenant_by_host", return_value=fake_tenant):
+        with patch("backend.services.auth_service.get_user_by_name", return_value=None):
             with pytest.raises(ValueError, match="incorrectos"):
                 login("noexiste", "pass", host="demo.mukusoft.com")
 
@@ -79,8 +79,8 @@ def test_login_usuario_inactivo():
         "id": 1, "name": "test", "role": "operador",
         "is_active": 0, "password_hash": "salt:hash"
     }
-    with patch("services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
-        with patch("services.auth_service.get_user_by_name", return_value=fake_user):
+    with patch("backend.services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
+        with patch("backend.services.auth_service.get_user_by_name", return_value=fake_user):
             with pytest.raises(ValueError, match="incorrectos"):
                 login("test", "pass", subdominio="demo")
 
@@ -91,8 +91,8 @@ def test_login_sin_contrasena_configurada():
         "id": 1, "name": "test", "role": "operador",
         "is_active": 1, "password_hash": None
     }
-    with patch("services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
-        with patch("services.auth_service.get_user_by_name", return_value=fake_user):
+    with patch("backend.services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
+        with patch("backend.services.auth_service.get_user_by_name", return_value=fake_user):
             with pytest.raises(ValueError, match="sin contrasena"):
                 login("test", "pass", subdominio="demo")
 
@@ -104,8 +104,8 @@ def test_login_contrasena_incorrecta():
         "id": 1, "name": "admin", "role": "maximo",
         "is_active": 1, "password_hash": pw_hash, "role_id": 7
     }
-    with patch("services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
-        with patch("services.auth_service.get_user_by_name", return_value=fake_user):
+    with patch("backend.services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
+        with patch("backend.services.auth_service.get_user_by_name", return_value=fake_user):
             with pytest.raises(ValueError, match="incorrectos"):
                 login("admin", "incorrecta", subdominio="demo")
 
@@ -117,9 +117,9 @@ def test_login_exitoso():
         "id": 1, "name": "admin", "role": "maximo",
         "is_active": 1, "password_hash": pw_hash, "role_id": 7
     }
-    with patch("services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
-        with patch("services.auth_service.get_user_by_name", return_value=fake_user):
-            with patch("services.auth_service.get_permissions_for_role", return_value=["dashboard", "settings"]):
+    with patch("backend.services.auth_service.get_tenant_by_subdominio", return_value=fake_tenant):
+        with patch("backend.services.auth_service.get_user_by_name", return_value=fake_user):
+            with patch("backend.services.auth_service.get_permissions_for_role", return_value=["dashboard", "settings"]):
                 user, perms = login("admin", "correcta", subdominio="demo")
                 assert user["name"] == "admin"
                 assert "dashboard" in perms

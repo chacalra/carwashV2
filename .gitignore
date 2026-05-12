@@ -10,3 +10,4 @@ data/*.db
 .codex
 
 .DS_Store
+datos/autocare_legacy.db

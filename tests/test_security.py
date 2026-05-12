@@ -1,7 +1,13 @@
 """Tests para utils/security.py."""
 
 import pytest
-from utils.security import hash_password, verify_password
+from backend.utils.security import (
+    TokenError,
+    create_access_token,
+    decode_access_token,
+    hash_password,
+    verify_password,
+)
 
 
 def test_hash_password_formato():
@@ -35,3 +41,30 @@ def test_verify_hash_invalido():
 
 def test_verify_hash_vacio():
     assert verify_password("cualquiera", "") is False
+
+
+def test_create_and_decode_access_token():
+    token, expires_at = create_access_token(
+        user_id=4,
+        lavanderia_id=9,
+        permissions=["dashboard", "register_sale"],
+    )
+
+    payload = decode_access_token(token)
+
+    assert payload["user_id"] == 4
+    assert payload["lavanderia_id"] == 9
+    assert payload["permissions"] == ["dashboard", "register_sale"]
+    assert payload["exp"] == int(expires_at.timestamp())
+
+
+def test_decode_access_token_rejects_tampered_signature():
+    token, _ = create_access_token(
+        user_id=1,
+        lavanderia_id=2,
+        permissions=["dashboard"],
+    )
+    tampered = token[:-1] + ("a" if token[-1] != "a" else "b")
+
+    with pytest.raises(TokenError, match="Token invalido"):
+        decode_access_token(tampered)

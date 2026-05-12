@@ -1,0 +1,10 @@
+---
+import Base from "@/layouts/Base.astro";
+import { LoginForm } from "@/components/auth/LoginForm";
+---
+
+<Base title="Iniciar sesión · Carwash">
+  <main class="flex min-h-screen items-center justify-center px-6 py-10">
+    <LoginForm client:load />
+  </main>
+</Base>

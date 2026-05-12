@@ -1,0 +1,14 @@
+---
+import Base from "@/layouts/Base.astro";
+import { PendingPage } from "@/components/PendingPage";
+---
+
+<Base title="Reportes · Carwash">
+  <PendingPage
+    client:load
+    activeKey="reports"
+    title="Reportes"
+    subtitle="Analítica"
+    iteration={7}
+  />
+</Base>

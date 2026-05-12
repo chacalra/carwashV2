@@ -4,12 +4,12 @@ from decimal import Decimal
 from types import SimpleNamespace
 from unittest.mock import Mock, patch
 
-from repositories.sale_items_repository import (
+from backend.repositories.sale_items_repository import (
     create_sale_item,
     create_sale_items,
     delete_sale_items,
 )
-from repositories.sales_repository import create_sale, delete_sale, update_sale
+from backend.repositories.sales_repository import _group_sales_rows, create_sale, delete_sale, update_sale
 
 
 def test_create_sale_populates_entity_and_flushes():
@@ -150,7 +150,7 @@ def test_delete_sale_items_deletes_all_related_rows():
     existing_items = [SimpleNamespace(id=1), SimpleNamespace(id=2)]
 
     with patch(
-        "repositories.sale_items_repository.list_sale_items",
+        "backend.repositories.sale_items_repository.list_sale_items",
         return_value=existing_items,
     ) as mock_list:
         delete_sale_items(session, 44)
@@ -160,3 +160,73 @@ def test_delete_sale_items_deletes_all_related_rows():
     session.delete.assert_any_call(existing_items[0])
     session.delete.assert_any_call(existing_items[1])
     session.flush.assert_called_once()
+
+
+def test_group_sales_rows_builds_nested_structure():
+    rows = [
+        SimpleNamespace(
+            sale_id=9,
+            date="2026-05-01",
+            created_at=None,
+            payment_type="Contado",
+            payment_method="Efectivo",
+            requires_invoice=False,
+            total=Decimal("62000.00"),
+            notes="Demo",
+            is_active=True,
+            customer_id=4,
+            customer_name="Ana",
+            ruc_ci=None,
+            vehicle_id=7,
+            license_plate="ABC123",
+            vehicle_type_id=1,
+            vehicle_type_name="Auto",
+            created_by_user_id=2,
+            created_by="admin",
+            lavanderia_id=3,
+            item_id=100,
+            service_id=5,
+            product_id=None,
+            item_name="Lavado",
+            quantity=1,
+            unit_price=Decimal("50000.00"),
+            subtotal=Decimal("50000.00"),
+        ),
+        SimpleNamespace(
+            sale_id=9,
+            date="2026-05-01",
+            created_at=None,
+            payment_type="Contado",
+            payment_method="Efectivo",
+            requires_invoice=False,
+            total=Decimal("62000.00"),
+            notes="Demo",
+            is_active=True,
+            customer_id=4,
+            customer_name="Ana",
+            ruc_ci=None,
+            vehicle_id=7,
+            license_plate="ABC123",
+            vehicle_type_id=1,
+            vehicle_type_name="Auto",
+            created_by_user_id=2,
+            created_by="admin",
+            lavanderia_id=3,
+            item_id=101,
+            service_id=None,
+            product_id=8,
+            item_name="Cera",
+            quantity=1,
+            unit_price=Decimal("12000.00"),
+            subtotal=Decimal("12000.00"),
+        ),
+    ]
+
+    grouped = _group_sales_rows(rows)
+
+    assert len(grouped) == 1
+    assert grouped[0]["id"] == 9
+    assert grouped[0]["total"] == 62000.0
+    assert len(grouped[0]["items"]) == 2
+    assert grouped[0]["items"][0]["item_type"] == "Servicio"
+    assert grouped[0]["items"][1]["item_type"] == "Producto"

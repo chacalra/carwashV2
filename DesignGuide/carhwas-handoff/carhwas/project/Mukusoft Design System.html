@@ -1,0 +1,3584 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Mukusoft · Design System</title>
+
+  <!-- Geist + Geist Mono (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      /* ============ SPACING ============ */
+      --s-1: 4px;  --s-2: 8px;  --s-3: 12px; --s-4: 16px;
+      --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
+
+      /* ============ RADII ============ */
+      --r-sm: 6px; --r-md: 8px; --r-lg: 12px; --r-xl: 16px; --r-pill: 999px;
+
+      /* ============ TYPE ============ */
+      --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+      --font-mono: 'Geist Mono', ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+
+    /* ============ LIGHT THEME (default) ============ */
+    .theme-light {
+      --bg-app:        #FAFAF9;   /* canvas */
+      --bg-surface:    #FFFFFF;   /* cards */
+      --bg-sunken:     #F4F4F2;   /* tables, inputs idle */
+      --bg-overlay:    rgba(255,255,255,0.72);
+
+      --border-subtle: #EDEDEA;
+      --border-default:#E4E4E0;
+      --border-strong: #D4D4D0;
+      --border-focus:  #3B82F6;
+
+      --text-primary:  #0A0A0A;
+      --text-secondary:#525252;
+      --text-tertiary: #737373;
+      --text-disabled: #A3A3A3;
+      --text-inverse:  #FAFAF9;
+
+      --accent:        #3B82F6;   /* electric blue */
+      --accent-hover:  #2563EB;
+      --accent-soft:   #EFF6FF;
+      --accent-fg:     #FFFFFF;
+
+      --pos:           #059669;   /* income */
+      --pos-soft:      #ECFDF5;
+      --pos-fg:        #047857;
+
+      --neg:           #DC2626;   /* expense */
+      --neg-soft:      #FEF2F2;
+      --neg-fg:        #B91C1C;
+
+      --warn:          #D97706;
+      --warn-soft:     #FFFBEB;
+      --warn-fg:       #B45309;
+
+      --shadow-xs: 0 1px 2px rgba(10,10,10,0.04);
+      --shadow-sm: 0 1px 3px rgba(10,10,10,0.06), 0 1px 2px rgba(10,10,10,0.04);
+      --shadow-md: 0 4px 12px rgba(10,10,10,0.06), 0 2px 4px rgba(10,10,10,0.04);
+      --shadow-lg: 0 12px 32px rgba(10,10,10,0.08), 0 4px 8px rgba(10,10,10,0.04);
+      --shadow-glass: 0 24px 64px rgba(10,10,10,0.18), 0 8px 16px rgba(10,10,10,0.08);
+    }
+
+    /* ============ DARK THEME ============ */
+    .theme-dark {
+      --bg-app:        #0A0A0A;
+      --bg-surface:    #141414;
+      --bg-sunken:     #0F0F0F;
+      --bg-overlay:    rgba(20,20,20,0.72);
+
+      --border-subtle: #1F1F1F;
+      --border-default:#262626;
+      --border-strong: #333333;
+      --border-focus:  #3B82F6;
+
+      --text-primary:  #FAFAFA;
+      --text-secondary:#A3A3A3;
+      --text-tertiary: #737373;
+      --text-disabled: #525252;
+      --text-inverse:  #0A0A0A;
+
+      --accent:        #3B82F6;
+      --accent-hover:  #60A5FA;
+      --accent-soft:   rgba(59,130,246,0.12);
+      --accent-fg:     #FFFFFF;
+
+      --pos:           #10B981;
+      --pos-soft:      rgba(16,185,129,0.12);
+      --pos-fg:        #34D399;
+
+      --neg:           #EF4444;
+      --neg-soft:      rgba(239,68,68,0.12);
+      --neg-fg:        #F87171;
+
+      --warn:          #F59E0B;
+      --warn-soft:     rgba(245,158,11,0.12);
+      --warn-fg:       #FBBF24;
+
+      --shadow-xs: 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-sm: 0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.3);
+      --shadow-lg: 0 12px 32px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3);
+      --shadow-glass: 0 24px 64px rgba(0,0,0,0.6), 0 8px 16px rgba(0,0,0,0.4);
+    }
+
+    html, body {
+      margin: 0; padding: 0;
+      font-family: var(--font-sans);
+      background: #f0eee9;
+      color: #0A0A0A;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      letter-spacing: -0.01em;
+    }
+    * { box-sizing: border-box; }
+
+    /* utilities used throughout the artboards */
+    .mono { font-family: var(--font-mono); font-feature-settings: "tnum" 1, "ss01" 1; }
+    .num  { font-family: var(--font-mono); font-feature-settings: "tnum" 1; letter-spacing: -0.02em; }
+  </style>
+
+  <!-- React + Babel -->
+  <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react" data-from="design-canvas.jsx">
+
+// DesignCanvas.jsx — Figma-ish design canvas wrapper
+// Warm gray grid bg + Sections + Artboards + PostIt notes.
+// Artboards are reorderable (grip-drag), deletable, labels/titles are
+// inline-editable, and any artboard can be opened in a fullscreen focus
+// overlay (←/→/Esc). State persists to a .design-canvas.state.json sidecar
+// via the host bridge. No assets, no deps.
+//
+// Usage:
+//   <DesignCanvas>
+//     <DCSection id="onboarding" title="Onboarding" subtitle="First-run variants">
+//       <DCArtboard id="a" label="A · Dusk" width={260} height={480}>…</DCArtboard>
+//       <DCArtboard id="b" label="B · Minimal" width={260} height={480}>…</DCArtboard>
+//     </DCSection>
+//   </DesignCanvas>
+
+const DC = {
+  bg: '#f0eee9',
+  grid: 'rgba(0,0,0,0.06)',
+  label: 'rgba(60,50,40,0.7)',
+  title: 'rgba(40,30,20,0.85)',
+  subtitle: 'rgba(60,50,40,0.6)',
+  postitBg: '#fef4a8',
+  postitText: '#5a4a2a',
+  font: '-apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif',
+};
+
+// One-time CSS injection (classes are dc-prefixed so they don't collide with
+// the hosted design's own styles).
+if (typeof document !== 'undefined' && !document.getElementById('dc-styles')) {
+  const s = document.createElement('style');
+  s.id = 'dc-styles';
+  s.textContent = [
+    '.dc-editable{cursor:text;outline:none;white-space:nowrap;border-radius:3px;padding:0 2px;margin:0 -2px}',
+    '.dc-editable:focus{background:#fff;box-shadow:0 0 0 1.5px #c96442}',
+    '[data-dc-slot]{transition:transform .18s cubic-bezier(.2,.7,.3,1)}',
+    '[data-dc-slot].dc-dragging{transition:none;z-index:10;pointer-events:none}',
+    '[data-dc-slot].dc-dragging .dc-card{box-shadow:0 12px 40px rgba(0,0,0,.25),0 0 0 2px #c96442;transform:scale(1.02)}',
+    // isolation:isolate contains artboard content's z-indexes so a
+    // z-indexed child (sticky navbar etc.) can't paint over .dc-header or
+    // the .dc-menu popover that drops into the top of the card.
+    '.dc-card{isolation:isolate;transition:box-shadow .15s,transform .15s}',
+    '.dc-card *{scrollbar-width:none}',
+    '.dc-card *::-webkit-scrollbar{display:none}',
+    // Per-artboard header: grip + label on the left, delete/expand on the
+    // right. Single flex row; when the artboard's on-screen width is too
+    // narrow for both the label yields (ellipsis, then hidden entirely below
+    // ~4ch via the container query) and the buttons stay on the row.
+    '.dc-header{position:absolute;bottom:100%;left:-4px;margin-bottom:calc(4px * var(--dc-inv-zoom,1));z-index:2;',
+    '  display:flex;align-items:center;container-type:inline-size}',
+    '.dc-labelrow{display:flex;align-items:center;gap:4px;height:24px;flex:1 1 auto;min-width:0}',
+    '.dc-grip{flex:0 0 auto;cursor:grab;display:flex;align-items:center;padding:5px 4px;border-radius:4px;transition:background .12s,opacity .12s}',
+    '.dc-grip:hover{background:rgba(0,0,0,.08)}',
+    '.dc-grip:active{cursor:grabbing}',
+    '.dc-labeltext{flex:1 1 auto;min-width:0;cursor:pointer;border-radius:4px;padding:3px 6px;',
+    '  display:flex;align-items:center;transition:background .12s;overflow:hidden}',
+    // Below ~4ch of label room: hide the label entirely, and drop the grip to
+    // hover-only (same reveal rule as .dc-btns) so a narrow header is clean
+    // until the card is moused.
+    '@container (max-width: 110px){',
+    '  .dc-labeltext{display:none}',
+    '  .dc-grip{opacity:0}',
+    '  [data-dc-slot]:hover .dc-grip{opacity:1}',
+    '}',
+    '.dc-labeltext:hover{background:rgba(0,0,0,.05)}',
+    '.dc-labeltext .dc-editable{overflow:hidden;text-overflow:ellipsis;max-width:100%}',
+    '.dc-labeltext .dc-editable:focus{overflow:visible;text-overflow:clip}',
+    '.dc-btns{flex:0 0 auto;margin-left:auto;display:flex;gap:2px;opacity:0;transition:opacity .12s}',
+    '[data-dc-slot]:hover .dc-btns,.dc-btns:has(.dc-menu){opacity:1}',
+    '.dc-expand,.dc-kebab{width:22px;height:22px;border-radius:5px;border:none;cursor:pointer;padding:0;',
+    '  background:transparent;color:rgba(60,50,40,.7);display:flex;align-items:center;justify-content:center;',
+    '  font:inherit;transition:background .12s,color .12s}',
+    '.dc-expand:hover,.dc-kebab:hover{background:rgba(0,0,0,.06);color:#2a251f}',
+    // Slot hosting an open menu floats above later siblings (which otherwise
+    // paint on top — same z-index:auto, later DOM order) so the popup isn't
+    // clipped by the next card.
+    '[data-dc-slot]:has(.dc-menu){z-index:10}',
+    '.dc-menu{position:absolute;top:100%;right:0;margin-top:4px;background:#fff;border-radius:8px;',
+    '  box-shadow:0 8px 28px rgba(0,0,0,.18),0 0 0 1px rgba(0,0,0,.05);padding:4px;min-width:160px;z-index:10}',
+    '.dc-menu button{display:block;width:100%;padding:7px 10px;border:0;background:transparent;',
+    '  border-radius:5px;font-family:inherit;font-size:13px;font-weight:500;line-height:1.2;',
+    '  color:#29261b;cursor:pointer;text-align:left;transition:background .12s;white-space:nowrap}',
+    '.dc-menu button:hover{background:rgba(0,0,0,.05)}',
+    '.dc-menu hr{border:0;border-top:1px solid rgba(0,0,0,.08);margin:4px 2px}',
+    '.dc-menu .dc-danger{color:#c96442}',
+    '.dc-menu .dc-danger:hover{background:rgba(201,100,66,.1)}',
+    // Chrome (titles / labels / buttons) counter-scales against the viewport
+    // zoom so it stays a constant on-screen size. --dc-inv-zoom is set by
+    // DCViewport on every transform update and inherits to all descendants —
+    // any overlay inside the world (e.g. a TweaksPanel on an artboard) can use
+    // it the same way.
+    //
+    // The header uses transform:scale (out-of-flow, so layout impact doesn't
+    // matter) with its world-space width set to card-width / inv-zoom so that
+    // after counter-scaling its on-screen width exactly matches the card's —
+    // that's what lets the container query + text-overflow behave against the
+    // card's visible edge at every zoom level.
+    //
+    // The section head uses CSS zoom instead of transform so its layout box
+    // grows with the counter-scale, pushing the card row down — otherwise the
+    // constant-screen-size title would overflow into the (shrinking) world-
+    // space gap and overlap the artboard headers at low zoom.
+    '.dc-header{width:calc((100% + 4px) / var(--dc-inv-zoom,1));',
+    '  transform:scale(var(--dc-inv-zoom,1));transform-origin:bottom left}',
+    '.dc-sectionhead{zoom:var(--dc-inv-zoom,1)}',
+  ].join('\n');
+  document.head.appendChild(s);
+}
+
+const DCCtx = React.createContext(null);
+
+// ─────────────────────────────────────────────────────────────
+// DesignCanvas — stateful wrapper around the pan/zoom viewport.
+// Owns runtime state (per-section order, renamed titles/labels, hidden
+// artboards, focused artboard). Order/titles/labels/hidden persist to a
+// .design-canvas.state.json
+// sidecar next to the HTML. Reads go via plain fetch() so the saved
+// arrangement is visible anywhere the HTML + sidecar are served together
+// (omelette preview, direct link, downloaded zip). Writes go through the
+// host's window.omelette bridge — editing requires the omelette runtime.
+// Focus is ephemeral.
+// ─────────────────────────────────────────────────────────────
+const DC_STATE_FILE = '.design-canvas.state.json';
+
+function DesignCanvas({ children, minScale, maxScale, style }) {
+  const [state, setState] = React.useState({ sections: {}, focus: null });
+  // Hold rendering until the sidecar read settles so the saved order/titles
+  // appear on first paint (no source-order flash). didRead gates writes until
+  // the read settles so the empty initial state can't clobber a slow read;
+  // skipNextWrite suppresses the one echo-write that would otherwise follow
+  // hydration.
+  const [ready, setReady] = React.useState(false);
+  const didRead = React.useRef(false);
+  const skipNextWrite = React.useRef(false);
+
+  React.useEffect(() => {
+    let off = false;
+    fetch('./' + DC_STATE_FILE)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((saved) => {
+        if (off || !saved || !saved.sections) return;
+        skipNextWrite.current = true;
+        setState((s) => ({ ...s, sections: saved.sections }));
+      })
+      .catch(() => {})
+      .finally(() => { didRead.current = true; if (!off) setReady(true); });
+    const t = setTimeout(() => { if (!off) setReady(true); }, 150);
+    return () => { off = true; clearTimeout(t); };
+  }, []);
+
+  React.useEffect(() => {
+    if (!didRead.current) return;
+    if (skipNextWrite.current) { skipNextWrite.current = false; return; }
+    const t = setTimeout(() => {
+      window.omelette?.writeFile(DC_STATE_FILE, JSON.stringify({ sections: state.sections })).catch(() => {});
+    }, 250);
+    return () => clearTimeout(t);
+  }, [state.sections]);
+
+  // Build registries synchronously from children so FocusOverlay can read
+  // them in the same render. Only direct DCSection > DCArtboard children are
+  // walked — wrapping them in other elements opts out of focus/reorder.
+  const registry = {};     // slotId -> { sectionId, artboard }
+  const sectionMeta = {};  // sectionId -> { title, subtitle, slotIds[] }
+  const sectionOrder = [];
+  React.Children.forEach(children, (sec) => {
+    if (!sec || sec.type !== DCSection) return;
+    const sid = sec.props.id ?? sec.props.title;
+    if (!sid) return;
+    sectionOrder.push(sid);
+    const persisted = state.sections[sid] || {};
+    const abs = [];
+    React.Children.forEach(sec.props.children, (ab) => {
+      if (!ab || ab.type !== DCArtboard) return;
+      const aid = ab.props.id ?? ab.props.label;
+      if (aid) abs.push([aid, ab]);
+    });
+    // hidden is scoped to one source revision — when the agent regenerates
+    // (artboard-ID set changes), prior deletes don't apply to new content.
+    const srcKey = abs.map(([k]) => k).join('\x1f');
+    const hidden = persisted.srcKey === srcKey ? (persisted.hidden || []) : [];
+    const srcIds = [];
+    abs.forEach(([aid, ab]) => {
+      if (hidden.includes(aid)) return;
+      registry[`${sid}/${aid}`] = { sectionId: sid, artboard: ab };
+      srcIds.push(aid);
+    });
+    const kept = (persisted.order || []).filter((k) => srcIds.includes(k));
+    sectionMeta[sid] = {
+      title: persisted.title ?? sec.props.title,
+      subtitle: sec.props.subtitle,
+      slotIds: [...kept, ...srcIds.filter((k) => !kept.includes(k))],
+    };
+  });
+
+  const api = React.useMemo(() => ({
+    state,
+    section: (id) => state.sections[id] || {},
+    patchSection: (id, p) => setState((s) => ({
+      ...s,
+      sections: { ...s.sections, [id]: { ...s.sections[id], ...(typeof p === 'function' ? p(s.sections[id] || {}) : p) } },
+    })),
+    setFocus: (slotId) => setState((s) => ({ ...s, focus: slotId })),
+  }), [state]);
+
+  // Esc exits focus; any outside pointerdown commits an in-progress rename.
+  React.useEffect(() => {
+    const onKey = (e) => { if (e.key === 'Escape') api.setFocus(null); };
+    const onPd = (e) => {
+      const ae = document.activeElement;
+      if (ae && ae.isContentEditable && !ae.contains(e.target)) ae.blur();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onPd, true);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onPd, true);
+    };
+  }, [api]);
+
+  return (
+    <DCCtx.Provider value={api}>
+      <DCViewport minScale={minScale} maxScale={maxScale} style={style}>{ready && children}</DCViewport>
+      {state.focus && registry[state.focus] && (
+        <DCFocusOverlay entry={registry[state.focus]} sectionMeta={sectionMeta} sectionOrder={sectionOrder} />
+      )}
+    </DCCtx.Provider>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// DCViewport — transform-based pan/zoom (internal)
+//
+// Input mapping (Figma-style):
+//   • trackpad pinch  → zoom   (ctrlKey wheel; Safari gesture* events)
+//   • trackpad scroll → pan    (two-finger)
+//   • mouse wheel     → zoom   (notched; distinguished from trackpad scroll)
+//   • middle-drag / primary-drag-on-bg → pan
+//
+// Transform state lives in a ref and is written straight to the DOM
+// (translate3d + will-change) so wheel ticks don't go through React —
+// keeps pans at 60fps on dense canvases.
+// ─────────────────────────────────────────────────────────────
+function DCViewport({ children, minScale = 0.1, maxScale = 8, style = {} }) {
+  const vpRef = React.useRef(null);
+  const worldRef = React.useRef(null);
+  const tf = React.useRef({ x: 0, y: 0, scale: 1 });
+  // Persist viewport across reloads so the user lands back where they were
+  // after an agent edit or browser refresh. The sandbox origin is already
+  // per-project; pathname keeps multiple canvas files in one project apart.
+  const tfKey = 'dc-viewport:' + location.pathname;
+  const saveT = React.useRef(0);
+
+  const lastPostedScale = React.useRef();
+  const apply = React.useCallback(() => {
+    const { x, y, scale } = tf.current;
+    const el = worldRef.current;
+    if (!el) return;
+    el.style.transform = `translate3d(${x}px, ${y}px, 0) scale(${scale})`;
+    // Exposed for zoom-invariant chrome (labels, buttons, TweaksPanel).
+    el.style.setProperty('--dc-inv-zoom', String(1 / scale));
+    // Keep the host toolbar's % readout in sync with the canvas scale. Pan
+    // ticks leave scale unchanged — skip the cross-frame post for those.
+    if (lastPostedScale.current !== scale) {
+      lastPostedScale.current = scale;
+      window.parent.postMessage({ type: '__dc_zoom', scale }, '*');
+    }
+    clearTimeout(saveT.current);
+    saveT.current = setTimeout(() => {
+      try { localStorage.setItem(tfKey, JSON.stringify(tf.current)); } catch {}
+    }, 200);
+  }, [tfKey]);
+
+  React.useLayoutEffect(() => {
+    const flush = () => {
+      clearTimeout(saveT.current);
+      try { localStorage.setItem(tfKey, JSON.stringify(tf.current)); } catch {}
+    };
+    try {
+      const s = JSON.parse(localStorage.getItem(tfKey) || 'null');
+      if (s && Number.isFinite(s.x) && Number.isFinite(s.y) && Number.isFinite(s.scale)) {
+        tf.current = { x: s.x, y: s.y, scale: Math.min(maxScale, Math.max(minScale, s.scale)) };
+        apply();
+      }
+    } catch {}
+    // Flush on pagehide and unmount so a reload within the 200ms debounce
+    // window doesn't drop the last pan/zoom.
+    window.addEventListener('pagehide', flush);
+    return () => { window.removeEventListener('pagehide', flush); flush(); };
+  }, []);
+
+  React.useEffect(() => {
+    const vp = vpRef.current;
+    if (!vp) return;
+
+    const zoomAt = (cx, cy, factor) => {
+      const r = vp.getBoundingClientRect();
+      const px = cx - r.left, py = cy - r.top;
+      const t = tf.current;
+      const next = Math.min(maxScale, Math.max(minScale, t.scale * factor));
+      const k = next / t.scale;
+      // keep the world point under the cursor fixed
+      t.x = px - (px - t.x) * k;
+      t.y = py - (py - t.y) * k;
+      t.scale = next;
+      apply();
+    };
+
+    // Mouse-wheel vs trackpad-scroll heuristic. A physical wheel sends
+    // line-mode deltas (Firefox) or large integer pixel deltas with no X
+    // component (Chrome/Safari, typically multiples of 100/120). Trackpad
+    // two-finger scroll sends small/fractional pixel deltas, often with
+    // non-zero deltaX. ctrlKey is set by the browser for trackpad pinch.
+    const isMouseWheel = (e) =>
+      e.deltaMode !== 0 ||
+      (e.deltaX === 0 && Number.isInteger(e.deltaY) && Math.abs(e.deltaY) >= 40);
+
+    const onWheel = (e) => {
+      e.preventDefault();
+      if (isGesturing) return; // Safari: gesture* owns the pinch — discard concurrent wheels
+      if ((e.ctrlKey || e.metaKey) && !isMouseWheel(e)) {
+        // trackpad pinch, or ctrl/cmd + smooth-scroll mouse. Notched
+        // wheels fall through to the fixed-step branch below.
+        zoomAt(e.clientX, e.clientY, Math.exp(-e.deltaY * 0.01));
+      } else if (isMouseWheel(e)) {
+        // notched mouse wheel — fixed-ratio step per click
+        zoomAt(e.clientX, e.clientY, Math.exp(-Math.sign(e.deltaY) * 0.18));
+      } else {
+        // trackpad two-finger scroll — pan
+        tf.current.x -= e.deltaX;
+        tf.current.y -= e.deltaY;
+        apply();
+      }
+    };
+
+    // Safari sends native gesture* events for trackpad pinch with a smooth
+    // e.scale; preferring these over the ctrl+wheel fallback gives a much
+    // better feel there. No-ops on other browsers. Safari also fires
+    // ctrlKey wheel events during the same pinch — isGesturing makes
+    // onWheel drop those entirely so they neither zoom nor pan.
+    let gsBase = 1;
+    let isGesturing = false;
+    const onGestureStart = (e) => { e.preventDefault(); isGesturing = true; gsBase = tf.current.scale; };
+    const onGestureChange = (e) => {
+      e.preventDefault();
+      zoomAt(e.clientX, e.clientY, (gsBase * e.scale) / tf.current.scale);
+    };
+    const onGestureEnd = (e) => { e.preventDefault(); isGesturing = false; };
+
+    // Drag-pan: middle button anywhere, or primary button on canvas
+    // background (anything that isn't an artboard or an inline editor).
+    let drag = null;
+    const onPointerDown = (e) => {
+      const onBg = !e.target.closest('[data-dc-slot], .dc-editable');
+      if (!(e.button === 1 || (e.button === 0 && onBg))) return;
+      e.preventDefault();
+      vp.setPointerCapture(e.pointerId);
+      drag = { id: e.pointerId, lx: e.clientX, ly: e.clientY };
+      vp.style.cursor = 'grabbing';
+    };
+    const onPointerMove = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      tf.current.x += e.clientX - drag.lx;
+      tf.current.y += e.clientY - drag.ly;
+      drag.lx = e.clientX; drag.ly = e.clientY;
+      apply();
+    };
+    const onPointerUp = (e) => {
+      if (!drag || e.pointerId !== drag.id) return;
+      vp.releasePointerCapture(e.pointerId);
+      drag = null;
+      vp.style.cursor = '';
+    };
+
+    // Host-driven zoom (toolbar % menu). Zooms around viewport centre so the
+    // visible midpoint stays fixed — matching the host's iframe-zoom feel.
+    const onHostMsg = (e) => {
+      const d = e.data;
+      if (d && d.type === '__dc_set_zoom' && typeof d.scale === 'number') {
+        const r = vp.getBoundingClientRect();
+        zoomAt(r.left + r.width / 2, r.top + r.height / 2, d.scale / tf.current.scale);
+      } else if (d && d.type === '__dc_probe') {
+        // Host's [readyGen] reset asks whether a canvas is present; it
+        // fires on the iframe's native 'load', which for canvases with
+        // images/fonts is after our mount-time announce, so re-announce.
+        // Clear the pan-tick guard so apply() re-posts the current scale
+        // even if it's unchanged — the host just reset dcScale to 1.
+        window.parent.postMessage({ type: '__dc_present' }, '*');
+        lastPostedScale.current = undefined;
+        apply();
+      }
+    };
+    window.addEventListener('message', onHostMsg);
+    // Announce canvas mode so the host toolbar proxies its % control here
+    // instead of scaling the iframe element (which would just shrink the
+    // viewport window of an infinite canvas). The apply() that follows emits
+    // the initial __dc_zoom so the toolbar % is correct before first pinch.
+    // lastPostedScale reset mirrors the __dc_probe handler: the layout
+    // effect's restore-path apply() may already have posted the restored
+    // scale (before __dc_present), so clear the guard to re-post it in order.
+    window.parent.postMessage({ type: '__dc_present' }, '*');
+    lastPostedScale.current = undefined;
+    apply();
+
+    vp.addEventListener('wheel', onWheel, { passive: false });
+    vp.addEventListener('gesturestart', onGestureStart, { passive: false });
+    vp.addEventListener('gesturechange', onGestureChange, { passive: false });
+    vp.addEventListener('gestureend', onGestureEnd, { passive: false });
+    vp.addEventListener('pointerdown', onPointerDown);
+    vp.addEventListener('pointermove', onPointerMove);
+    vp.addEventListener('pointerup', onPointerUp);
+    vp.addEventListener('pointercancel', onPointerUp);
+    return () => {
+      window.removeEventListener('message', onHostMsg);
+      vp.removeEventListener('wheel', onWheel);
+      vp.removeEventListener('gesturestart', onGestureStart);
+      vp.removeEventListener('gesturechange', onGestureChange);
+      vp.removeEventListener('gestureend', onGestureEnd);
+      vp.removeEventListener('pointerdown', onPointerDown);
+      vp.removeEventListener('pointermove', onPointerMove);
+      vp.removeEventListener('pointerup', onPointerUp);
+      vp.removeEventListener('pointercancel', onPointerUp);
+    };
+  }, [apply, minScale, maxScale]);
+
+  const gridSvg = `url("data:image/svg+xml,%3Csvg width='120' height='120' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M120 0H0v120' fill='none' stroke='${encodeURIComponent(DC.grid)}' stroke-width='1'/%3E%3C/svg%3E")`;
+  return (
+    <div
+      ref={vpRef}
+      className="design-canvas"
+      style={{
+        height: '100vh', width: '100vw',
+        background: DC.bg,
+        overflow: 'hidden',
+        overscrollBehavior: 'none',
+        touchAction: 'none',
+        position: 'relative',
+        fontFamily: DC.font,
+        boxSizing: 'border-box',
+        ...style,
+      }}
+    >
+      <div
+        ref={worldRef}
+        style={{
+          position: 'absolute', top: 0, left: 0,
+          transformOrigin: '0 0',
+          willChange: 'transform',
+          width: 'max-content', minWidth: '100%',
+          minHeight: '100%',
+          padding: '60px 0 80px',
+        }}
+      >
+        <div style={{ position: 'absolute', inset: -6000, backgroundImage: gridSvg, backgroundSize: '120px 120px', pointerEvents: 'none', zIndex: -1 }} />
+        {children}
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// DCSection — editable title + h-row of artboards in persisted order
+// ─────────────────────────────────────────────────────────────
+function DCSection({ id, title, subtitle, children, gap = 48 }) {
+  const ctx = React.useContext(DCCtx);
+  const sid = id ?? title;
+  const all = React.Children.toArray(children);
+  const artboards = all.filter((c) => c && c.type === DCArtboard);
+  const rest = all.filter((c) => !(c && c.type === DCArtboard));
+  const sec = (ctx && sid && ctx.section(sid)) || {};
+  // Must match DesignCanvas's srcKey computation exactly (it filters falsy
+  // IDs), or onDelete persists a srcKey that DesignCanvas never recognizes.
+  const allIds = artboards.map((a) => a.props.id ?? a.props.label).filter(Boolean);
+  const srcKey = allIds.join('\x1f');
+  const hidden = sec.srcKey === srcKey ? (sec.hidden || []) : [];
+  const srcOrder = allIds.filter((k) => !hidden.includes(k));
+
+  const order = React.useMemo(() => {
+    const kept = (sec.order || []).filter((k) => srcOrder.includes(k));
+    return [...kept, ...srcOrder.filter((k) => !kept.includes(k))];
+  }, [sec.order, srcOrder.join('|')]);
+
+  const byId = Object.fromEntries(artboards.map((a) => [a.props.id ?? a.props.label, a]));
+
+  // marginBottom counter-scales so the on-screen gap between sections stays
+  // constant — otherwise at low zoom the (world-space) gap collapses while
+  // the screen-constant sectionhead below it doesn't, and the title reads as
+  // belonging to the section above. paddingBottom below is just enough for
+  // the 24px artboard-header (abs-positioned above each card) plus ~8px, so
+  // the title sits tight against its own row at every zoom.
+  return (
+    <div data-dc-section={sid}
+      style={{ marginBottom: 'calc(80px * var(--dc-inv-zoom, 1))', position: 'relative' }}>
+      <div style={{ padding: '0 60px' }}>
+        <div className="dc-sectionhead" style={{ paddingBottom: 36 }}>
+          <DCEditable tag="div" value={sec.title ?? title}
+            onChange={(v) => ctx && sid && ctx.patchSection(sid, { title: v })}
+            style={{ fontSize: 28, fontWeight: 600, color: DC.title, letterSpacing: -0.4, marginBottom: 6, display: 'inline-block' }} />
+          {subtitle && <div style={{ fontSize: 16, color: DC.subtitle }}>{subtitle}</div>}
+        </div>
+      </div>
+      <div style={{ display: 'flex', gap, padding: '0 60px', alignItems: 'flex-start', width: 'max-content' }}>
+        {order.map((k) => (
+          <DCArtboardFrame key={k} sectionId={sid} artboard={byId[k]} order={order}
+            label={(sec.labels || {})[k] ?? byId[k].props.label}
+            onRename={(v) => ctx && ctx.patchSection(sid, (x) => ({ labels: { ...x.labels, [k]: v } }))}
+            onReorder={(next) => ctx && ctx.patchSection(sid, { order: next })}
+            onDelete={() => ctx && ctx.patchSection(sid, (x) => ({
+              hidden: [...(x.srcKey === srcKey ? (x.hidden || []) : []), k],
+              srcKey,
+            }))}
+            onFocus={() => ctx && ctx.setFocus(`${sid}/${k}`)} />
+        ))}
+      </div>
+      {rest}
+    </div>
+  );
+}
+
+// DCArtboard — marker; rendered by DCArtboardFrame via DCSection.
+function DCArtboard() { return null; }
+
+// Per-artboard export (kind: 'png' | 'html'). Both paths share the same
+// self-contained clone: computed styles baked in, @font-face / <img> /
+// inline-style background-image urls inlined as data URIs. PNG wraps the
+// clone in foreignObject→canvas at 3× the artboard's natural width×height
+// (same pipeline the host uses for page captures); HTML wraps it in a
+// minimal standalone document. Both are independent of viewport zoom.
+async function dcExport(node, w, h, name, kind) {
+  try { await document.fonts.ready; } catch {}
+  const toDataURL = (url) => fetch(url).then((r) => r.blob()).then((b) => new Promise((res) => {
+    const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = () => res(url); fr.readAsDataURL(b);
+  })).catch(() => url);
+
+  // Collect @font-face rules. ss.cssRules throws SecurityError on
+  // cross-origin sheets (e.g. fonts.googleapis.com) — in that case fetch
+  // the CSS text directly (those endpoints send ACAO:*) and regex-extract
+  // the blocks. @import and @media/@supports are walked so nested
+  // @font-face rules aren't missed.
+  const fontRules = [], pending = [], seen = new Set();
+  const scrapeCss = (href) => {
+    if (seen.has(href)) return; seen.add(href);
+    pending.push(fetch(href).then((r) => r.text()).then((css) => {
+      for (const m of css.match(/@font-face\s*{[^}]*}/g) || []) fontRules.push({ css: m, base: href });
+      for (const m of css.matchAll(/@import\s+(?:url\()?['"]?([^'")\s;]+)/g))
+        scrapeCss(new URL(m[1], href).href);
+    }).catch(() => {}));
+  };
+  const walk = (rules, base) => {
+    for (const r of rules) {
+      if (r.type === CSSRule.FONT_FACE_RULE) fontRules.push({ css: r.cssText, base });
+      else if (r.type === CSSRule.IMPORT_RULE && r.styleSheet) {
+        const ibase = r.styleSheet.href || base;
+        try { walk(r.styleSheet.cssRules, ibase); } catch { scrapeCss(ibase); }
+      } else if (r.cssRules) walk(r.cssRules, base);
+    }
+  };
+  for (const ss of document.styleSheets) {
+    const base = ss.href || location.href;
+    try { walk(ss.cssRules, base); } catch { if (ss.href) scrapeCss(ss.href); }
+  }
+  while (pending.length) await pending.shift();
+  const fontCss = (await Promise.all(fontRules.map(async (rule) => {
+    let out = rule.css, m; const re = /url\((['"]?)([^'")]+)\1\)/g;
+    while ((m = re.exec(rule.css))) {
+      if (m[2].indexOf('data:') === 0) continue;
+      let abs; try { abs = new URL(m[2], rule.base).href; } catch { continue; }
+      out = out.split(m[0]).join('url("' + await toDataURL(abs) + '")');
+    }
+    return out;
+  }))).join('\n');
+
+  const cloneStyled = (src) => {
+    if (src.nodeType === 8 || (src.nodeType === 1 && src.tagName === 'SCRIPT')) return document.createTextNode('');
+    const dst = src.cloneNode(false);
+    if (src.nodeType === 1) {
+      const cs = getComputedStyle(src); let txt = '';
+      for (let i = 0; i < cs.length; i++) txt += cs[i] + ':' + cs.getPropertyValue(cs[i]) + ';';
+      dst.setAttribute('style', txt + 'animation:none;transition:none;');
+      if (src.tagName === 'CANVAS') try { const im = document.createElement('img'); im.src = src.toDataURL(); im.setAttribute('style', txt); return im; } catch {}
+    }
+    for (let c = src.firstChild; c; c = c.nextSibling) dst.appendChild(cloneStyled(c));
+    return dst;
+  };
+  const clone = cloneStyled(node);
+  clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+  // Drop the card's own shadow/radius so the export is a flush w×h rect;
+  // the artboard's own background (if any) is already in the computed style.
+  clone.style.boxShadow = 'none'; clone.style.borderRadius = '0';
+
+  const jobs = [];
+  clone.querySelectorAll('img').forEach((el) => {
+    const s = el.getAttribute('src');
+    if (s && s.indexOf('data:') !== 0) jobs.push(toDataURL(el.src).then((d) => el.setAttribute('src', d)));
+  });
+  [clone, ...clone.querySelectorAll('*')].forEach((el) => {
+    const bg = el.style.backgroundImage; if (!bg) return;
+    let m; const re = /url\(["']?([^"')]+)["']?\)/g;
+    while ((m = re.exec(bg))) {
+      const tok = m[0], url = m[1];
+      if (url.indexOf('data:') === 0) continue;
+      jobs.push(toDataURL(url).then((d) => { el.style.backgroundImage = el.style.backgroundImage.split(tok).join('url("' + d + '")'); }));
+    }
+  });
+  await Promise.all(jobs);
+
+  const xml = new XMLSerializer().serializeToString(clone);
+  const save = (blob, ext) => {
+    if (!blob) return;
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob); a.download = name + '.' + ext; a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  };
+
+  if (kind === 'html') {
+    const html = '<!doctype html><html><head><meta charset="utf-8"><title>' + name + '</title>' +
+      (fontCss ? '<style>' + fontCss + '</style>' : '') +
+      '</head><body style="margin:0">' + xml + '</body></html>';
+    return save(new Blob([html], { type: 'text/html' }), 'html');
+  }
+
+  // PNG: the SVG's own width/height must be the output resolution — an
+  // <img>-loaded SVG rasterizes at its intrinsic size, so sizing it at 1×
+  // and ctx.scale()-ing up would just upscale a 1× bitmap. viewBox maps the
+  // w×h foreignObject onto the px·w × px·h SVG canvas so the browser renders
+  // the HTML at full resolution.
+  const px = 3;
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w * px + '" height="' + h * px +
+    '" viewBox="0 0 ' + w + ' ' + h + '"><foreignObject width="' + w + '" height="' + h + '">' +
+    (fontCss ? '<style><![CDATA[' + fontCss + ']]></style>' : '') + xml + '</foreignObject></svg>';
+  const img = new Image();
+  await new Promise((res, rej) => {
+    img.onload = res; img.onerror = () => rej(new Error('svg load failed'));
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  });
+  const cv = document.createElement('canvas');
+  cv.width = w * px; cv.height = h * px;
+  cv.getContext('2d').drawImage(img, 0, 0);
+  cv.toBlob((blob) => save(blob, 'png'), 'image/png');
+}
+
+function DCArtboardFrame({ sectionId, artboard, label, order, onRename, onReorder, onFocus, onDelete }) {
+  const { id: rawId, label: rawLabel, width = 260, height = 480, children, style = {} } = artboard.props;
+  const id = rawId ?? rawLabel;
+  const ref = React.useRef(null);
+  const cardRef = React.useRef(null);
+  const menuRef = React.useRef(null);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+  const [confirming, setConfirming] = React.useState(false);
+
+  // ⋯ menu: close on any outside pointerdown. Two-click delete lives inside
+  // the menu — first click arms the row, second commits; closing disarms.
+  React.useEffect(() => {
+    if (!menuOpen) { setConfirming(false); return; }
+    const off = (e) => { if (!menuRef.current || !menuRef.current.contains(e.target)) setMenuOpen(false); };
+    document.addEventListener('pointerdown', off, true);
+    return () => document.removeEventListener('pointerdown', off, true);
+  }, [menuOpen]);
+
+  const doExport = (kind) => {
+    setMenuOpen(false);
+    if (!cardRef.current) return;
+    const name = String(label || id || 'artboard').replace(/[^\w\s.-]+/g, '_');
+    dcExport(cardRef.current, width, height, name, kind)
+      .catch((e) => console.error('[design-canvas] export failed:', e));
+  };
+
+  // Live drag-reorder: dragged card sticks to cursor; siblings slide into
+  // their would-be slots in real time via transforms. DOM order only
+  // changes on drop.
+  const onGripDown = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const me = ref.current;
+    // translateX is applied in local (pre-scale) space but pointer deltas and
+    // getBoundingClientRect().left are screen-space — divide by the viewport's
+    // current scale so the dragged card tracks the cursor at any zoom level.
+    const scale = me.getBoundingClientRect().width / me.offsetWidth || 1;
+    const peers = Array.from(document.querySelectorAll(`[data-dc-section="${sectionId}"] [data-dc-slot]`));
+    const homes = peers.map((el) => ({ el, id: el.dataset.dcSlot, x: el.getBoundingClientRect().left }));
+    const slotXs = homes.map((h) => h.x);
+    const startIdx = order.indexOf(id);
+    const startX = e.clientX;
+    let liveOrder = order.slice();
+    me.classList.add('dc-dragging');
+
+    const layout = () => {
+      for (const h of homes) {
+        if (h.id === id) continue;
+        const slot = liveOrder.indexOf(h.id);
+        h.el.style.transform = `translateX(${(slotXs[slot] - h.x) / scale}px)`;
+      }
+    };
+
+    const move = (ev) => {
+      const dx = ev.clientX - startX;
+      me.style.transform = `translateX(${dx / scale}px)`;
+      const cur = homes[startIdx].x + dx;
+      let nearest = 0, best = Infinity;
+      for (let i = 0; i < slotXs.length; i++) {
+        const d = Math.abs(slotXs[i] - cur);
+        if (d < best) { best = d; nearest = i; }
+      }
+      if (liveOrder.indexOf(id) !== nearest) {
+        liveOrder = order.filter((k) => k !== id);
+        liveOrder.splice(nearest, 0, id);
+        layout();
+      }
+    };
+
+    const up = () => {
+      document.removeEventListener('pointermove', move);
+      document.removeEventListener('pointerup', up);
+      const finalSlot = liveOrder.indexOf(id);
+      me.classList.remove('dc-dragging');
+      me.style.transform = `translateX(${(slotXs[finalSlot] - homes[startIdx].x) / scale}px)`;
+      // After the settle transition, kill transitions + clear transforms +
+      // commit the reorder in the same frame so there's no visual snap-back.
+      setTimeout(() => {
+        for (const h of homes) { h.el.style.transition = 'none'; h.el.style.transform = ''; }
+        if (liveOrder.join('|') !== order.join('|')) onReorder(liveOrder);
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          for (const h of homes) h.el.style.transition = '';
+        }));
+      }, 180);
+    };
+    document.addEventListener('pointermove', move);
+    document.addEventListener('pointerup', up);
+  };
+
+  return (
+    <div ref={ref} data-dc-slot={id} style={{ position: 'relative', flexShrink: 0 }}>
+      <div className="dc-header" style={{ color: DC.label }} onPointerDown={(e) => e.stopPropagation()}>
+        <div className="dc-labelrow">
+          <div className="dc-grip" onPointerDown={onGripDown} title="Drag to reorder">
+            <svg width="9" height="13" viewBox="0 0 9 13" fill="currentColor"><circle cx="2" cy="2" r="1.1"/><circle cx="7" cy="2" r="1.1"/><circle cx="2" cy="6.5" r="1.1"/><circle cx="7" cy="6.5" r="1.1"/><circle cx="2" cy="11" r="1.1"/><circle cx="7" cy="11" r="1.1"/></svg>
+          </div>
+          <div className="dc-labeltext" onClick={onFocus} title="Click to focus">
+            <DCEditable value={label} onChange={onRename} onClick={(e) => e.stopPropagation()}
+              style={{ fontSize: 15, fontWeight: 500, color: DC.label, lineHeight: 1 }} />
+          </div>
+        </div>
+        <div className="dc-btns">
+          <div ref={menuRef} style={{ position: 'relative' }}>
+            <button className="dc-kebab" title="More" onClick={() => setMenuOpen((o) => !o)}>
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><circle cx="2.5" cy="6" r="1.1"/><circle cx="6" cy="6" r="1.1"/><circle cx="9.5" cy="6" r="1.1"/></svg>
+            </button>
+            {menuOpen && (
+              <div className="dc-menu" onPointerDown={(e) => e.stopPropagation()}>
+                <button onClick={() => doExport('png')}>Download PNG</button>
+                <button onClick={() => doExport('html')}>Download HTML</button>
+                <hr />
+                <button className="dc-danger"
+                  onClick={() => { if (confirming) { setMenuOpen(false); onDelete(); } else setConfirming(true); }}>
+                  {confirming ? 'Click again to delete' : 'Delete'}
+                </button>
+              </div>
+            )}
+          </div>
+          <button className="dc-expand" onClick={onFocus} title="Focus">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"><path d="M7 1h4v4M5 11H1V7M11 1L7.5 4.5M1 11l3.5-3.5"/></svg>
+          </button>
+        </div>
+      </div>
+      <div ref={cardRef} className="dc-card"
+        style={{ borderRadius: 2, boxShadow: '0 1px 3px rgba(0,0,0,.08),0 4px 16px rgba(0,0,0,.06)', overflow: 'hidden', width, height, background: '#fff', ...style }}>
+        {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb', fontSize: 13, fontFamily: DC.font }}>{id}</div>}
+      </div>
+    </div>
+  );
+}
+
+// Inline rename — commits on blur or Enter.
+function DCEditable({ value, onChange, style, tag = 'span', onClick }) {
+  const T = tag;
+  return (
+    <T className="dc-editable" contentEditable suppressContentEditableWarning
+      onClick={onClick}
+      onPointerDown={(e) => e.stopPropagation()}
+      onBlur={(e) => onChange && onChange(e.currentTarget.textContent)}
+      onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); e.currentTarget.blur(); } }}
+      style={style}>{value}</T>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Focus mode — overlay one artboard; ←/→ within section, ↑/↓ across
+// sections, Esc or backdrop click to exit.
+// ─────────────────────────────────────────────────────────────
+function DCFocusOverlay({ entry, sectionMeta, sectionOrder }) {
+  const ctx = React.useContext(DCCtx);
+  const { sectionId, artboard } = entry;
+  const sec = ctx.section(sectionId);
+  const meta = sectionMeta[sectionId];
+  const peers = meta.slotIds;
+  const aid = artboard.props.id ?? artboard.props.label;
+  const idx = peers.indexOf(aid);
+  const secIdx = sectionOrder.indexOf(sectionId);
+
+  const go = (d) => { const n = peers[(idx + d + peers.length) % peers.length]; if (n) ctx.setFocus(`${sectionId}/${n}`); };
+  const goSection = (d) => {
+    // Sections whose artboards are all deleted have slotIds:[] — step past
+    // them to the next non-empty section so ↑/↓ doesn't dead-end.
+    const n = sectionOrder.length;
+    for (let i = 1; i < n; i++) {
+      const ns = sectionOrder[(((secIdx + d * i) % n) + n) % n];
+      const first = sectionMeta[ns] && sectionMeta[ns].slotIds[0];
+      if (first) { ctx.setFocus(`${ns}/${first}`); return; }
+    }
+  };
+
+  React.useEffect(() => {
+    const k = (e) => {
+      if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
+      if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
+      if (e.key === 'ArrowUp') { e.preventDefault(); goSection(-1); }
+      if (e.key === 'ArrowDown') { e.preventDefault(); goSection(1); }
+    };
+    document.addEventListener('keydown', k);
+    return () => document.removeEventListener('keydown', k);
+  });
+
+  const { width = 260, height = 480, children } = artboard.props;
+  const [vp, setVp] = React.useState({ w: window.innerWidth, h: window.innerHeight });
+  React.useEffect(() => { const r = () => setVp({ w: window.innerWidth, h: window.innerHeight }); window.addEventListener('resize', r); return () => window.removeEventListener('resize', r); }, []);
+  const scale = Math.max(0.1, Math.min((vp.w - 200) / width, (vp.h - 260) / height, 2));
+
+  const [ddOpen, setDd] = React.useState(false);
+  const Arrow = ({ dir, onClick }) => (
+    <button onClick={(e) => { e.stopPropagation(); onClick(); }}
+      style={{ position: 'absolute', top: '50%', [dir]: 28, transform: 'translateY(-50%)',
+        border: 'none', background: 'rgba(255,255,255,.08)', color: 'rgba(255,255,255,.9)',
+        width: 44, height: 44, borderRadius: 22, fontSize: 18, cursor: 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background .15s' }}
+      onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.18)')}
+      onMouseLeave={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.08)')}>
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+        <path d={dir === 'left' ? 'M11 3L5 9l6 6' : 'M7 3l6 6-6 6'} /></svg>
+    </button>
+  );
+
+  // Portal to body so position:fixed is the real viewport regardless of any
+  // transform on DesignCanvas's ancestors (including the canvas zoom itself).
+  return ReactDOM.createPortal(
+    <div onClick={() => ctx.setFocus(null)}
+      onWheel={(e) => e.preventDefault()}
+      style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(24,20,16,.6)', backdropFilter: 'blur(14px)',
+        fontFamily: DC.font, color: '#fff' }}>
+
+      {/* top bar: section dropdown (left) · close (right) */}
+      <div onClick={(e) => e.stopPropagation()}
+        style={{ position: 'absolute', top: 0, left: 0, right: 0, height: 72, display: 'flex', alignItems: 'flex-start', padding: '16px 20px 0', gap: 16 }}>
+        <div style={{ position: 'relative' }}>
+          <button onClick={() => setDd((o) => !o)}
+            style={{ border: 'none', background: 'transparent', color: '#fff', cursor: 'pointer', padding: '6px 8px',
+              borderRadius: 6, textAlign: 'left', fontFamily: 'inherit' }}>
+            <span style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <span style={{ fontSize: 18, fontWeight: 600, letterSpacing: -0.3 }}>{meta.title}</span>
+              <svg width="11" height="11" viewBox="0 0 11 11" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" style={{ opacity: .7 }}><path d="M2 4l3.5 3.5L9 4"/></svg>
+            </span>
+            {meta.subtitle && <span style={{ display: 'block', fontSize: 13, opacity: .6, fontWeight: 400, marginTop: 2 }}>{meta.subtitle}</span>}
+          </button>
+          {ddOpen && (
+            <div style={{ position: 'absolute', top: '100%', left: 0, marginTop: 4, background: '#2a251f', borderRadius: 8,
+              boxShadow: '0 8px 32px rgba(0,0,0,.4)', padding: 4, minWidth: 200, zIndex: 10 }}>
+              {sectionOrder.filter((sid) => sectionMeta[sid].slotIds.length).map((sid) => (
+                <button key={sid} onClick={() => { setDd(false); const f = sectionMeta[sid].slotIds[0]; if (f) ctx.setFocus(`${sid}/${f}`); }}
+                  style={{ display: 'block', width: '100%', textAlign: 'left', border: 'none', cursor: 'pointer',
+                    background: sid === sectionId ? 'rgba(255,255,255,.1)' : 'transparent', color: '#fff',
+                    padding: '8px 12px', borderRadius: 5, fontSize: 14, fontWeight: sid === sectionId ? 600 : 400, fontFamily: 'inherit' }}>
+                  {sectionMeta[sid].title}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <div style={{ flex: 1 }} />
+        <button onClick={() => ctx.setFocus(null)}
+          onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,.12)')}
+          onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+          style={{ border: 'none', background: 'transparent', color: 'rgba(255,255,255,.7)', width: 32, height: 32,
+            borderRadius: 16, fontSize: 20, cursor: 'pointer', lineHeight: 1, transition: 'background .12s' }}>×</button>
+      </div>
+
+      {/* card centered, label + index below — only the card itself stops
+          propagation so any backdrop click (including the margins around
+          the card) exits focus */}
+      <div
+        style={{ position: 'absolute', top: 64, bottom: 56, left: 100, right: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 16 }}>
+        <div onClick={(e) => e.stopPropagation()} style={{ width: width * scale, height: height * scale, position: 'relative' }}>
+          <div style={{ width, height, transform: `scale(${scale})`, transformOrigin: 'top left', background: '#fff', borderRadius: 2, overflow: 'hidden',
+            boxShadow: '0 20px 80px rgba(0,0,0,.4)' }}>
+            {children || <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bbb' }}>{aid}</div>}
+          </div>
+        </div>
+        <div onClick={(e) => e.stopPropagation()} style={{ fontSize: 14, fontWeight: 500, opacity: .85, textAlign: 'center' }}>
+          {(sec.labels || {})[aid] ?? artboard.props.label}
+          <span style={{ opacity: .5, marginLeft: 10, fontVariantNumeric: 'tabular-nums' }}>{idx + 1} / {peers.length}</span>
+        </div>
+      </div>
+
+      <Arrow dir="left" onClick={() => go(-1)} />
+      <Arrow dir="right" onClick={() => go(1)} />
+
+      {/* dots */}
+      <div onClick={(e) => e.stopPropagation()}
+        style={{ position: 'absolute', bottom: 20, left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: 8 }}>
+        {peers.map((p, i) => (
+          <button key={p} onClick={() => ctx.setFocus(`${sectionId}/${p}`)}
+            style={{ border: 'none', padding: 0, cursor: 'pointer', width: 6, height: 6, borderRadius: 3,
+              background: i === idx ? '#fff' : 'rgba(255,255,255,.3)' }} />
+        ))}
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// Post-it — absolute-positioned sticky note
+// ─────────────────────────────────────────────────────────────
+function DCPostIt({ children, top, left, right, bottom, rotate = -2, width = 180 }) {
+  return (
+    <div style={{
+      position: 'absolute', top, left, right, bottom, width,
+      background: DC.postitBg, padding: '14px 16px',
+      fontFamily: '"Comic Sans MS", "Marker Felt", "Segoe Print", cursive',
+      fontSize: 14, lineHeight: 1.4, color: DC.postitText,
+      boxShadow: '0 2px 8px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.08)',
+      transform: `rotate(${rotate}deg)`,
+      zIndex: 5,
+    }}>{children}</div>
+  );
+}
+
+Object.assign(window, { DesignCanvas, DCSection, DCArtboard, DCPostIt });
+
+
+</script>
+
+<script type="text/babel" data-presets="react" data-from="ds-primitives.jsx">
+// ds-primitives.jsx — atoms shared across DS artboards.
+// Every component reads from CSS vars so the same JSX renders correctly
+// inside .theme-light and .theme-dark wrappers.
+
+// ============== ICONS ==============
+// Stroke-only line icons, 1.5px, 20px viewBox. Lucide-style. Original.
+const Icon = ({ name, size = 18, stroke = 1.6, color = 'currentColor' }) => {
+  const paths = {
+    dashboard: <><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></>,
+    cash:      <><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v6M18 9v6"/></>,
+    arrow_in:  <><path d="M12 5v14M5 12l7 7 7-7"/></>,
+    arrow_out: <><path d="M12 19V5M5 12l7-7 7 7"/></>,
+    list:      <><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3.5" cy="6" r="1"/><circle cx="3.5" cy="12" r="1"/><circle cx="3.5" cy="18" r="1"/></>,
+    chart:     <><path d="M3 3v18h18"/><path d="M7 14l4-4 3 3 5-6"/></>,
+    settings:  <><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></>,
+    search:    <><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></>,
+    plus:      <><path d="M12 5v14M5 12h14"/></>,
+    bell:      <><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></>,
+    download:  <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></>,
+    filter:    <><path d="M3 4h18l-7 9v6l-4-2v-4z"/></>,
+    calendar:  <><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></>,
+    car:       <><path d="M5 17h14M5 17a2 2 0 0 1-2-2v-3l2-5a2 2 0 0 1 2-1h10a2 2 0 0 1 2 1l2 5v3a2 2 0 0 1-2 2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/></>,
+    droplet:   <><path d="M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11Z"/></>,
+    user:      <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></>,
+    check:     <><path d="m5 12 5 5L20 7"/></>,
+    x:         <><path d="m6 6 12 12M18 6 6 18"/></>,
+    chevron_down: <><path d="m6 9 6 6 6-6"/></>,
+    chevron_right: <><path d="m9 6 6 6-6 6"/></>,
+    arrow_right: <><path d="M5 12h14M13 5l7 7-7 7"/></>,
+    more:      <><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></>,
+    lock:      <><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></>,
+    unlock:    <><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7-2"/></>,
+    inbox:     <><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11Z"/></>,
+    receipt:   <><path d="M4 2v20l3-2 3 2 3-2 3 2 3-2 1 2V2"/><path d="M8 7h8M8 11h8M8 15h5"/></>,
+    sparkle:   <><path d="M12 3v6M12 15v6M3 12h6M15 12h6M5.6 5.6l4.2 4.2M14.2 14.2l4.2 4.2M5.6 18.4l4.2-4.2M14.2 9.8l4.2-4.2"/></>,
+    upload:    <><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></>,
+    print:     <><path d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8" rx="1"/></>,
+  };
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24"
+         fill="none" stroke={color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round"
+         style={{ flex: '0 0 auto', display: 'block' }}>
+      {paths[name] || <circle cx="12" cy="12" r="9"/>}
+    </svg>
+  );
+};
+
+// ============== FORMAT ==============
+// Paraguay convention: thousands with '.', no decimals.
+const fmtPYG = (n, { sign = false } = {}) => {
+  const abs = Math.abs(Math.round(n)).toLocaleString('de-DE');
+  if (sign && n > 0) return '+ Gs. ' + abs;
+  if (sign && n < 0) return '− Gs. ' + abs;
+  return 'Gs. ' + abs;
+};
+
+// ============== BUTTON ==============
+const Button = ({ variant = 'primary', size = 'md', children, leading, trailing, full, style, ...rest }) => {
+  const base = {
+    fontFamily: 'inherit', fontWeight: 500, letterSpacing: '-0.01em',
+    border: '1px solid transparent', cursor: 'pointer',
+    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+    gap: 'var(--s-2)', whiteSpace: 'nowrap',
+    transition: 'background .12s ease, border-color .12s ease, box-shadow .12s ease, color .12s ease',
+    width: full ? '100%' : 'auto',
+  };
+  const sizes = {
+    sm: { height: 30, padding: '0 12px', fontSize: 13, borderRadius: 'var(--r-md)' },
+    md: { height: 36, padding: '0 14px', fontSize: 14, borderRadius: 'var(--r-md)' },
+    lg: { height: 44, padding: '0 18px', fontSize: 15, borderRadius: 'var(--r-md)' },
+  };
+  const variants = {
+    primary: {
+      background: 'var(--accent)', color: 'var(--accent-fg)',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), var(--shadow-xs)',
+    },
+    secondary: {
+      background: 'var(--bg-surface)', color: 'var(--text-primary)',
+      borderColor: 'var(--border-default)', boxShadow: 'var(--shadow-xs)',
+    },
+    ghost: {
+      background: 'transparent', color: 'var(--text-secondary)',
+    },
+    danger: {
+      background: 'var(--bg-surface)', color: 'var(--neg-fg)',
+      borderColor: 'var(--border-default)',
+    },
+    success: {
+      background: 'var(--pos)', color: '#fff',
+      boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), var(--shadow-xs)',
+    },
+  };
+  return (
+    <button {...rest} style={{ ...base, ...sizes[size], ...variants[variant], ...style }}>
+      {leading}{children}{trailing}
+    </button>
+  );
+};
+
+// ============== INPUT ==============
+const Input = ({ label, hint, value, placeholder, leading, trailing, style, prefix, suffix, error, ...rest }) => (
+  <label style={{ display: 'flex', flexDirection: 'column', gap: 6, ...style }}>
+    {label && (
+      <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', letterSpacing: 0 }}>
+        {label}
+      </span>
+    )}
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 8,
+      height: 38, padding: '0 12px',
+      background: 'var(--bg-surface)',
+      border: `1px solid ${error ? 'var(--neg)' : 'var(--border-default)'}`,
+      borderRadius: 'var(--r-md)',
+      boxShadow: error ? 'none' : 'var(--shadow-xs)',
+      transition: 'border-color .12s, box-shadow .12s',
+    }}>
+      {leading && <span style={{ color: 'var(--text-tertiary)', display: 'flex' }}>{leading}</span>}
+      {prefix && <span style={{ color: 'var(--text-tertiary)', fontSize: 13 }} className="mono">{prefix}</span>}
+      <input
+        defaultValue={value}
+        placeholder={placeholder}
+        {...rest}
+        style={{
+          flex: 1, border: 0, outline: 0, background: 'transparent',
+          fontFamily: 'inherit', fontSize: 14, color: 'var(--text-primary)',
+          minWidth: 0, padding: 0,
+        }}
+      />
+      {suffix && <span style={{ color: 'var(--text-tertiary)', fontSize: 13 }} className="mono">{suffix}</span>}
+      {trailing && <span style={{ color: 'var(--text-tertiary)', display: 'flex' }}>{trailing}</span>}
+    </span>
+    {hint && (
+      <span style={{ fontSize: 12, color: error ? 'var(--neg-fg)' : 'var(--text-tertiary)' }}>
+        {hint}
+      </span>
+    )}
+  </label>
+);
+
+// ============== BADGE ==============
+const Badge = ({ tone = 'neutral', children, dot, style }) => {
+  const tones = {
+    neutral: { bg: 'var(--bg-sunken)', fg: 'var(--text-secondary)', dot: 'var(--text-tertiary)' },
+    pos:     { bg: 'var(--pos-soft)', fg: 'var(--pos-fg)',         dot: 'var(--pos)' },
+    neg:     { bg: 'var(--neg-soft)', fg: 'var(--neg-fg)',         dot: 'var(--neg)' },
+    warn:    { bg: 'var(--warn-soft)',fg: 'var(--warn-fg)',        dot: 'var(--warn)' },
+    accent:  { bg: 'var(--accent-soft)', fg: 'var(--accent)',      dot: 'var(--accent)' },
+  };
+  const t = tones[tone];
+  return (
+    <span style={{
+      display: 'inline-flex', alignItems: 'center', gap: 6,
+      height: 22, padding: '0 8px',
+      borderRadius: 'var(--r-pill)',
+      background: t.bg, color: t.fg,
+      fontSize: 11, fontWeight: 500, letterSpacing: 0,
+      ...style,
+    }}>
+      {dot && <span style={{ width: 6, height: 6, borderRadius: 999, background: t.dot }} />}
+      {children}
+    </span>
+  );
+};
+
+// ============== CARD ==============
+const Card = ({ title, action, padding = 'var(--s-5)', children, style, bodyStyle }) => (
+  <div style={{
+    background: 'var(--bg-surface)',
+    border: '1px solid var(--border-default)',
+    borderRadius: 'var(--r-lg)',
+    boxShadow: 'var(--shadow-xs)',
+    ...style,
+  }}>
+    {(title || action) && (
+      <div style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        padding: 'var(--s-4) var(--s-5)',
+        borderBottom: '1px solid var(--border-subtle)',
+      }}>
+        <div style={{ fontSize: 14, fontWeight: 600, color: 'var(--text-primary)' }}>{title}</div>
+        <div>{action}</div>
+      </div>
+    )}
+    <div style={{ padding, ...bodyStyle }}>{children}</div>
+  </div>
+);
+
+// ============== KPI CARD ==============
+const KPI = ({ label, value, delta, deltaTone = 'pos', sparkline, hint }) => (
+  <div style={{
+    background: 'var(--bg-surface)',
+    border: '1px solid var(--border-default)',
+    borderRadius: 'var(--r-lg)',
+    padding: 'var(--s-5)',
+    boxShadow: 'var(--shadow-xs)',
+    display: 'flex', flexDirection: 'column', gap: 'var(--s-3)',
+  }}>
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+      <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', letterSpacing: 0 }}>{label}</div>
+      {delta && <Badge tone={deltaTone} dot>{delta}</Badge>}
+    </div>
+    <div className="num" style={{ fontSize: 28, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.03em', lineHeight: 1.1 }}>
+      {value}
+    </div>
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', gap: 'var(--s-3)' }}>
+      <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{hint}</div>
+      {sparkline}
+    </div>
+  </div>
+);
+
+// ============== SPARKLINE ==============
+const Sparkline = ({ data, color = 'var(--accent)', width = 80, height = 28, fill = true }) => {
+  const min = Math.min(...data), max = Math.max(...data);
+  const range = max - min || 1;
+  const points = data.map((v, i) => {
+    const x = (i / (data.length - 1)) * width;
+    const y = height - ((v - min) / range) * (height - 4) - 2;
+    return [x, y];
+  });
+  const path = 'M' + points.map(p => p.join(',')).join(' L');
+  const area = path + ` L${width},${height} L0,${height} Z`;
+  const id = 'sg-' + Math.random().toString(36).slice(2, 8);
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} style={{ flex: '0 0 auto' }}>
+      {fill && (
+        <>
+          <defs>
+            <linearGradient id={id} x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor={color} stopOpacity="0.2" />
+              <stop offset="100%" stopColor={color} stopOpacity="0" />
+            </linearGradient>
+          </defs>
+          <path d={area} fill={`url(#${id})`} />
+        </>
+      )}
+      <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+};
+
+// ============== SECTION HEADER (in-screen) ==============
+const SectionH = ({ title, subtitle, action }) => (
+  <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 'var(--s-4)' }}>
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-tertiary)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>{subtitle}</div>
+      <div style={{ fontSize: 18, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em', marginTop: 2 }}>{title}</div>
+    </div>
+    {action}
+  </div>
+);
+
+// ============== LOGO ==============
+const Logo = ({ size = 22, color = 'var(--text-primary)' }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <rect x="2" y="2" width="20" height="20" rx="6" fill={color} />
+      <path d="M7 16c1.5-2 3-2 5 0s3.5 2 5 0" stroke="var(--bg-surface)" strokeWidth="1.8" strokeLinecap="round" fill="none" />
+      <circle cx="9" cy="9" r="1.4" fill="var(--bg-surface)" />
+      <circle cx="15" cy="9" r="1.4" fill="var(--bg-surface)" />
+    </svg>
+    <span style={{ fontSize: 15, fontWeight: 600, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>Mukusoft</span>
+  </div>
+);
+
+// ============== ARTBOARD WRAPPER ==============
+// Wraps artboard contents so they pick up the right CSS-var theme.
+const Themed = ({ theme = 'light', children, style }) => (
+  <div className={`theme-${theme}`} style={{
+    width: '100%', height: '100%',
+    background: 'var(--bg-app)',
+    color: 'var(--text-primary)',
+    fontFamily: 'var(--font-sans)',
+    fontSize: 14,
+    overflow: 'hidden',
+    ...style,
+  }}>
+    {children}
+  </div>
+);
+
+Object.assign(window, {
+  Icon, Button, Input, Badge, Card, KPI, Sparkline, SectionH, Logo, Themed, fmtPYG,
+});
+
+</script>
+
+<script type="text/babel" data-presets="react" data-from="ds-foundations.jsx">
+// ds-foundations.jsx — Color palette, type scale, spacing, radii, shadows, depth.
+// All visuals derive from CSS vars so they stay in sync with theme switches.
+
+const Swatch = ({ varName, label, hex }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px',
+                background: 'var(--bg-surface)', border: '1px solid var(--border-subtle)',
+                borderRadius: 'var(--r-md)' }}>
+    <div style={{
+      width: 32, height: 32, borderRadius: 8,
+      background: `var(${varName})`,
+      boxShadow: 'inset 0 0 0 1px rgba(0,0,0,0.06)',
+      flex: '0 0 auto',
+    }} />
+    <div style={{ minWidth: 0, flex: 1 }}>
+      <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>{label}</div>
+      <div className="mono" style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 1 }}>{hex}</div>
+    </div>
+  </div>
+);
+
+// Colors split by semantic role; not the raw palette but tokenized so the
+// values visible here are exactly what the dev would reference in code.
+const COLOR_GROUPS = {
+  light: {
+    Surface: [
+      ['--bg-app', 'bg.app', '#FAFAF9'],
+      ['--bg-surface', 'bg.surface', '#FFFFFF'],
+      ['--bg-sunken', 'bg.sunken', '#F4F4F2'],
+    ],
+    Text: [
+      ['--text-primary', 'text.primary', '#0A0A0A'],
+      ['--text-secondary', 'text.secondary', '#525252'],
+      ['--text-tertiary', 'text.tertiary', '#737373'],
+      ['--text-disabled', 'text.disabled', '#A3A3A3'],
+    ],
+    Borders: [
+      ['--border-subtle', 'border.subtle', '#EDEDEA'],
+      ['--border-default', 'border.default', '#E4E4E0'],
+      ['--border-strong', 'border.strong', '#D4D4D0'],
+    ],
+    Accent: [
+      ['--accent', 'accent', '#3B82F6'],
+      ['--accent-hover', 'accent.hover', '#2563EB'],
+      ['--accent-soft', 'accent.soft', '#EFF6FF'],
+    ],
+    'Estado financiero': [
+      ['--pos', 'pos · ingreso', '#059669'],
+      ['--pos-soft', 'pos.soft', '#ECFDF5'],
+      ['--neg', 'neg · egreso', '#DC2626'],
+      ['--neg-soft', 'neg.soft', '#FEF2F2'],
+      ['--warn', 'warn', '#D97706'],
+      ['--warn-soft', 'warn.soft', '#FFFBEB'],
+    ],
+  },
+  dark: {
+    Surface: [
+      ['--bg-app', 'bg.app', '#0A0A0A'],
+      ['--bg-surface', 'bg.surface', '#141414'],
+      ['--bg-sunken', 'bg.sunken', '#0F0F0F'],
+    ],
+    Text: [
+      ['--text-primary', 'text.primary', '#FAFAFA'],
+      ['--text-secondary', 'text.secondary', '#A3A3A3'],
+      ['--text-tertiary', 'text.tertiary', '#737373'],
+      ['--text-disabled', 'text.disabled', '#525252'],
+    ],
+    Borders: [
+      ['--border-subtle', 'border.subtle', '#1F1F1F'],
+      ['--border-default', 'border.default', '#262626'],
+      ['--border-strong', 'border.strong', '#333333'],
+    ],
+    Accent: [
+      ['--accent', 'accent', '#3B82F6'],
+      ['--accent-hover', 'accent.hover', '#60A5FA'],
+      ['--accent-soft', 'accent.soft', 'rgba(59,130,246,.12)'],
+    ],
+    'Estado financiero': [
+      ['--pos', 'pos · ingreso', '#10B981'],
+      ['--pos-soft', 'pos.soft', 'rgba(16,185,129,.12)'],
+      ['--neg', 'neg · egreso', '#EF4444'],
+      ['--neg-soft', 'neg.soft', 'rgba(239,68,68,.12)'],
+      ['--warn', 'warn', '#F59E0B'],
+      ['--warn-soft', 'warn.soft', 'rgba(245,158,11,.12)'],
+    ],
+  },
+};
+
+const ColorPalette = ({ theme }) => {
+  const groups = COLOR_GROUPS[theme];
+  return (
+    <Themed theme={theme} style={{ padding: 'var(--s-6)', overflowY: 'auto' }}>
+      <div style={{ marginBottom: 'var(--s-5)' }}>
+        <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>01 · Foundations</div>
+        <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.03em', marginTop: 4 }}>Paleta · {theme === 'light' ? 'Claro' : 'Oscuro'}</div>
+        <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 6, maxWidth: 540 }}>
+          Tokens semánticos. Usa siempre la variable, nunca el HEX. Cada token mapea a un color de Material 3 en Flet.
+        </div>
+      </div>
+
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 'var(--s-4)' }}>
+        {Object.entries(groups).map(([groupName, items]) => (
+          <div key={groupName}>
+            <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                          letterSpacing: '0.06em', textTransform: 'uppercase',
+                          marginBottom: 8 }}>{groupName}</div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {items.map(([v, l, h]) => <Swatch key={v} varName={v} label={l} hex={h} />)}
+            </div>
+          </div>
+        ))}
+      </div>
+    </Themed>
+  );
+};
+
+// ============== TYPE SCALE ==============
+const TypeRow = ({ label, sample, size, weight, lh, ls, mono, role }) => (
+  <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 200px', gap: 24,
+                alignItems: 'baseline',
+                padding: '18px 0',
+                borderBottom: '1px solid var(--border-subtle)' }}>
+    <div>
+      <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-primary)' }}>{label}</div>
+      <div className="mono" style={{ fontSize: 10, color: 'var(--text-tertiary)', marginTop: 2 }}>{role}</div>
+    </div>
+    <div style={{
+      fontSize: size, fontWeight: weight, lineHeight: lh, letterSpacing: ls,
+      fontFamily: mono ? 'var(--font-mono)' : 'var(--font-sans)',
+      color: 'var(--text-primary)',
+    }}>{sample}</div>
+    <div className="mono" style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>
+      {mono ? 'Geist Mono' : 'Geist'} · {size}/{lh} · {weight}
+    </div>
+  </div>
+);
+
+const Typography = ({ theme }) => (
+  <Themed theme={theme} style={{ padding: 'var(--s-6)', overflowY: 'auto' }}>
+    <div style={{ marginBottom: 'var(--s-5)' }}>
+      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>02 · Foundations</div>
+      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.03em', marginTop: 4 }}>Tipografía</div>
+      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 6, maxWidth: 540 }}>
+        Geist para UI · Geist Mono para todos los números financieros (tabular, alineados). Pareja moderna estilo Vercel/Linear.
+      </div>
+    </div>
+    <div>
+      <TypeRow label="Display"  role="Pantallas vacías"      sample="Sin movimientos hoy"     size={36} weight={600} lh={1.1} ls="-0.04em" />
+      <TypeRow label="Title XL" role="Encabezado de sección" sample="Caja diaria"             size={26} weight={600} lh={1.15} ls="-0.03em" />
+      <TypeRow label="Title L"  role="Títulos de página"     sample="Movimientos recientes"   size={20} weight={600} lh={1.2} ls="-0.025em" />
+      <TypeRow label="Title M"  role="Cards"                 sample="Total ingresos"          size={16} weight={600} lh={1.3} ls="-0.02em" />
+      <TypeRow label="Body"     role="Texto principal"       sample="Lavado completo · Toyota Hilux ABC 123" size={14} weight={400} lh={1.5} ls="-0.01em" />
+      <TypeRow label="Body S"   role="Secundario"            sample="Hace 4 minutos · Caja 1" size={13} weight={400} lh={1.5} ls="-0.005em" />
+      <TypeRow label="Caption"  role="Labels, hints"         sample="Método de pago"          size={12} weight={500} lh={1.4} ls="0" />
+      <TypeRow label="Overline" role="Etiquetas en CAPS"     sample="EGRESO · OPERACIÓN"      size={11} weight={500} lh={1.4} ls="0.06em" />
+      <TypeRow label="Num XL"   role="Total destacado"       sample="Gs. 4.280.000" mono     size={36} weight={600} lh={1.1} ls="-0.04em" />
+      <TypeRow label="Num L"    role="KPI"                   sample="Gs. 1.250.000" mono     size={26} weight={600} lh={1.15} ls="-0.03em" />
+      <TypeRow label="Num M"    role="Tablas"                sample="Gs. 85.000"    mono     size={14} weight={500} lh={1.5} ls="-0.01em" />
+    </div>
+  </Themed>
+);
+
+// ============== SPACING + RADII + SHADOWS ==============
+const Tokens = ({ theme }) => (
+  <Themed theme={theme} style={{ padding: 'var(--s-6)', overflowY: 'auto' }}>
+    <div style={{ marginBottom: 'var(--s-5)' }}>
+      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>03 · Foundations</div>
+      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.03em', marginTop: 4 }}>Spacing · Radii · Shadows</div>
+    </div>
+
+    {/* Spacing */}
+    <div style={{ marginBottom: 'var(--s-6)' }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Spacing scale · base 4px
+      </div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+        {[
+          ['s-1', 4],['s-2', 8],['s-3', 12],['s-4', 16],
+          ['s-5', 24],['s-6', 32],['s-7', 48],['s-8', 64],
+        ].map(([t, px]) => (
+          <div key={t} style={{ display: 'grid', gridTemplateColumns: '60px 60px 1fr', alignItems: 'center', gap: 12 }}>
+            <span className="mono" style={{ fontSize: 11, color: 'var(--text-secondary)' }}>{t}</span>
+            <span className="mono" style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{px}px</span>
+            <div style={{ height: 12, background: 'var(--accent)', width: px, borderRadius: 2 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Radii */}
+    <div style={{ marginBottom: 'var(--s-6)' }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Border radius
+      </div>
+      <div style={{ display: 'flex', gap: 16 }}>
+        {[['sm', 6, 'inputs · badges'], ['md', 8, 'botones'], ['lg', 12, 'cards'], ['xl', 16, 'modales']].map(([n, px, use]) => (
+          <div key={n} style={{ flex: 1, textAlign: 'center' }}>
+            <div style={{ height: 64, background: 'var(--bg-surface)',
+                          border: '1px solid var(--border-default)',
+                          borderRadius: px, marginBottom: 8 }} />
+            <div className="mono" style={{ fontSize: 11, color: 'var(--text-secondary)' }}>r-{n} · {px}px</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{use}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Elevations */}
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Elevation · sombras planas
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
+        {[['xs', 'cards · botones'], ['sm', 'hover'], ['md', 'dropdowns'], ['lg', 'popovers']].map(([n, use]) => (
+          <div key={n} style={{ textAlign: 'center', padding: 8 }}>
+            <div style={{ height: 64, background: 'var(--bg-surface)',
+                          border: '1px solid var(--border-default)',
+                          borderRadius: 12, marginBottom: 12,
+                          boxShadow: `var(--shadow-${n})` }} />
+            <div className="mono" style={{ fontSize: 11, color: 'var(--text-secondary)' }}>shadow-{n}</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>{use}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Themed>
+);
+
+Object.assign(window, { ColorPalette, Typography, Tokens });
+
+</script>
+
+<script type="text/babel" data-presets="react" data-from="ds-components.jsx">
+// ds-components.jsx — Buttons, inputs, badges, cards, table samples, depth.
+
+const Row = ({ children, style }) => (
+  <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--s-3)', flexWrap: 'wrap', ...style }}>
+    {children}
+  </div>
+);
+
+const Group = ({ title, children, hint }) => (
+  <div style={{ marginBottom: 'var(--s-6)' }}>
+    <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                  letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 4 }}>{title}</div>
+    {hint && <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginBottom: 12 }}>{hint}</div>}
+    <div style={{ marginTop: 12 }}>{children}</div>
+  </div>
+);
+
+const Components = ({ theme }) => (
+  <Themed theme={theme} style={{ padding: 'var(--s-6)', overflowY: 'auto' }}>
+    <div style={{ marginBottom: 'var(--s-6)' }}>
+      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>04 · Components</div>
+      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.03em', marginTop: 4 }}>UI Kit</div>
+      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 6, maxWidth: 540 }}>
+        Componentes equivalentes a controles de Flet · MD3. Cada uno mapea a `ft.FilledButton`, `ft.TextField`, `ft.Card`, etc.
+      </div>
+    </div>
+
+    <Group title="Buttons" hint="Primary = ft.FilledButton · Secondary = ft.OutlinedButton · Ghost = ft.TextButton · Success = ft.FilledButton (color verde)">
+      <Row>
+        <Button variant="primary">Registrar ingreso</Button>
+        <Button variant="secondary">Cancelar</Button>
+        <Button variant="ghost">Ver detalles</Button>
+        <Button variant="danger">Anular</Button>
+        <Button variant="success" leading={<Icon name="check" size={15} />}>Cerrar caja</Button>
+      </Row>
+      <Row style={{ marginTop: 12 }}>
+        <Button variant="primary" size="sm">SM 30px</Button>
+        <Button variant="primary" size="md">MD 36px</Button>
+        <Button variant="primary" size="lg">LG 44px</Button>
+        <Button variant="primary" leading={<Icon name="plus" size={15} />}>Nuevo movimiento</Button>
+        <Button variant="secondary" trailing={<Icon name="chevron_down" size={15} />}>Filtros</Button>
+        <Button variant="ghost" leading={<Icon name="download" size={15} />}>Exportar</Button>
+      </Row>
+    </Group>
+
+    <Group title="Inputs · TextField" hint="Altura 38px · radio 8px · borde focus = accent · monoespaciado para montos">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, maxWidth: 800 }}>
+        <Input label="Cliente" placeholder="Nombre o cédula" leading={<Icon name="search" size={15} />} />
+        <Input label="Monto" prefix="Gs." placeholder="0" />
+        <Input label="Vehículo" placeholder="Patente" hint="Opcional" />
+        <Input label="Fecha" placeholder="07/05/2026" trailing={<Icon name="calendar" size={15} />} />
+        <Input label="Concepto" placeholder="Detalle del egreso" error hint="Este campo es obligatorio" />
+        <Input label="Caja" prefix="Caja" suffix="↑" placeholder="1" />
+      </div>
+    </Group>
+
+    <Group title="Badges · Status">
+      <Row>
+        <Badge tone="pos" dot>Cobrado</Badge>
+        <Badge tone="warn" dot>Pendiente</Badge>
+        <Badge tone="neg" dot>Anulado</Badge>
+        <Badge tone="accent" dot>En curso</Badge>
+        <Badge tone="neutral">Caja 1</Badge>
+        <Badge tone="neutral">Efectivo</Badge>
+        <Badge tone="neutral">Transferencia</Badge>
+        <Badge tone="accent">Premium</Badge>
+      </Row>
+    </Group>
+
+    <Group title="Cards · Elevation" hint="Estructura base · ft.Container con border + boxShadow">
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+        <KPI label="Ingresos hoy"  value="Gs. 4.280.000" delta="+12.4%" deltaTone="pos"
+             hint="vs. ayer Gs. 3.808.000"
+             sparkline={<Sparkline data={[3,5,4,7,6,9,8,11,10,12]} color="var(--pos)" />} />
+        <KPI label="Egresos hoy"   value="Gs. 685.000"   delta="−4.1%"  deltaTone="neg"
+             hint="vs. ayer Gs. 715.000"
+             sparkline={<Sparkline data={[5,4,6,3,5,4,3,4,3,2]} color="var(--neg)" />} />
+        <KPI label="Servicios"     value="34"            delta="+6"     deltaTone="pos"
+             hint="vehículos atendidos"
+             sparkline={<Sparkline data={[2,4,3,5,7,6,8,9,11,10]} color="var(--accent)" />} />
+      </div>
+    </Group>
+
+    <Group title="Table" hint="Hover row · zebra opcional · headers compactos en CAPS · números monoespaciados alineados a la derecha">
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)',
+                    borderRadius: 'var(--r-lg)', overflow: 'hidden', boxShadow: 'var(--shadow-xs)' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: 'var(--bg-sunken)' }}>
+              {['Hora', 'Cliente', 'Servicio', 'Método', 'Estado', 'Monto'].map((h, i) => (
+                <th key={h} style={{
+                  textAlign: i === 5 ? 'right' : 'left',
+                  padding: '10px 16px',
+                  fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                  letterSpacing: '0.06em', textTransform: 'uppercase',
+                  borderBottom: '1px solid var(--border-subtle)',
+                }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ['14:32', 'Cárdenas, M.', 'Lavado completo · Toyota Hilux', 'Efectivo', ['pos','Cobrado'], 85000],
+              ['14:18', 'González, R.', 'Aspirado interior · Honda Fit',  'Transferencia', ['accent','En curso'], 45000],
+              ['13:55', 'Riveros, A.',  'Encerado premium · BMW X3',      'Tarjeta', ['pos','Cobrado'], 220000],
+              ['13:40', 'Martínez, L.', 'Lavado básico · Volkswagen Gol', 'Efectivo', ['warn','Pendiente'], 35000],
+            ].map(([h, c, s, m, st, mt], i) => (
+              <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                <td className="mono" style={{ padding: '12px 16px', color: 'var(--text-tertiary)' }}>{h}</td>
+                <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: 500 }}>{c}</td>
+                <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{s}</td>
+                <td style={{ padding: '12px 16px' }}><Badge tone="neutral">{m}</Badge></td>
+                <td style={{ padding: '12px 16px' }}><Badge tone={st[0]} dot>{st[1]}</Badge></td>
+                <td className="num" style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 500, color: 'var(--text-primary)' }}>
+                  {fmtPYG(mt)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </Group>
+
+    <Group title="Glass · Modal overlay" hint="Único uso de glassmorphism · solo overlays / dialogs">
+      <div style={{ position: 'relative', height: 220, borderRadius: 12, overflow: 'hidden',
+                    background: 'linear-gradient(135deg, #3B82F6 0%, #8B5CF6 50%, #EC4899 100%)' }}>
+        <div style={{
+          position: 'absolute', inset: 'auto 24px 24px auto',
+          width: 320, padding: 'var(--s-5)',
+          background: 'var(--bg-overlay)',
+          backdropFilter: 'blur(24px) saturate(1.4)',
+          WebkitBackdropFilter: 'blur(24px) saturate(1.4)',
+          border: '1px solid var(--border-default)',
+          borderRadius: 'var(--r-xl)',
+          boxShadow: 'var(--shadow-glass)',
+        }}>
+          <div style={{ fontSize: 14, fontWeight: 600 }}>Confirmar cierre de caja</div>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 6, lineHeight: 1.5 }}>
+            Total efectivo: <span className="num" style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Gs. 3.595.000</span>
+          </div>
+          <Row style={{ marginTop: 16, justifyContent: 'flex-end', gap: 8 }}>
+            <Button variant="ghost" size="sm">Cancelar</Button>
+            <Button variant="primary" size="sm">Cerrar caja</Button>
+          </Row>
+        </div>
+      </div>
+    </Group>
+  </Themed>
+);
+
+Object.assign(window, { Components });
+
+</script>
+
+<script type="text/babel" data-presets="react" data-from="ds-screens.jsx">
+// ds-screens.jsx — Real product screens applied to the design system.
+// Each screen is wrapped in <Themed> and rendered inside its own <DCArtboard>.
+
+// ============== SHARED: SIDEBAR ==============
+const navItems = [
+  ['dashboard', 'Dashboard', true],
+  ['cash',      'Caja diaria', false],
+  ['arrow_in',  'Ingresos',  false],
+  ['arrow_out', 'Egresos',   false],
+  ['list',      'Movimientos', false],
+  ['chart',     'Reportes',  false],
+];
+
+const Sidebar = ({ active = 'Dashboard', collapsed = false }) => (
+  <aside style={{
+    width: collapsed ? 64 : 232,
+    flex: '0 0 auto',
+    background: 'var(--bg-surface)',
+    borderRight: '1px solid var(--border-subtle)',
+    display: 'flex', flexDirection: 'column',
+    padding: '20px 12px',
+  }}>
+    <div style={{ padding: '4px 8px 24px' }}>
+      {collapsed
+        ? <div style={{ width: 28, height: 28, borderRadius: 8, background: 'var(--text-primary)' }} />
+        : <Logo />
+      }
+    </div>
+
+    {!collapsed && (
+      <div style={{ fontSize: 10, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.08em', textTransform: 'uppercase',
+                    padding: '0 10px 8px' }}>Operación</div>
+    )}
+
+    <nav style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {navItems.map(([icon, label]) => {
+        const isActive = label === active;
+        return (
+          <div key={label} style={{
+            display: 'flex', alignItems: 'center', gap: 10,
+            padding: collapsed ? '9px' : '8px 10px',
+            justifyContent: collapsed ? 'center' : 'flex-start',
+            borderRadius: 8,
+            background: isActive ? 'var(--bg-sunken)' : 'transparent',
+            color: isActive ? 'var(--text-primary)' : 'var(--text-secondary)',
+            fontSize: 13, fontWeight: isActive ? 500 : 400,
+            cursor: 'pointer', position: 'relative',
+          }}>
+            {isActive && !collapsed && (
+              <span style={{ position: 'absolute', left: 0, top: 8, bottom: 8, width: 2,
+                             background: 'var(--accent)', borderRadius: 2 }} />
+            )}
+            <Icon name={icon} size={17} stroke={isActive ? 1.8 : 1.5} />
+            {!collapsed && <span>{label}</span>}
+          </div>
+        );
+      })}
+    </nav>
+
+    <div style={{ marginTop: 'auto' }}>
+      {!collapsed && (
+        <div style={{
+          padding: 12, borderRadius: 10,
+          background: 'var(--bg-sunken)',
+          marginBottom: 12,
+        }}>
+          <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Caja 1 · abierta</div>
+          <div className="num" style={{ fontSize: 14, fontWeight: 600, marginTop: 2 }}>Gs. 3.595.000</div>
+          <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 6 }}>Desde 07:30 · Andrés</div>
+        </div>
+      )}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 10px' }}>
+        <div style={{ width: 28, height: 28, borderRadius: 999, background: 'var(--accent-soft)',
+                      color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12, fontWeight: 600 }}>AC</div>
+        {!collapsed && (
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 12, fontWeight: 500 }}>Andrés Cárdenas</div>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Operador · Caja 1</div>
+          </div>
+        )}
+        {!collapsed && <Icon name="settings" size={15} color="var(--text-tertiary)" />}
+      </div>
+    </div>
+  </aside>
+);
+
+// ============== SHARED: TOP BAR ==============
+const TopBar = ({ title, subtitle, actions }) => (
+  <header style={{
+    display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    padding: '20px 32px', borderBottom: '1px solid var(--border-subtle)',
+    background: 'var(--bg-app)',
+  }}>
+    <div>
+      <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{subtitle}</div>
+      <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.025em', marginTop: 2 }}>{title}</div>
+    </div>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>{actions}</div>
+  </header>
+);
+
+const AppShell = ({ active, title, subtitle, actions, children }) => (
+  <div style={{ display: 'flex', height: '100%', minHeight: 0 }}>
+    <Sidebar active={active} />
+    <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+      <TopBar title={title} subtitle={subtitle} actions={actions} />
+      <main style={{ flex: 1, minHeight: 0, overflow: 'auto', padding: '24px 32px 40px' }}>
+        {children}
+      </main>
+    </div>
+  </div>
+);
+
+// ============== SCREEN: DASHBOARD ==============
+const cashflowData = [
+  { d: 'L',  in: 3.4, out: 0.6 },
+  { d: 'M',  in: 4.1, out: 0.9 },
+  { d: 'M',  in: 3.8, out: 0.7 },
+  { d: 'J',  in: 4.6, out: 1.1 },
+  { d: 'V',  in: 5.2, out: 0.8 },
+  { d: 'S',  in: 6.4, out: 1.2 },
+  { d: 'D',  in: 4.3, out: 0.7 },
+];
+
+const CashflowChart = () => {
+  const W = 720, H = 220, P = { t: 12, r: 12, b: 28, l: 44 };
+  const innerW = W - P.l - P.r, innerH = H - P.t - P.b;
+  const max = 7;
+  const barW = innerW / cashflowData.length / 3;
+
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%', height: 220, display: 'block' }}>
+      {/* gridlines */}
+      {[0, 2, 4, 6].map(v => {
+        const y = P.t + innerH - (v / max) * innerH;
+        return (
+          <g key={v}>
+            <line x1={P.l} x2={W - P.r} y1={y} y2={y} stroke="var(--border-subtle)" strokeWidth="1" />
+            <text x={P.l - 8} y={y + 3} fontSize="10" fill="var(--text-tertiary)" textAnchor="end" fontFamily="var(--font-mono)">
+              {v}M
+            </text>
+          </g>
+        );
+      })}
+      {/* bars */}
+      {cashflowData.map((d, i) => {
+        const cx = P.l + (i + 0.5) * (innerW / cashflowData.length);
+        const inH = (d.in / max) * innerH;
+        const outH = (d.out / max) * innerH;
+        return (
+          <g key={i}>
+            <rect x={cx - barW - 1} y={P.t + innerH - inH} width={barW} height={inH}
+                  fill="var(--pos)" rx="2" />
+            <rect x={cx + 1} y={P.t + innerH - outH} width={barW} height={outH}
+                  fill="var(--neg)" rx="2" opacity="0.85" />
+            <text x={cx} y={H - 8} fontSize="11" fill="var(--text-tertiary)" textAnchor="middle">{d.d}</text>
+          </g>
+        );
+      })}
+    </svg>
+  );
+};
+
+const Dashboard = ({ theme }) => (
+  <Themed theme={theme}>
+    <AppShell
+      active="Dashboard"
+      subtitle="Operación · Caja 1"
+      title="Buen día, Andrés"
+      actions={<>
+        <Button variant="secondary" size="sm" leading={<Icon name="calendar" size={14} />}>Hoy · 07 may</Button>
+        <Button variant="primary" size="sm" leading={<Icon name="plus" size={14} />}>Nuevo movimiento</Button>
+      </>}
+    >
+      {/* KPIs */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
+        <KPI label="Ingresos del día" value="Gs. 4.280.000" delta="+12.4%" deltaTone="pos"
+             hint="vs. promedio semanal"
+             sparkline={<Sparkline data={[3,5,4,7,6,9,8,11,10,12]} color="var(--pos)" />} />
+        <KPI label="Egresos del día" value="Gs. 685.000" delta="−4.1%" deltaTone="pos"
+             hint="bajo presupuesto"
+             sparkline={<Sparkline data={[5,4,6,3,5,4,3,4,3,2]} color="var(--neg)" />} />
+        <KPI label="Balance neto" value="Gs. 3.595.000" delta="+18.2%" deltaTone="pos"
+             hint="utilidad operativa"
+             sparkline={<Sparkline data={[2,4,3,5,7,6,8,9,11,10]} color="var(--accent)" />} />
+        <KPI label="Servicios" value="34" delta="+6" deltaTone="pos"
+             hint="ticket prom. Gs. 125.882"
+             sparkline={<Sparkline data={[4,5,6,5,8,7,9,8,10,11]} color="var(--text-secondary)" fill={false} />} />
+      </div>
+
+      {/* Chart + Side */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.6fr 1fr', gap: 16, marginBottom: 24 }}>
+        <Card
+          padding="0"
+          title="Flujo de caja"
+          action={<Row>
+            <span style={{ fontSize: 11, color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--pos)' }} /> Ingresos
+            </span>
+            <span style={{ fontSize: 11, color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <span style={{ width: 8, height: 8, borderRadius: 2, background: 'var(--neg)' }} /> Egresos
+            </span>
+            <Button variant="ghost" size="sm" trailing={<Icon name="chevron_down" size={14} />}>Esta semana</Button>
+          </Row>}
+        >
+          <div style={{ padding: 'var(--s-4) var(--s-5)' }}>
+            <CashflowChart />
+          </div>
+        </Card>
+
+        <Card title="Métodos de pago" action={<span style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Hoy</span>}>
+          {[
+            ['Efectivo',       'Gs. 2.450.000', 57, 'var(--accent)'],
+            ['Transferencia',  'Gs. 1.180.000', 28, 'var(--pos)'],
+            ['Tarjeta',        'Gs. 520.000',   12, 'var(--warn)'],
+            ['QR · Pago Móvil','Gs. 130.000',    3, 'var(--text-tertiary)'],
+          ].map(([n, m, p, c]) => (
+            <div key={n} style={{ marginBottom: 14 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6, fontSize: 13 }}>
+                <span style={{ color: 'var(--text-secondary)' }}>{n}</span>
+                <span className="num" style={{ fontWeight: 500 }}>{m}</span>
+              </div>
+              <div style={{ height: 6, background: 'var(--bg-sunken)', borderRadius: 999, overflow: 'hidden' }}>
+                <div style={{ width: `${p}%`, height: '100%', background: c, borderRadius: 999 }} />
+              </div>
+            </div>
+          ))}
+        </Card>
+      </div>
+
+      {/* Recent movements */}
+      <Card title="Movimientos recientes" padding="0"
+        action={<Button variant="ghost" size="sm" trailing={<Icon name="arrow_right" size={14} />}>Ver todos</Button>}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr>
+              {['Hora','Tipo','Detalle','Método','Estado','Monto'].map((h, i) => (
+                <th key={h} style={{
+                  textAlign: i === 5 ? 'right' : 'left',
+                  padding: '10px 20px',
+                  fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                  letterSpacing: '0.06em', textTransform: 'uppercase',
+                  borderBottom: '1px solid var(--border-subtle)',
+                }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ['14:32', 'in',  'Lavado completo',  'Toyota Hilux · ABC 123',    'Efectivo',      ['pos','Cobrado'],   85000],
+              ['14:18', 'in',  'Aspirado interior','Honda Fit · BCD 456',       'Transferencia', ['accent','En curso'], 45000],
+              ['13:55', 'in',  'Encerado premium', 'BMW X3 · CDE 789',           'Tarjeta',       ['pos','Cobrado'],  220000],
+              ['13:40', 'out', 'Compra de jabón',  'Distribuidora Sur · F-2841', 'Efectivo',      ['pos','Pagado'],   -180000],
+              ['13:12', 'in',  'Lavado básico',    'Volkswagen Gol · DEF 012',   'Efectivo',      ['warn','Pendiente'], 35000],
+            ].map(([h, type, det, sub, m, st, mt], i) => (
+              <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                <td className="mono" style={{ padding: '14px 20px', color: 'var(--text-tertiary)' }}>{h}</td>
+                <td style={{ padding: '14px 20px' }}>
+                  <span style={{
+                    width: 26, height: 26, borderRadius: 8,
+                    background: type === 'in' ? 'var(--pos-soft)' : 'var(--neg-soft)',
+                    color: type === 'in' ? 'var(--pos)' : 'var(--neg)',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    <Icon name={type === 'in' ? 'arrow_in' : 'arrow_out'} size={14} stroke={2} />
+                  </span>
+                </td>
+                <td style={{ padding: '14px 20px' }}>
+                  <div style={{ fontWeight: 500 }}>{det}</div>
+                  <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>{sub}</div>
+                </td>
+                <td style={{ padding: '14px 20px' }}><Badge tone="neutral">{m}</Badge></td>
+                <td style={{ padding: '14px 20px' }}><Badge tone={st[0]} dot>{st[1]}</Badge></td>
+                <td className="num" style={{ padding: '14px 20px', textAlign: 'right', fontWeight: 500,
+                                              color: mt < 0 ? 'var(--neg-fg)' : 'var(--text-primary)' }}>
+                  {fmtPYG(mt, { sign: true })}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </Card>
+    </AppShell>
+  </Themed>
+);
+
+// ============== SCREEN: CAJA DIARIA ==============
+const CajaDiaria = ({ theme }) => (
+  <Themed theme={theme}>
+    <AppShell
+      active="Caja diaria"
+      subtitle="Operación"
+      title="Caja diaria · Caja 1"
+      actions={<>
+        <Badge tone="pos" dot>Abierta · 06h 47m</Badge>
+        <Button variant="secondary" size="sm" leading={<Icon name="print" size={14} />}>Imprimir arqueo</Button>
+        <Button variant="primary" size="sm" leading={<Icon name="lock" size={14} />}>Cerrar caja</Button>
+      </>}
+    >
+      {/* Status strip */}
+      <div style={{
+        display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-default)',
+        borderRadius: 'var(--r-lg)',
+        boxShadow: 'var(--shadow-xs)',
+        marginBottom: 24,
+        overflow: 'hidden',
+      }}>
+        {[
+          ['Apertura', 'Gs. 200.000', '07:30 · Andrés C.'],
+          ['Ingresos', 'Gs. 4.280.000', '34 servicios'],
+          ['Egresos',  'Gs. 685.000',   '4 movimientos'],
+          ['Saldo en caja', 'Gs. 3.795.000', 'Esperado · físico por arquear'],
+        ].map(([l, v, h], i) => (
+          <div key={l} style={{
+            padding: 'var(--s-5)',
+            borderRight: i < 3 ? '1px solid var(--border-subtle)' : 'none',
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-tertiary)',
+                          letterSpacing: '0.04em', textTransform: 'uppercase' }}>{l}</div>
+            <div className="num" style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.025em', marginTop: 8,
+                                          color: i === 3 ? 'var(--accent)' : 'var(--text-primary)' }}>{v}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 6 }}>{h}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Arqueo + denominaciones */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16, marginBottom: 24 }}>
+        <Card title="Arqueo de efectivo" action={<Badge tone="warn" dot>En proceso</Badge>}>
+          <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginBottom: 16 }}>
+            Contá los billetes y monedas físicos. El sistema calcula la diferencia automáticamente.
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+            {[
+              ['100.000', 18, 1800000],
+              ['50.000',  21, 1050000],
+              ['20.000',  14, 280000],
+              ['10.000',  19, 190000],
+              ['5.000',    8, 40000],
+              ['2.000',   12, 24000],
+              ['1.000',   15, 15000],
+              ['500',     22, 11000],
+            ].map(([den, qty, total]) => (
+              <div key={den} style={{
+                display: 'grid', gridTemplateColumns: '70px 1fr 100px',
+                alignItems: 'center', gap: 10,
+                padding: '8px 12px',
+                background: 'var(--bg-sunken)',
+                borderRadius: 'var(--r-md)',
+                border: '1px solid var(--border-subtle)',
+              }}>
+                <span className="num" style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-secondary)' }}>{den}</span>
+                <Input style={{ marginBottom: 0 }} prefix="×" value={String(qty)} />
+                <span className="num" style={{ fontSize: 12, fontWeight: 500, textAlign: 'right' }}>
+                  {fmtPYG(total)}
+                </span>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Card title="Resumen de cierre">
+            {[
+              ['Saldo esperado',  'Gs. 3.795.000', 'var(--text-secondary)'],
+              ['Conteo físico',   'Gs. 3.410.000', 'var(--text-primary)'],
+              ['Diferencia',      '− Gs. 385.000', 'var(--neg-fg)'],
+            ].map(([l, v, c]) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between',
+                                    padding: '10px 0',
+                                    borderBottom: '1px solid var(--border-subtle)' }}>
+                <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{l}</span>
+                <span className="num" style={{ fontSize: 14, fontWeight: 500, color: c }}>{v}</span>
+              </div>
+            ))}
+            <div style={{ padding: 12, marginTop: 12,
+                          background: 'var(--neg-soft)',
+                          borderRadius: 8,
+                          fontSize: 12, color: 'var(--neg-fg)', lineHeight: 1.5 }}>
+              Diferencia significativa. Verificá los billetes de Gs. 100.000 antes de cerrar.
+            </div>
+            <Button variant="primary" full style={{ marginTop: 16 }} leading={<Icon name="lock" size={15} />}>
+              Cerrar caja con diferencia
+            </Button>
+          </Card>
+
+          <Card title="Próxima caja">
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Operador siguiente: <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>Lucía Benítez</span>
+            </div>
+            <Input label="Apertura sugerida" prefix="Gs." value="200.000" style={{ marginTop: 12 }} />
+          </Card>
+        </div>
+      </div>
+    </AppShell>
+  </Themed>
+);
+
+// ============== SCREEN: NUEVO INGRESO ==============
+const NuevoIngreso = ({ theme }) => (
+  <Themed theme={theme}>
+    <AppShell
+      active="Ingresos"
+      subtitle="Operación · Caja 1"
+      title="Registrar ingreso"
+      actions={<>
+        <Button variant="ghost" size="sm">Cancelar</Button>
+        <Button variant="success" size="sm" leading={<Icon name="check" size={14} />}>Cobrar Gs. 220.000</Button>
+      </>}
+    >
+      <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16, maxWidth: 1180 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <Card title="Servicio">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
+              {[
+                ['Lavado básico',    '35.000',  false],
+                ['Lavado completo',  '85.000',  false],
+                ['Encerado premium', '220.000', true],
+                ['Aspirado interior','45.000',  false],
+                ['Pulido óptico',    '180.000', false],
+                ['Detallado full',   '450.000', false],
+              ].map(([n, p, sel]) => (
+                <div key={n} style={{
+                  padding: 14,
+                  borderRadius: 10,
+                  border: `1px solid ${sel ? 'var(--accent)' : 'var(--border-default)'}`,
+                  background: sel ? 'var(--accent-soft)' : 'var(--bg-surface)',
+                  cursor: 'pointer', position: 'relative',
+                }}>
+                  <div style={{ fontSize: 13, fontWeight: 500,
+                                color: sel ? 'var(--accent)' : 'var(--text-primary)' }}>{n}</div>
+                  <div className="num" style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4 }}>
+                    Gs. {p}
+                  </div>
+                  {sel && <div style={{ position: 'absolute', top: 8, right: 8 }}><Icon name="check" size={14} color="var(--accent)" stroke={2.5} /></div>}
+                </div>
+              ))}
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
+              <Input label="Vehículo" placeholder="Marca y modelo" value="BMW X3" />
+              <Input label="Patente" placeholder="ABC 123" value="CDE 789" />
+              <Input label="Operario asignado" placeholder="Seleccionar" value="Ramón Duarte" trailing={<Icon name="chevron_down" size={15} />} />
+              <Input label="Tiempo estimado" suffix="min" value="45" />
+            </div>
+          </Card>
+
+          <Card title="Cliente">
+            <Row>
+              <Input label="Buscar cliente" placeholder="Nombre, cédula o teléfono"
+                     leading={<Icon name="search" size={15} />}
+                     style={{ flex: 1 }} />
+              <div style={{ marginTop: 22 }}>
+                <Button variant="secondary" leading={<Icon name="plus" size={15} />}>Nuevo</Button>
+              </div>
+            </Row>
+            <div style={{
+              marginTop: 12, padding: 14,
+              background: 'var(--bg-sunken)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: 'var(--r-md)',
+              display: 'flex', alignItems: 'center', gap: 12,
+            }}>
+              <div style={{ width: 36, height: 36, borderRadius: 999, background: 'var(--accent-soft)',
+                            color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            fontSize: 12, fontWeight: 600 }}>RC</div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 13, fontWeight: 500 }}>Ricardo Cárdenas</div>
+                <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>+595 981 234 567 · 18 servicios · Cliente frecuente</div>
+              </div>
+              <Badge tone="accent">Premium</Badge>
+            </div>
+          </Card>
+        </div>
+
+        <Card title="Resumen y cobro">
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10, paddingBottom: 16,
+                        borderBottom: '1px solid var(--border-subtle)' }}>
+            {[
+              ['Encerado premium', 220000],
+              ['Descuento cliente frecuente', -22000],
+            ].map(([l, v]) => (
+              <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+                <span style={{ color: 'var(--text-secondary)' }}>{l}</span>
+                <span className="num" style={{ fontWeight: 500,
+                                                color: v < 0 ? 'var(--neg-fg)' : 'var(--text-primary)' }}>
+                  {fmtPYG(v, { sign: v < 0 })}
+                </span>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline',
+                        padding: '16px 0' }}>
+            <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Total a cobrar</span>
+            <span className="num" style={{ fontSize: 28, fontWeight: 600, letterSpacing: '-0.03em' }}>
+              Gs. 198.000
+            </span>
+          </div>
+
+          <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                        letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+            Método de pago
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8 }}>
+            {[
+              ['Efectivo', true],
+              ['Transferencia', false],
+              ['Tarjeta', false],
+              ['QR', false],
+            ].map(([n, sel]) => (
+              <div key={n} style={{
+                padding: '10px 12px', borderRadius: 8,
+                border: `1px solid ${sel ? 'var(--accent)' : 'var(--border-default)'}`,
+                background: sel ? 'var(--accent-soft)' : 'var(--bg-surface)',
+                color: sel ? 'var(--accent)' : 'var(--text-secondary)',
+                fontSize: 13, fontWeight: 500, textAlign: 'center', cursor: 'pointer',
+              }}>{n}</div>
+            ))}
+          </div>
+
+          <Input label="Recibido" prefix="Gs." value="200.000" style={{ marginTop: 16 }} />
+          <div style={{ display: 'flex', justifyContent: 'space-between',
+                        padding: '12px 0',
+                        fontSize: 13 }}>
+            <span style={{ color: 'var(--text-secondary)' }}>Vuelto</span>
+            <span className="num" style={{ fontWeight: 500, color: 'var(--pos-fg)' }}>Gs. 2.000</span>
+          </div>
+        </Card>
+      </div>
+    </AppShell>
+  </Themed>
+);
+
+// ============== SCREEN: NUEVO EGRESO ==============
+const NuevoEgreso = ({ theme }) => (
+  <Themed theme={theme}>
+    <AppShell
+      active="Egresos"
+      subtitle="Operación · Caja 1"
+      title="Registrar egreso"
+      actions={<>
+        <Button variant="ghost" size="sm">Cancelar</Button>
+        <Button variant="primary" size="sm" leading={<Icon name="check" size={14} />}>Registrar Gs. 180.000</Button>
+      </>}
+    >
+      <div style={{ maxWidth: 760 }}>
+        <Card title="Detalle del egreso">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>Categoría</div>
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
+                {[
+                  ['Insumos', true],
+                  ['Servicios públicos', false],
+                  ['Sueldos', false],
+                  ['Mantenimiento', false],
+                  ['Combustible', false],
+                  ['Otros', false],
+                ].map(([n, sel]) => (
+                  <span key={n} style={{
+                    padding: '8px 14px', borderRadius: 'var(--r-pill)',
+                    border: `1px solid ${sel ? 'var(--accent)' : 'var(--border-default)'}`,
+                    background: sel ? 'var(--accent-soft)' : 'var(--bg-surface)',
+                    color: sel ? 'var(--accent)' : 'var(--text-secondary)',
+                    fontSize: 13, fontWeight: 500, cursor: 'pointer',
+                  }}>{n}</span>
+                ))}
+              </div>
+            </div>
+
+            <Input label="Concepto" placeholder="Detalle breve" value="Compra de jabón industrial" />
+            <Input label="Proveedor" placeholder="Razón social" value="Distribuidora Sur S.A." trailing={<Icon name="chevron_down" size={15} />} />
+
+            <Input label="Monto" prefix="Gs." value="180.000" />
+            <Input label="Fecha" value="07/05/2026" trailing={<Icon name="calendar" size={15} />} />
+
+            <Input label="N° comprobante" placeholder="Factura / ticket" value="F-2841" />
+            <Input label="Método de pago" value="Efectivo · Caja 1" trailing={<Icon name="chevron_down" size={15} />} />
+
+            <div style={{ gridColumn: '1 / -1' }}>
+              <div style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)', marginBottom: 6 }}>Comprobante adjunto</div>
+              <div style={{
+                padding: 24, border: '1.5px dashed var(--border-strong)', borderRadius: 10,
+                textAlign: 'center', color: 'var(--text-tertiary)',
+                background: 'var(--bg-sunken)',
+              }}>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 13 }}>
+                  <Icon name="upload" size={16} />
+                  <span>Arrastrá una foto o <span style={{ color: 'var(--accent)', fontWeight: 500 }}>buscá un archivo</span></span>
+                </div>
+                <div style={{ fontSize: 11, marginTop: 6 }}>JPG, PNG o PDF · máx. 5MB</div>
+              </div>
+            </div>
+
+            <div style={{ gridColumn: '1 / -1' }}>
+              <Input label="Notas" placeholder="Observaciones adicionales (opcional)" />
+            </div>
+          </div>
+        </Card>
+      </div>
+    </AppShell>
+  </Themed>
+);
+
+// ============== SCREEN: MOVIMIENTOS (table + filters) ==============
+const Movimientos = ({ theme }) => (
+  <Themed theme={theme}>
+    <AppShell
+      active="Movimientos"
+      subtitle="Operación"
+      title="Movimientos"
+      actions={<>
+        <Button variant="secondary" size="sm" leading={<Icon name="download" size={14} />}>Exportar</Button>
+        <Button variant="primary" size="sm" leading={<Icon name="plus" size={14} />}>Nuevo</Button>
+      </>}
+    >
+      {/* Filter bar */}
+      <div style={{
+        display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap',
+        padding: 12, marginBottom: 16,
+        background: 'var(--bg-surface)',
+        border: '1px solid var(--border-default)',
+        borderRadius: 'var(--r-lg)',
+      }}>
+        <Input placeholder="Buscar por cliente, vehículo, concepto…" leading={<Icon name="search" size={15} />}
+               style={{ flex: 1, minWidth: 240 }} />
+        <Button variant="secondary" size="sm" trailing={<Icon name="chevron_down" size={14} />}>Tipo · Todos</Button>
+        <Button variant="secondary" size="sm" trailing={<Icon name="chevron_down" size={14} />}>Método · Todos</Button>
+        <Button variant="secondary" size="sm" trailing={<Icon name="chevron_down" size={14} />}>Estado · Todos</Button>
+        <Button variant="secondary" size="sm" leading={<Icon name="calendar" size={14} />}>01–07 may</Button>
+        <Badge tone="accent" dot>3 filtros activos</Badge>
+      </div>
+
+      {/* Summary */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 16 }}>
+        {[
+          ['Total movimientos', '184',         'neutral'],
+          ['Ingresos',          'Gs. 28.450.000', 'pos'],
+          ['Egresos',           'Gs. 4.120.000',  'neg'],
+          ['Balance',           'Gs. 24.330.000', 'accent'],
+        ].map(([l, v, t]) => (
+          <div key={l} style={{
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 'var(--r-lg)',
+            padding: 16, boxShadow: 'var(--shadow-xs)',
+          }}>
+            <div style={{ fontSize: 11, fontWeight: 500, color: 'var(--text-tertiary)',
+                          letterSpacing: '0.04em', textTransform: 'uppercase' }}>{l}</div>
+            <div className="num" style={{ fontSize: 20, fontWeight: 600, marginTop: 6,
+                                          color: t === 'pos' ? 'var(--pos-fg)'
+                                              : t === 'neg' ? 'var(--neg-fg)'
+                                              : t === 'accent' ? 'var(--accent)'
+                                              : 'var(--text-primary)' }}>{v}</div>
+          </div>
+        ))}
+      </div>
+
+      <Card padding="0">
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: 'var(--bg-sunken)' }}>
+              {['Fecha', 'Tipo', 'Concepto', 'Cliente / Proveedor', 'Método', 'Estado', 'Monto'].map((h, i) => (
+                <th key={h} style={{
+                  textAlign: i === 6 ? 'right' : 'left',
+                  padding: '11px 16px',
+                  fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                  letterSpacing: '0.06em', textTransform: 'uppercase',
+                  borderBottom: '1px solid var(--border-subtle)',
+                }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ['07/05 · 14:32','in', 'Lavado completo',     'Cárdenas, M.',  'Efectivo',      ['pos','Cobrado'],   85000],
+              ['07/05 · 14:18','in', 'Aspirado interior',   'González, R.',  'Transferencia', ['accent','En curso'], 45000],
+              ['07/05 · 13:55','in', 'Encerado premium',    'Riveros, A.',   'Tarjeta',       ['pos','Cobrado'],  220000],
+              ['07/05 · 13:40','out','Compra de jabón',     'Distrib. Sur',  'Efectivo',      ['pos','Pagado'],  -180000],
+              ['07/05 · 13:12','in', 'Lavado básico',       'Martínez, L.',  'Efectivo',      ['warn','Pendiente'], 35000],
+              ['07/05 · 12:48','in', 'Detallado full',      'Empresa Pegasus','Transferencia', ['pos','Cobrado'],  450000],
+              ['07/05 · 12:15','out','Pago empleado · día', 'Duarte, R.',    'Efectivo',      ['pos','Pagado'],  -220000],
+              ['07/05 · 11:30','in', 'Pulido óptico',       'Velázquez, P.', 'QR',            ['pos','Cobrado'],  180000],
+              ['07/05 · 10:42','in', 'Lavado completo',     'Acosta, F.',    'Efectivo',      ['neg','Anulado'],   85000],
+              ['07/05 · 09:55','out','Combustible · moto',  'Petrobras',     'Efectivo',      ['pos','Pagado'],   -85000],
+            ].map(([d, type, c, p, m, st, mt], i) => (
+              <tr key={i} style={{ borderBottom: '1px solid var(--border-subtle)',
+                                    background: i % 2 === 1 ? 'transparent' : 'transparent' }}>
+                <td className="mono" style={{ padding: '12px 16px', color: 'var(--text-tertiary)' }}>{d}</td>
+                <td style={{ padding: '12px 16px' }}>
+                  <span style={{
+                    width: 22, height: 22, borderRadius: 6,
+                    background: type === 'in' ? 'var(--pos-soft)' : 'var(--neg-soft)',
+                    color: type === 'in' ? 'var(--pos)' : 'var(--neg)',
+                    display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                  }}><Icon name={type === 'in' ? 'arrow_in' : 'arrow_out'} size={12} stroke={2.2} /></span>
+                </td>
+                <td style={{ padding: '12px 16px', color: 'var(--text-primary)', fontWeight: 500 }}>{c}</td>
+                <td style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{p}</td>
+                <td style={{ padding: '12px 16px' }}><Badge tone="neutral">{m}</Badge></td>
+                <td style={{ padding: '12px 16px' }}><Badge tone={st[0]} dot>{st[1]}</Badge></td>
+                <td className="num" style={{ padding: '12px 16px', textAlign: 'right', fontWeight: 500,
+                                              color: mt < 0 ? 'var(--neg-fg)'
+                                                    : st[1] === 'Anulado' ? 'var(--text-disabled)'
+                                                    : 'var(--text-primary)',
+                                              textDecoration: st[1] === 'Anulado' ? 'line-through' : 'none' }}>
+                  {fmtPYG(mt, { sign: true })}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                      padding: '12px 16px', borderTop: '1px solid var(--border-subtle)' }}>
+          <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Mostrando 1–10 de 184</div>
+          <Row>
+            <Button variant="secondary" size="sm">Anterior</Button>
+            <Button variant="secondary" size="sm">Siguiente</Button>
+          </Row>
+        </div>
+      </Card>
+    </AppShell>
+  </Themed>
+);
+
+// ============== SCREEN: REPORTES ==============
+const Reportes = ({ theme }) => {
+  const trend = [12, 18, 15, 22, 28, 24, 32, 38, 35, 42, 48, 52, 49, 58, 62, 65, 68, 72, 78, 82, 88, 92, 89, 95, 102, 108, 112, 118, 122, 128];
+
+  return (
+    <Themed theme={theme}>
+      <AppShell
+        active="Reportes"
+        subtitle="Análisis"
+        title="Reportes"
+        actions={<>
+          <Button variant="secondary" size="sm" leading={<Icon name="calendar" size={14} />}>Mayo 2026</Button>
+          <Button variant="secondary" size="sm" leading={<Icon name="download" size={14} />}>Exportar PDF</Button>
+        </>}
+      >
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 16 }}>
+          <KPI label="Facturación mensual" value="Gs. 84.2M" delta="+18%" deltaTone="pos"
+               hint="objetivo Gs. 80M · 105%"
+               sparkline={<Sparkline data={trend.slice(-12)} color="var(--pos)" />} />
+          <KPI label="Margen operativo" value="68.4%" delta="+2.1pp" deltaTone="pos"
+               hint="vs. mes anterior 66.3%"
+               sparkline={<Sparkline data={[60,62,61,64,66,65,67,68,68,68]} color="var(--accent)" />} />
+          <KPI label="Ticket promedio" value="Gs. 142.500" delta="+5.8%" deltaTone="pos"
+               hint="por servicio cobrado"
+               sparkline={<Sparkline data={[8,9,10,11,10,12,13,12,14,15]} color="var(--text-secondary)" fill={false} />} />
+          <KPI label="Servicios totales" value="591" delta="+12.3%" deltaTone="pos"
+               hint="19.7 por día"
+               sparkline={<Sparkline data={[15,18,16,20,22,21,24,26,28,30]} color="var(--warn)" />} />
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 16 }}>
+          <Card padding="0" title="Tendencia · ingresos del mes"
+                action={<Row>
+                  <Badge tone="neutral">Mayo</Badge>
+                  <Badge tone="neutral">vs. abril</Badge>
+                </Row>}>
+            <div style={{ padding: '16px 24px 8px' }}>
+              <svg viewBox="0 0 720 240" style={{ width: '100%', height: 240, display: 'block' }}>
+                {[0, 1, 2, 3].map(i => (
+                  <line key={i} x1="40" x2="710" y1={20 + i * 50} y2={20 + i * 50}
+                        stroke="var(--border-subtle)" strokeWidth="1" />
+                ))}
+                {(() => {
+                  const max = Math.max(...trend);
+                  const points = trend.map((v, i) => [
+                    40 + (i / (trend.length - 1)) * 670,
+                    220 - (v / max) * 200,
+                  ]);
+                  const path = 'M' + points.map(p => p.join(',')).join(' L');
+                  const area = path + ` L${points[points.length-1][0]},220 L40,220 Z`;
+                  return <>
+                    <defs>
+                      <linearGradient id="g-rep" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.18" />
+                        <stop offset="100%" stopColor="var(--accent)" stopOpacity="0" />
+                      </linearGradient>
+                    </defs>
+                    <path d={area} fill="url(#g-rep)" />
+                    <path d={path} stroke="var(--accent)" strokeWidth="2" fill="none" strokeLinecap="round" />
+                    <circle cx={points[points.length-1][0]} cy={points[points.length-1][1]} r="4" fill="var(--accent)" stroke="var(--bg-surface)" strokeWidth="2" />
+                  </>;
+                })()}
+                {[1, 8, 15, 22, 30].map((d, i) => (
+                  <text key={d} x={40 + ((d-1) / 29) * 670} y="234"
+                        fontSize="10" fill="var(--text-tertiary)" textAnchor="middle">{d} may</text>
+                ))}
+              </svg>
+            </div>
+          </Card>
+
+          <Card title="Top servicios · mes">
+            {[
+              ['Lavado completo',  185, 'var(--accent)'],
+              ['Lavado básico',    142, 'var(--pos)'],
+              ['Encerado premium',  87, 'var(--warn)'],
+              ['Aspirado interior', 76, 'var(--text-secondary)'],
+              ['Detallado full',    44, 'var(--text-tertiary)'],
+            ].map(([n, c, color], i) => {
+              const pct = (c / 185) * 100;
+              return (
+                <div key={n} style={{ marginBottom: 12 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between',
+                                fontSize: 13, marginBottom: 6 }}>
+                    <span>{n}</span>
+                    <span className="num" style={{ color: 'var(--text-secondary)' }}>{c}</span>
+                  </div>
+                  <div style={{ height: 6, background: 'var(--bg-sunken)', borderRadius: 999, overflow: 'hidden' }}>
+                    <div style={{ width: `${pct}%`, height: '100%', background: color, borderRadius: 999 }} />
+                  </div>
+                </div>
+              );
+            })}
+          </Card>
+        </div>
+
+        <Card title="Comparativo por día de la semana">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 12 }}>
+            {['Lunes','Martes','Miércoles','Jueves','Viernes','Sábado','Domingo'].map((d, i) => {
+              const vals = [3.4, 4.1, 3.8, 4.6, 5.2, 6.4, 4.3];
+              const max = 6.4;
+              return (
+                <div key={d} style={{ textAlign: 'center' }}>
+                  <div style={{ height: 110, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
+                    <div style={{
+                      width: '60%',
+                      height: `${(vals[i] / max) * 100}%`,
+                      background: i === 5 ? 'var(--accent)' : 'var(--bg-sunken)',
+                      border: i === 5 ? 'none' : '1px solid var(--border-default)',
+                      borderRadius: '6px 6px 0 0',
+                    }} />
+                  </div>
+                  <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginTop: 8 }}>{d}</div>
+                  <div className="num" style={{ fontSize: 12, fontWeight: 500, marginTop: 2,
+                                                  color: i === 5 ? 'var(--accent)' : 'var(--text-primary)' }}>
+                    Gs. {vals[i]}M
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </Card>
+      </AppShell>
+    </Themed>
+  );
+};
+
+// ============== SCREEN: EMPTY STATES ==============
+const EmptyStates = ({ theme }) => (
+  <Themed theme={theme} style={{ padding: 32, overflowY: 'auto' }}>
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>05 · Patterns</div>
+      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.03em', marginTop: 4 }}>Estados vacíos & feedback</div>
+    </div>
+
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+      {/* Empty state */}
+      <Card padding="0" style={{ minHeight: 320 }}>
+        <div style={{ padding: 'var(--s-7) var(--s-5)', textAlign: 'center' }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 14,
+            background: 'var(--bg-sunken)',
+            border: '1px solid var(--border-subtle)',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--text-tertiary)',
+          }}>
+            <Icon name="inbox" size={26} stroke={1.4} />
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 600, marginTop: 16, letterSpacing: '-0.02em' }}>
+            Sin movimientos hoy
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 6, maxWidth: 320, marginInline: 'auto', lineHeight: 1.5 }}>
+            Cuando registres un ingreso o egreso aparecerá acá.
+          </div>
+          <div style={{ marginTop: 20, display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <Button variant="primary" size="sm" leading={<Icon name="plus" size={14} />}>Registrar ingreso</Button>
+            <Button variant="ghost" size="sm">Ver ayer</Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Error state */}
+      <Card padding="0" style={{ minHeight: 320 }}>
+        <div style={{ padding: 'var(--s-7) var(--s-5)', textAlign: 'center' }}>
+          <div style={{
+            width: 56, height: 56, borderRadius: 14,
+            background: 'var(--neg-soft)',
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+            color: 'var(--neg)',
+          }}>
+            <Icon name="x" size={26} stroke={2} />
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 600, marginTop: 16, letterSpacing: '-0.02em' }}>
+            No pudimos sincronizar la caja
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 6, maxWidth: 340, marginInline: 'auto', lineHeight: 1.5 }}>
+            Hay 3 movimientos guardados localmente. Revisá tu conexión o reintentá ahora.
+          </div>
+          <div style={{ marginTop: 20, display: 'flex', gap: 8, justifyContent: 'center' }}>
+            <Button variant="primary" size="sm">Reintentar</Button>
+            <Button variant="ghost" size="sm">Ver detalles</Button>
+          </div>
+        </div>
+      </Card>
+
+      {/* Success toast */}
+      <Card title="Toast · success">
+        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12,
+                      padding: 14, background: 'var(--bg-sunken)',
+                      border: '1px solid var(--border-default)',
+                      borderRadius: 10,
+                      borderLeft: '3px solid var(--pos)' }}>
+          <span style={{ width: 24, height: 24, borderRadius: 999, background: 'var(--pos-soft)',
+                         color: 'var(--pos)', display: 'inline-flex',
+                         alignItems: 'center', justifyContent: 'center', flex: '0 0 auto' }}>
+            <Icon name="check" size={14} stroke={2.4} />
+          </span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 500 }}>Ingreso registrado</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 2 }}>
+              Gs. 198.000 · BMW X3 · Encerado premium
+            </div>
+          </div>
+          <Icon name="x" size={14} color="var(--text-tertiary)" />
+        </div>
+      </Card>
+
+      {/* Confirm dialog (glass) */}
+      <Card title="Modal · glass overlay">
+        <div style={{ position: 'relative', height: 220, borderRadius: 10, overflow: 'hidden',
+                      background: 'linear-gradient(135deg, #1e3a8a 0%, #3B82F6 100%)' }}>
+          <div style={{
+            position: 'absolute', inset: 'auto 16px 16px 16px',
+            padding: 18,
+            background: 'var(--bg-overlay)',
+            backdropFilter: 'blur(20px) saturate(1.4)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 14,
+            boxShadow: 'var(--shadow-glass)',
+          }}>
+            <div style={{ fontSize: 14, fontWeight: 600 }}>¿Anular este movimiento?</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4 }}>
+              Esta acción no se puede deshacer.
+            </div>
+            <Row style={{ marginTop: 14, justifyContent: 'flex-end', gap: 6 }}>
+              <Button variant="ghost" size="sm">Cancelar</Button>
+              <Button variant="danger" size="sm">Anular</Button>
+            </Row>
+          </div>
+        </div>
+      </Card>
+    </div>
+  </Themed>
+);
+
+Object.assign(window, {
+  Dashboard, CajaDiaria, NuevoIngreso, NuevoEgreso, Movimientos, Reportes, EmptyStates,
+});
+
+</script>
+
+<script type="text/babel" data-presets="react" data-from="ds-responsive.jsx">
+// ds-responsive.jsx — Mobile-first Registrar Ingreso + tablet vertical + responsive docs.
+// Mapped to Flet ResponsiveRow / col conventions.
+
+// Breakpoints aligned to MD3 + Flet
+const BP = {
+  xs: { range: '< 600',     name: 'Móvil',           cols: 4 },
+  sm: { range: '600–904',   name: 'Móvil grande',    cols: 8 },
+  md: { range: '905–1239',  name: 'Tablet vertical', cols: 12 },
+  lg: { range: '1240–1439', name: 'Desktop',         cols: 12 },
+  xl: { range: '≥ 1440',    name: 'Desktop wide',    cols: 12 },
+};
+
+// ============== MOBILE: REGISTRAR INGRESO ==============
+// 4 stacked steps in a single scrollable view, optimized for thumb reach
+// and single-hand operation. Sticky CTA bottom. 48px+ hit targets.
+const MobileIngreso = () => {
+  const SERVICES = [
+    ['Lavado básico',     '35.000',  false],
+    ['Lavado completo',   '85.000',  false],
+    ['Encerado premium',  '220.000', true],
+    ['Aspirado interior', '45.000',  false],
+    ['Pulido óptico',     '180.000', false],
+    ['Detallado full',    '450.000', false],
+  ];
+  const PAYS = [['Efectivo', true], ['Transfer.', false], ['Tarjeta', false], ['QR', false]];
+
+  return (
+    <Themed theme="light" style={{ display: 'flex', flexDirection: 'column' }}>
+      {/* Header — back + title + step indicator */}
+      <header style={{
+        display: 'flex', alignItems: 'center', gap: 12,
+        padding: '14px 16px',
+        background: 'var(--bg-surface)',
+        borderBottom: '1px solid var(--border-subtle)',
+        position: 'sticky', top: 0, zIndex: 5,
+      }}>
+        <button style={{
+          width: 40, height: 40, borderRadius: 10, border: 'none',
+          background: 'var(--bg-sunken)', color: 'var(--text-primary)',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+        }}>
+          <Icon name="chevron_right" size={18} stroke={2} color="var(--text-primary)" />
+        </button>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Caja 1 · Andrés</div>
+          <div style={{ fontSize: 16, fontWeight: 600, letterSpacing: '-0.02em' }}>Nuevo ingreso</div>
+        </div>
+        <div style={{ display: 'flex', gap: 4 }}>
+          {[1,2,3,4].map(n => (
+            <span key={n} style={{
+              width: 18, height: 4, borderRadius: 2,
+              background: n <= 2 ? 'var(--accent)' : 'var(--bg-sunken)',
+            }} />
+          ))}
+        </div>
+      </header>
+
+      <div style={{ flex: 1, overflowY: 'auto', padding: '16px 16px 120px' }}>
+        {/* Step 1 — Service */}
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                      letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+          1 · Servicio
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 24 }}>
+          {SERVICES.map(([n, p, sel]) => (
+            <div key={n} style={{
+              padding: 14, minHeight: 76,
+              borderRadius: 12,
+              border: `1.5px solid ${sel ? 'var(--accent)' : 'var(--border-default)'}`,
+              background: sel ? 'var(--accent-soft)' : 'var(--bg-surface)',
+              display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+              position: 'relative',
+            }}>
+              <div style={{ fontSize: 13, fontWeight: 500, color: sel ? 'var(--accent)' : 'var(--text-primary)', lineHeight: 1.3 }}>{n}</div>
+              <div className="num" style={{ fontSize: 14, fontWeight: 600, marginTop: 6,
+                                              color: sel ? 'var(--accent)' : 'var(--text-primary)' }}>
+                Gs. {p}
+              </div>
+              {sel && (
+                <div style={{ position: 'absolute', top: 8, right: 8,
+                              width: 18, height: 18, borderRadius: 999,
+                              background: 'var(--accent)',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <Icon name="check" size={11} stroke={3} color="#fff" />
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* Step 2 — Vehicle */}
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                      letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+          2 · Vehículo
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, marginBottom: 24 }}>
+          {/* Larger inputs — 48px height — touch-friendly */}
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)' }}>Patente</span>
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              height: 48, padding: '0 14px',
+              background: 'var(--bg-surface)',
+              border: '1.5px solid var(--accent)',
+              borderRadius: 12,
+              boxShadow: '0 0 0 4px var(--accent-soft)',
+            }}>
+              <span className="mono" style={{ fontSize: 18, fontWeight: 600, letterSpacing: '0.05em' }}>CDE 789</span>
+              <span style={{ width: 2, height: 22, background: 'var(--accent)', marginLeft: 4,
+                              animation: 'blink 1s infinite' }} />
+            </div>
+          </label>
+          <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)' }}>Marca y modelo</span>
+            <div style={{
+              display: 'flex', alignItems: 'center',
+              height: 48, padding: '0 14px',
+              background: 'var(--bg-surface)',
+              border: '1.5px solid var(--border-default)',
+              borderRadius: 12,
+            }}>
+              <span style={{ fontSize: 15, color: 'var(--text-primary)' }}>BMW X3</span>
+            </div>
+          </label>
+        </div>
+
+        {/* Step 3 — Cliente (compact) */}
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                      letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+          3 · Cliente <span style={{ textTransform: 'none', letterSpacing: 0, color: 'var(--text-tertiary)', fontWeight: 400 }}>· opcional</span>
+        </div>
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 12,
+          padding: 12,
+          background: 'var(--bg-surface)',
+          border: '1px solid var(--border-default)',
+          borderRadius: 12,
+          marginBottom: 24,
+        }}>
+          <div style={{ width: 40, height: 40, borderRadius: 999, background: 'var(--accent-soft)',
+                        color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        fontSize: 13, fontWeight: 600 }}>RC</div>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 14, fontWeight: 500 }}>Ricardo Cárdenas</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>18 servicios · frecuente</div>
+          </div>
+          <Badge tone="accent">−10%</Badge>
+        </div>
+
+        {/* Step 4 — Payment */}
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                      letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 10 }}>
+          4 · Método de pago
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 6, marginBottom: 16 }}>
+          {PAYS.map(([n, sel]) => (
+            <div key={n} style={{
+              padding: '14px 6px', minHeight: 56,
+              borderRadius: 12,
+              border: `1.5px solid ${sel ? 'var(--accent)' : 'var(--border-default)'}`,
+              background: sel ? 'var(--accent-soft)' : 'var(--bg-surface)',
+              color: sel ? 'var(--accent)' : 'var(--text-secondary)',
+              fontSize: 12, fontWeight: 500, textAlign: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>{n}</div>
+          ))}
+        </div>
+
+        {/* Numeric keypad-friendly amount field */}
+        <label style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          <span style={{ fontSize: 12, fontWeight: 500, color: 'var(--text-secondary)' }}>Recibido</span>
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            height: 56, padding: '0 16px',
+            background: 'var(--bg-surface)',
+            border: '1.5px solid var(--border-default)',
+            borderRadius: 12,
+          }}>
+            <span className="mono" style={{ fontSize: 14, color: 'var(--text-tertiary)' }}>Gs.</span>
+            <span className="num" style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.02em' }}>200.000</span>
+          </div>
+          <span style={{ fontSize: 12, color: 'var(--pos-fg)', marginTop: 4 }}>
+            Vuelto: <span className="num" style={{ fontWeight: 500 }}>Gs. 2.000</span>
+          </span>
+        </label>
+      </div>
+
+      {/* Sticky bottom CTA — total + button */}
+      <div style={{
+        position: 'sticky', bottom: 0,
+        padding: '14px 16px 22px',
+        background: 'var(--bg-surface)',
+        borderTop: '1px solid var(--border-subtle)',
+        boxShadow: '0 -8px 16px rgba(0,0,0,0.04)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+          <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Total a cobrar</span>
+          <span className="num" style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.025em' }}>Gs. 198.000</span>
+        </div>
+        <button style={{
+          width: '100%', height: 52,
+          background: 'var(--pos)', color: '#fff',
+          border: 'none', borderRadius: 12,
+          fontFamily: 'inherit', fontSize: 15, fontWeight: 600,
+          letterSpacing: '-0.01em',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+          boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 12px rgba(5,150,105,0.25)',
+        }}>
+          <Icon name="check" size={18} stroke={2.4} color="#fff" />
+          Cobrar Gs. 198.000
+        </button>
+      </div>
+    </Themed>
+  );
+};
+
+// ============== TABLET VERTICAL: REGISTRAR INGRESO ==============
+// 2-column adaptive: form left, summary right (sticky).
+// Larger touch targets than desktop, but uses the available width.
+const TabletIngreso = () => (
+  <Themed theme="light">
+    <header style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '18px 24px',
+      background: 'var(--bg-surface)',
+      borderBottom: '1px solid var(--border-subtle)',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+        <button style={{ width: 40, height: 40, borderRadius: 10, border: 'none',
+                          background: 'var(--bg-sunken)' }}>
+          <Icon name="chevron_right" size={18} stroke={2} />
+        </button>
+        <div>
+          <div style={{ fontSize: 11, color: 'var(--text-tertiary)' }}>Caja 1 · Andrés</div>
+          <div style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.02em' }}>Registrar ingreso</div>
+        </div>
+      </div>
+      <Button variant="ghost" size="md">Cancelar</Button>
+    </header>
+
+    <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 16, padding: 20 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <Card title="Servicio">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+            {[
+              ['Lavado básico',    '35.000',  false],
+              ['Lavado completo',  '85.000',  false],
+              ['Encerado premium', '220.000', true],
+              ['Aspirado interior','45.000',  false],
+              ['Pulido óptico',    '180.000', false],
+              ['Detallado full',   '450.000', false],
+            ].map(([n, p, sel]) => (
+              <div key={n} style={{
+                padding: 16, minHeight: 76,
+                borderRadius: 12,
+                border: `1.5px solid ${sel ? 'var(--accent)' : 'var(--border-default)'}`,
+                background: sel ? 'var(--accent-soft)' : 'var(--bg-surface)',
+              }}>
+                <div style={{ fontSize: 14, fontWeight: 500, color: sel ? 'var(--accent)' : 'var(--text-primary)' }}>{n}</div>
+                <div className="num" style={{ fontSize: 13, color: 'var(--text-tertiary)', marginTop: 6 }}>Gs. {p}</div>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card title="Vehículo y operario">
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <Input label="Patente" value="CDE 789" />
+            <Input label="Marca y modelo" value="BMW X3" />
+            <Input label="Operario" value="Ramón Duarte" trailing={<Icon name="chevron_down" size={15} />} />
+            <Input label="Tiempo estimado" suffix="min" value="45" />
+          </div>
+        </Card>
+      </div>
+
+      <Card title="Cobro">
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, paddingBottom: 14,
+                      borderBottom: '1px solid var(--border-subtle)' }}>
+          {[['Encerado premium', 220000], ['Descuento frecuente', -22000]].map(([l, v]) => (
+            <div key={l} style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13 }}>
+              <span style={{ color: 'var(--text-secondary)' }}>{l}</span>
+              <span className="num" style={{ fontWeight: 500, color: v < 0 ? 'var(--neg-fg)' : 'var(--text-primary)' }}>
+                {fmtPYG(v, { sign: v < 0 })}
+              </span>
+            </div>
+          ))}
+        </div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '14px 0' }}>
+          <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>Total</span>
+          <span className="num" style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.03em' }}>Gs. 198.000</span>
+        </div>
+
+        <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                      letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 8 }}>
+          Método de pago
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginBottom: 14 }}>
+          {[['Efectivo', true],['Transferencia', false],['Tarjeta', false],['QR', false]].map(([n, sel]) => (
+            <div key={n} style={{
+              padding: '14px 12px', borderRadius: 10,
+              border: `1.5px solid ${sel ? 'var(--accent)' : 'var(--border-default)'}`,
+              background: sel ? 'var(--accent-soft)' : 'var(--bg-surface)',
+              color: sel ? 'var(--accent)' : 'var(--text-secondary)',
+              fontSize: 13, fontWeight: 500, textAlign: 'center', minHeight: 48,
+            }}>{n}</div>
+          ))}
+        </div>
+
+        <Input label="Recibido" prefix="Gs." value="200.000" />
+        <button style={{
+          width: '100%', height: 52, marginTop: 16,
+          background: 'var(--pos)', color: '#fff',
+          border: 'none', borderRadius: 12,
+          fontFamily: 'inherit', fontSize: 15, fontWeight: 600,
+          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+        }}>
+          <Icon name="check" size={18} stroke={2.4} color="#fff" />
+          Cobrar Gs. 198.000
+        </button>
+      </Card>
+    </div>
+  </Themed>
+);
+
+// ============== RESPONSIVE DOCS ==============
+const ResponsiveDocs = () => (
+  <Themed theme="light" style={{ padding: 32, overflowY: 'auto' }}>
+    <div style={{ marginBottom: 24 }}>
+      <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>11 · Responsive</div>
+      <div style={{ fontSize: 26, fontWeight: 600, letterSpacing: '-0.03em', marginTop: 4 }}>Sistema responsive · Flet</div>
+      <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 8, maxWidth: 580, lineHeight: 1.55 }}>
+        Breakpoints alineados a Material Design 3 + grid de 12 columnas para `ft.ResponsiveRow`. Mobile-first: el layout móvil es la base y crece hacia arriba.
+      </div>
+    </div>
+
+    {/* Breakpoints */}
+    <div style={{ marginBottom: 32 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Breakpoints
+      </div>
+      <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)',
+                    borderRadius: 12, overflow: 'hidden' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+          <thead>
+            <tr style={{ background: 'var(--bg-sunken)' }}>
+              {['Token', 'Rango (px)', 'Dispositivo', 'Cols ResponsiveRow', 'Padding', 'Gap'].map(h => (
+                <th key={h} style={{ textAlign: 'left', padding: '11px 16px',
+                                      fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                                      letterSpacing: '0.06em', textTransform: 'uppercase',
+                                      borderBottom: '1px solid var(--border-subtle)' }}>{h}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              ['xs', '< 600',     'Móvil',           '4 cols',  '16px', '8/12'],
+              ['sm', '600–904',   'Móvil grande',    '8 cols',  '20px', '12'],
+              ['md', '905–1239',  'Tablet vertical', '12 cols', '24px', '16'],
+              ['lg', '1240–1439', 'Desktop',         '12 cols', '32px', '16'],
+              ['xl', '≥ 1440',    'Desktop wide',    '12 cols', '40px', '24'],
+            ].map(([t, r, d, c, p, g]) => (
+              <tr key={t} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                <td className="mono" style={{ padding: '12px 16px', fontWeight: 500, color: 'var(--accent)' }}>{t}</td>
+                <td className="mono" style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{r}</td>
+                <td style={{ padding: '12px 16px', color: 'var(--text-primary)' }}>{d}</td>
+                <td className="mono" style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{c}</td>
+                <td className="mono" style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{p}</td>
+                <td className="mono" style={{ padding: '12px 16px', color: 'var(--text-secondary)' }}>{g}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    {/* Visual breakpoint diagram */}
+    <div style={{ marginBottom: 32 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Reflow de Registrar Ingreso
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }}>
+        {[
+          { lbl: 'xs · Móvil', w: 320, layout: ['Servicio (2col)', 'Vehículo (1col)', 'Cliente', 'Pago (4col)', 'CTA sticky'] },
+          { lbl: 'md · Tablet', w: 720, layout: ['Form izq · Cobro der', '2 cols cards', 'CTA en card'] },
+          { lbl: 'lg · Desktop', w: 1280, layout: ['Sidebar · Form · Cobro', '3 cols servicios', 'CTA en topbar'] },
+        ].map(b => (
+          <div key={b.lbl}>
+            <div className="mono" style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 6 }}>{b.lbl} · {b.w}px</div>
+            <div style={{
+              border: '1.5px solid var(--border-default)',
+              borderRadius: 10, padding: 8,
+              background: 'var(--bg-surface)',
+              display: 'flex', flexDirection: 'column', gap: 5,
+            }}>
+              {b.layout.map((l, i) => (
+                <div key={i} style={{
+                  height: 24, borderRadius: 5,
+                  background: i === b.layout.length - 1 ? 'var(--accent)' : 'var(--bg-sunken)',
+                  color: i === b.layout.length - 1 ? '#fff' : 'var(--text-secondary)',
+                  fontSize: 10, padding: '0 8px',
+                  display: 'flex', alignItems: 'center',
+                }}>{l}</div>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Touch targets */}
+    <div style={{ marginBottom: 32 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Tamaños táctiles · mínimo 44px (Apple HIG) · 48px recomendado (MD3)
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+        {[
+          ['Botón primario', '52px', 'Sticky CTA móvil'],
+          ['Inputs',         '48px', 'Más alto que desktop (38px)'],
+          ['Service chips',  '76px', 'Mínima altura 2 líneas + monto'],
+          ['Pago tabs',      '56px', 'Cuadrícula 4×56'],
+        ].map(([l, h, n]) => (
+          <div key={l} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border-default)',
+                                 borderRadius: 10, padding: 14 }}>
+            <div className="num" style={{ fontSize: 22, fontWeight: 600, color: 'var(--accent)' }}>{h}</div>
+            <div style={{ fontSize: 13, fontWeight: 500, marginTop: 4 }}>{l}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4 }}>{n}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+
+    {/* Flet code */}
+    <div style={{ marginBottom: 16 }}>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Implementación · Flet ResponsiveRow
+      </div>
+      <div className="mono" style={{
+        background: '#0A0A0A', color: '#E4E4E0',
+        padding: 18, borderRadius: 10,
+        fontSize: 12, lineHeight: 1.65,
+        whiteSpace: 'pre', overflowX: 'auto',
+      }}>
+{`# Servicio cards: 2 cols xs, 3 cols md, 6 cols lg
+ft.ResponsiveRow(
+    columns=12, spacing=10, run_spacing=10,
+    controls=[
+        service_card(s, col={"xs": 6, "md": 4, "lg": 2})
+        for s in SERVICES
+    ],
+)
+
+# Form left + summary right (md+) — stacks on xs
+ft.ResponsiveRow(
+    columns=12, spacing=16,
+    controls=[
+        ft.Container(content=form,    col={"xs": 12, "md": 7}),
+        ft.Container(content=summary, col={"xs": 12, "md": 5}),
+    ],
+)
+
+# Touch-friendly input (mobile)
+ft.TextField(
+    label="Patente",
+    text_size=18,
+    height=48,                     # vs 38 desktop
+    border_radius=12,
+    keyboard_type=ft.KeyboardType.TEXT,
+    text_capitalization=ft.TextCapitalization.CHARACTERS,
+)
+
+# Numeric input — opens numpad
+ft.TextField(
+    label="Recibido", prefix_text="Gs. ",
+    keyboard_type=ft.KeyboardType.NUMBER,
+    height=56, text_size=22,
+    text_style=ft.TextStyle(font_family="Geist Mono", weight=ft.FontWeight.W_600),
+)
+
+# Sticky bottom CTA — Stack + alignment
+ft.Stack([
+    main_scroll_view,
+    ft.Container(
+        content=cta_button,
+        bottom=0, left=0, right=0,
+        bgcolor=SURFACE,
+        padding=ft.padding.only(left=16, right=16, top=14, bottom=22),
+        border=ft.border.only(top=ft.BorderSide(1, BORDER_SUBTLE)),
+    ),
+])
+
+# Adapt sidebar -> bottom nav
+def build_nav(page):
+    if page.width < 905:                    # xs/sm
+        return ft.NavigationBar(destinations=[...])  # bottom
+    return ft.NavigationRail(extended=page.width >= 1240)
+
+page.on_resized = lambda e: page.update()`}
+      </div>
+    </div>
+
+    {/* Reflow rules */}
+    <div>
+      <div style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-tertiary)',
+                    letterSpacing: '0.06em', textTransform: 'uppercase', marginBottom: 12 }}>
+        Reglas de adaptación
+      </div>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
+        {[
+          ['Sidebar', 'lg+: NavigationRail extendido · md: rail compacto · xs/sm: NavigationBar (bottom)'],
+          ['KPIs',    'lg: 4 en fila · md: 2×2 · xs: 1 col scroll vertical (o carrusel horizontal)'],
+          ['Tabla',   'lg/md: DataTable · xs/sm: lista de cards apiladas con monto destacado'],
+          ['Forms',   'lg/md: 2 cols · xs/sm: 1 col, 100% ancho'],
+          ['Modales', 'md+: AlertDialog centrado · xs: BottomSheet full-height'],
+          ['Filtros', 'lg: barra horizontal · xs: BottomSheet con chips'],
+          ['Topbar',  'lg: título + acciones inline · xs: título + 1 acción primaria + kebab'],
+          ['CTA',     'lg: top-right · xs: sticky bottom 100% width'],
+        ].map(([k, v]) => (
+          <div key={k} style={{
+            padding: 14,
+            background: 'var(--bg-surface)',
+            border: '1px solid var(--border-default)',
+            borderRadius: 10,
+          }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)' }}>{k}</div>
+            <div style={{ fontSize: 12, color: 'var(--text-secondary)', marginTop: 4, lineHeight: 1.55 }}>{v}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </Themed>
+);
+
+// ============== iPHONE FRAME WRAPPER ==============
+const PhoneFrame = ({ children }) => (
+  <div style={{
+    width: '100%', height: '100%',
+    background: '#f0eee9',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: 24,
+  }}>
+    <div style={{
+      width: 390, height: 800,
+      background: 'var(--bg-app)',
+      borderRadius: 44,
+      boxShadow: '0 0 0 12px #1a1a1a, 0 24px 60px rgba(0,0,0,0.18)',
+      overflow: 'hidden', position: 'relative',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {/* Notch / dynamic island */}
+      <div style={{
+        position: 'absolute', top: 12, left: '50%', transform: 'translateX(-50%)',
+        width: 110, height: 30, borderRadius: 999,
+        background: '#000', zIndex: 50,
+      }} />
+      {/* Status bar spacer */}
+      <div style={{ height: 50, flex: '0 0 auto', display: 'flex',
+                    alignItems: 'center', justifyContent: 'space-between',
+                    padding: '0 28px', fontSize: 14, fontWeight: 600,
+                    fontFamily: '-apple-system, BlinkMacSystemFont, sans-serif' }}>
+        <span>9:41</span>
+        <span style={{ display: 'flex', gap: 5, alignItems: 'center' }}>
+          <span style={{ width: 16, height: 10, border: '1.2px solid currentColor', borderRadius: 2,
+                          position: 'relative' }}>
+            <span style={{ position: 'absolute', inset: 1, background: 'currentColor', width: '70%', borderRadius: 1 }} />
+          </span>
+        </span>
+      </div>
+      <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
+const TabletFrame = ({ children }) => (
+  <div style={{
+    width: '100%', height: '100%',
+    background: '#f0eee9',
+    display: 'flex', alignItems: 'center', justifyContent: 'center',
+    padding: 20,
+  }}>
+    <div style={{
+      width: 820, height: 1100,
+      background: 'var(--bg-app)',
+      borderRadius: 28,
+      boxShadow: '0 0 0 14px #1a1a1a, 0 24px 60px rgba(0,0,0,0.18)',
+      overflow: 'hidden',
+      display: 'flex', flexDirection: 'column',
+    }}>
+      {children}
+    </div>
+  </div>
+);
+
+Object.assign(window, { MobileIngreso, TabletIngreso, ResponsiveDocs, PhoneFrame, TabletFrame });
+
+</script>
+
+<script type="text/babel" data-presets="react" data-from="ds-app.jsx">
+// ds-app.jsx — assembles the design canvas with sections + artboards.
+
+const App = () => {
+  // Standard artboard sizes
+  const W_FULL = 1280;   // desktop screen
+  const H_FULL = 820;
+  const W_DOC = 720;     // narrow ref doc (palette, type, tokens)
+  const H_DOC = 820;
+  const W_WIDE = 1280;   // components canvas
+  const H_COMP = 1280;
+
+  return (
+    <DesignCanvas>
+      {/* Intro */}
+      <DCSection
+        id="intro"
+        title="Mukusoft · Design System"
+        subtitle="Dashboard financiero para Car Wash · Stripe/Vercel-style · Geist + Geist Mono · Light + Dark"
+      >
+        <DCArtboard id="intro-card" label="Brief" width={720} height={420}>
+          <Themed theme="light" style={{ padding: 40, display: 'flex', flexDirection: 'column' }}>
+            <Logo size={26} />
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase', marginTop: 28 }}>
+              Cómo leer este sistema
+            </div>
+            <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.025em', lineHeight: 1.35, marginTop: 8, color: 'var(--text-primary)' }}>
+              Cards planas con borde 1px, vidrio sólo en overlays.
+              Tipografía protagonista, números siempre tabulares.
+              Acento azul eléctrico únicamente para acción y totales.
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 24, marginTop: 32 }}>
+              {[
+                ['Mood',     'Stripe / Vercel'],
+                ['Densidad', 'Cómoda · base 14'],
+                ['Acento',   '#3B82F6 · azul eléctrico'],
+                ['Type',     'Geist · Geist Mono'],
+                ['Spacing',  '4 · 8 · 12 · 16 · 24'],
+                ['Stack',    'Flet + MD3 compat.'],
+              ].map(([k, v]) => (
+                <div key={k}>
+                  <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>{k}</div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-primary)', marginTop: 4 }}>{v}</div>
+                </div>
+              ))}
+            </div>
+          </Themed>
+        </DCArtboard>
+      </DCSection>
+
+      {/* Foundations */}
+      <DCSection
+        id="foundations"
+        title="01 · Foundations"
+        subtitle="Color, tipografía y tokens"
+      >
+        <DCArtboard id="palette-light" label="Paleta · Light" width={W_DOC} height={H_DOC}>
+          <ColorPalette theme="light" />
+        </DCArtboard>
+        <DCArtboard id="palette-dark" label="Paleta · Dark" width={W_DOC} height={H_DOC}>
+          <ColorPalette theme="dark" />
+        </DCArtboard>
+        <DCArtboard id="type" label="Tipografía" width={900} height={H_DOC}>
+          <Typography theme="light" />
+        </DCArtboard>
+        <DCArtboard id="tokens" label="Spacing · Radii · Shadow" width={W_DOC} height={H_DOC}>
+          <Tokens theme="light" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Components */}
+      <DCSection
+        id="components"
+        title="02 · Components"
+        subtitle="Kit aplicable a Flet · MD3"
+      >
+        <DCArtboard id="components-light" label="Components · Light" width={W_WIDE} height={H_COMP}>
+          <Components theme="light" />
+        </DCArtboard>
+        <DCArtboard id="components-dark" label="Components · Dark" width={W_WIDE} height={H_COMP}>
+          <Components theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Dashboard */}
+      <DCSection
+        id="dashboard"
+        title="03 · Dashboard"
+        subtitle="KPIs · cashflow · movimientos del día"
+      >
+        <DCArtboard id="dash-light" label="Dashboard · Light" width={W_FULL} height={H_FULL}>
+          <Dashboard theme="light" />
+        </DCArtboard>
+        <DCArtboard id="dash-dark" label="Dashboard · Dark" width={W_FULL} height={H_FULL}>
+          <Dashboard theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Caja diaria */}
+      <DCSection
+        id="caja"
+        title="04 · Caja diaria"
+        subtitle="Apertura · arqueo de billetes · cierre"
+      >
+        <DCArtboard id="caja-light" label="Caja diaria · Light" width={W_FULL} height={H_FULL}>
+          <CajaDiaria theme="light" />
+        </DCArtboard>
+        <DCArtboard id="caja-dark" label="Caja diaria · Dark" width={W_FULL} height={H_FULL}>
+          <CajaDiaria theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Ingreso */}
+      <DCSection
+        id="ingreso"
+        title="05 · Registrar ingreso"
+        subtitle="Selector de servicio · cliente · cobro"
+      >
+        <DCArtboard id="ingreso-light" label="Nuevo ingreso · Light" width={W_FULL} height={H_FULL}>
+          <NuevoIngreso theme="light" />
+        </DCArtboard>
+        <DCArtboard id="ingreso-dark" label="Nuevo ingreso · Dark" width={W_FULL} height={H_FULL}>
+          <NuevoIngreso theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Egreso */}
+      <DCSection
+        id="egreso"
+        title="06 · Registrar egreso"
+        subtitle="Categoría · proveedor · comprobante"
+      >
+        <DCArtboard id="egreso-light" label="Nuevo egreso · Light" width={W_FULL} height={H_FULL}>
+          <NuevoEgreso theme="light" />
+        </DCArtboard>
+        <DCArtboard id="egreso-dark" label="Nuevo egreso · Dark" width={W_FULL} height={H_FULL}>
+          <NuevoEgreso theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Movimientos */}
+      <DCSection
+        id="movimientos"
+        title="07 · Movimientos"
+        subtitle="Tabla con filtros · resumen · paginación"
+      >
+        <DCArtboard id="mov-light" label="Movimientos · Light" width={W_FULL} height={H_FULL}>
+          <Movimientos theme="light" />
+        </DCArtboard>
+        <DCArtboard id="mov-dark" label="Movimientos · Dark" width={W_FULL} height={H_FULL}>
+          <Movimientos theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Reportes */}
+      <DCSection
+        id="reportes"
+        title="08 · Reportes"
+        subtitle="Tendencias · top servicios · comparativos"
+      >
+        <DCArtboard id="rep-light" label="Reportes · Light" width={W_FULL} height={H_FULL}>
+          <Reportes theme="light" />
+        </DCArtboard>
+        <DCArtboard id="rep-dark" label="Reportes · Dark" width={W_FULL} height={H_FULL}>
+          <Reportes theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Patterns */}
+      <DCSection
+        id="patterns"
+        title="09 · Patterns"
+        subtitle="Estados vacíos · errores · feedback · modales con vidrio"
+      >
+        <DCArtboard id="empty-light" label="Patterns · Light" width={1080} height={780}>
+          <EmptyStates theme="light" />
+        </DCArtboard>
+        <DCArtboard id="empty-dark" label="Patterns · Dark" width={1080} height={780}>
+          <EmptyStates theme="dark" />
+        </DCArtboard>
+      </DCSection>
+
+      {/* Responsive */}
+      <DCSection
+        id="responsive"
+        title="10 · Responsive · Mobile + Tablet"
+        subtitle="Registrar ingreso optimizado para móvil web · breakpoints + ResponsiveRow"
+      >
+        <DCArtboard id="responsive-docs" label="Sistema responsive" width={1080} height={1480}>
+          <ResponsiveDocs />
+        </DCArtboard>
+        <DCArtboard id="ingreso-mobile" label="Ingreso · iPhone 14" width={460} height={880}>
+          <PhoneFrame><MobileIngreso /></PhoneFrame>
+        </DCArtboard>
+        <DCArtboard id="ingreso-tablet" label="Ingreso · Tablet vertical" width={880} height={1180}>
+          <TabletFrame><TabletIngreso /></TabletFrame>
+        </DCArtboard>
+      </DCSection>
+
+      {/* Flet mapping */}
+      <DCSection
+        id="flet"
+        title="11 · Flet · MD3 mapping"
+        subtitle="Cómo se traduce este sistema a controles reales"
+      >
+        <DCArtboard id="flet-map" label="Flet mapping" width={900} height={680}>
+          <Themed theme="light" style={{ padding: 32, overflowY: 'auto' }}>
+            <div style={{ fontSize: 11, color: 'var(--text-tertiary)', letterSpacing: '0.08em', textTransform: 'uppercase' }}>Stack guidance</div>
+            <div style={{ fontSize: 22, fontWeight: 600, letterSpacing: '-0.025em', marginTop: 4 }}>Tokens → Flet · Material Design 3</div>
+            <div style={{ fontSize: 13, color: 'var(--text-secondary)', marginTop: 8, marginBottom: 24, maxWidth: 580, lineHeight: 1.55 }}>
+              Tokens DS expresados como <span className="mono" style={{ background: 'var(--bg-sunken)', padding: '1px 6px', borderRadius: 4 }}>ft.colors</span> y propiedades. Mantené esta tabla como la única fuente de verdad.
+            </div>
+
+            {[
+              ['Surface · bg.app',     'page.bgcolor',                          '#FAFAF9 / #0A0A0A'],
+              ['Surface · bg.surface', 'ft.Container(bgcolor=…) · ft.Card',     '#FFFFFF / #141414'],
+              ['Border default',       'border=ft.border.all(1, …)',            '#E4E4E0 / #262626'],
+              ['Accent',               'ft.colors.PRIMARY override',            '#3B82F6 (ambos)'],
+              ['Pos / Neg',            'colors custom · success / error',       '#059669 #DC2626 / #10B981 #EF4444'],
+              ['Radius · md',          'border_radius=8',                       'botones, inputs'],
+              ['Radius · lg',          'border_radius=12',                      'cards'],
+              ['Shadow · xs',          'shadow=ft.BoxShadow(blur=2, …)',        'cards en reposo'],
+              ['Type · UI',            'ft.TextStyle(font_family="Geist")',     'preload con google fonts'],
+              ['Type · Num',           'ft.TextStyle(font_family="Geist Mono")', 'siempre montos / horarios'],
+              ['Button · primary',     'ft.FilledButton(style=…)',              'altura 36 · radius 8'],
+              ['Button · secondary',   'ft.OutlinedButton(style=…)',            'borde 1 · sin sombra'],
+              ['Button · ghost',       'ft.TextButton(style=…)',                'sólo color secondary'],
+              ['Input',                'ft.TextField(border_radius=8, dense=True)', 'altura 38 · borde focus accent'],
+              ['Table',                'ft.DataTable o ft.Column de filas',     'header en bg.sunken · CAPS 11px'],
+              ['Modal · glass',        'ft.AlertDialog + Container con bgcolor rgba + blur', 'único uso de glassmorphism'],
+              ['Sidebar',              'ft.NavigationRail extendido (custom)',  'logo arriba · item activo con bg.sunken + barra accent'],
+              ['Iconos',               'ft.icons material-symbols-outlined',    'stroke 1.5 · 18-20px'],
+            ].map(([token, flet, val]) => (
+              <div key={token} style={{
+                display: 'grid',
+                gridTemplateColumns: '180px 1fr 200px',
+                gap: 16,
+                padding: '12px 0',
+                borderBottom: '1px solid var(--border-subtle)',
+                alignItems: 'baseline',
+                fontSize: 13,
+              }}>
+                <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{token}</span>
+                <span className="mono" style={{ fontSize: 12, color: 'var(--accent)' }}>{flet}</span>
+                <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>{val}</span>
+              </div>
+            ))}
+          </Themed>
+        </DCArtboard>
+      </DCSection>
+    </DesignCanvas>
+  );
+};
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+
+</script>
+  </body>
+</html>
