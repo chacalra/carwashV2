@@ -23,6 +23,23 @@
   alineados con `ds-foundations` (con accent en mint Mukusoft, no en azul
   genérico).
 
+## Estado de producción (live desde 2026-05-12)
+
+- **URLs vivas**:
+  - `https://demo.carwash.mukusoft.com` — tenant demo con datos seed (30 ventas + 10 egresos).
+  - `https://autocare.carwash.mukusoft.com` — cliente real Rafael Almada (479 ventas + 64 egresos importados del legacy SQLite via `scripts/import_autocare_legacy.py`).
+- **Infra**: VPS Contabo `mukusoft` (164.68.127.94, Ubuntu 24.04). Stack en Docker en `/home/ramon/projects/carwash-v2/`. NGINX Proxy Manager hace de reverse proxy + SSL Let's Encrypt por subdominio.
+- **Credenciales admin**: `Demo#2026` y `Autocare#2026` (guardadas en KeePassXC ~/Documents/keepassXC/muku.kdbx pendiente de configurar; la maestra de la base creada nueva fue elegida por el usuario).
+- **CD activo**: push a `main` dispara workflow `.github/workflows/deploy.yml` → corre tests backend+frontend → SSH al VPS → `git pull` + `docker compose up -d --build` → smoke test `/api/health`. Tiempo total ~2 min. Secrets `SSH_HOST/USER/PORT/PRIVATE_KEY` en GitHub. Deploy key dedicada (la privada vive solo en GitHub Secrets desde el cleanup).
+- **Backup automático**: cron diario 03:00 hora VPS, dump comprimido en `~/backups/`, retención 30 días, log en `~/backups/backup.log`. Script `scripts/backup_db.sh`.
+- **Doc de deploy**: `docs/DEPLOY.md` con 12 secciones (manual bootstrap, alta cliente, troubleshooting).
+
+### Pendientes operativos (no urgentes)
+
+1. Guardar `.env` de prod en KeePassXC. La base `muku.kdbx` está creada pero el usuario no recuerda la maestra que recién fijó (probablemente la confundió con otra). Si se pierde, regenerar la base es trivial (es vacía). El `.env` vive seguro en el VPS hoy.
+2. Avisarle a Rafael por canal seguro con URL `https://autocare.carwash.mukusoft.com` + `admin/Autocare#2026`, pedirle que cambie password al primer login.
+3. Sentry / monitoreo de errores en runtime (opcional, no bloqueante).
+
 ## Iteraciones — estado
 
 | # | Nombre | Estado | Archivos clave |
@@ -51,6 +68,9 @@
 | D1 containerización | Stack docker completo: `backend.Dockerfile` (Python 3.13 + uv + entrypoint que migra + sembra permisos + arranca uvicorn), `frontend/web/Dockerfile` (multi-stage Bun build + nginx alpine), `docker-compose.yml` (db + backend + frontend con red interna). Login y CRUD verificados en `localhost:8080`. | ✅ | `backend.Dockerfile`, `frontend/web/Dockerfile`, `frontend/web/nginx.conf`, `docker-compose.yml`, `scripts/docker_entrypoint.sh`, `.dockerignore`, `.env.example` |
 | D2 seed demo | Script `scripts/seed_demo.py` idempotente: pobla un tenant con catálogo genérico de lavadero (5 servicios, 6 productos, 4 tipos vehículo, 5 categorías egreso), ~30 ventas y 10 egresos en últimos 30 días, distribución 70/20/10 (servicio solo / mezcla / producto solo), ~20% con factura. Soporta `--reset`. | ✅ | `scripts/seed_demo.py` |
 | D3 doc deploy | `docs/DEPLOY.md` con 12 secciones: inventario VPS, DNS, apagar legacy, clonar repo, .env de prod, build + up con override, configurar NPM, crear tenants, smoke test, operación, troubleshooting, alta de cliente. Cubre el flujo manual completo. CD automático con GitHub Actions queda para iteración siguiente. | ✅ | `docs/DEPLOY.md`, `docker-compose.prod.yml` |
+| D4 deploy real | Bootstrap manual completo del VPS ejecutado siguiendo `DEPLOY.md`: carwash viejo apagado, repo clonado, `.env` generado con secrets aleatorios (permisos 600), stack levantado con `docker-compose.prod.yml`, NPM con dos Proxy Hosts (`demo.` y `autocare.`) + SSL Let's Encrypt, tenants `demo` y `autocare` creados, seed demo aplicado, import legacy de AutoCare ejecutado (479 ventas + 64 egresos). Smoke test login + `/api/reports/sales-summary` verde contra prod. | ✅ | en VPS `/home/ramon/projects/carwash-v2/` |
+| D5 CD GitHub Actions | Workflow `deploy.yml` con dos jobs (`test`: pytest + bun test + bun build; `deploy`: SSH al VPS + `git reset --hard` + `docker compose up -d --build` + health check). Actions bumpeadas a Node 24 (`checkout@v6`, `setup-uv@v8.1.0`, `setup-bun@v2.2.0`) salvando el deadline de junio 2026. Script `scripts/deploy.sh` corre dentro del VPS. Deploy key dedicada (privada solo en GitHub Secrets). Tiempo total push→prod ~2 min. Validado tres deploys consecutivos verdes. | ✅ | `.github/workflows/deploy.yml`, `scripts/deploy.sh` |
+| D6 backup diario | Script `scripts/backup_db.sh` que hace `pg_dump` del Postgres del stack, comprime con gzip, retención de 30 días (los más viejos se borran solos), log en `~/backups/backup.log`. Cron instalado en el VPS: `0 3 * * * .../backup_db.sh`. Validado manualmente. | ✅ | `scripts/backup_db.sh`, crontab del usuario `ramon` en VPS |
 | B11 precio 0 hard-stop | El form bloquea el submit en modo `create` cuando alguna línea tiene `unitPrice <= 0`. Zod schema cambió de `min(0)` a `positive()`. UI: botón "Cobrar" deshabilitado, label vuelve a "Precio en 0", banner warn en el sidebar del resumen explicando por qué. Modo `edit` no bloquea (data legacy con precio 0 sigue editable). Resumen del carrito: conteo del header pasó a unidades totales (no líneas distintas). | ✅ | `frontend/web/src/components/sales/SalesNewView.tsx`, `frontend/web/test/SalesFormInner.test.tsx` (+1 test) |
 | B10 cart summary | Nuevo componente `<CartSummary>` para el resumen del form de venta (sidebar desktop + drawer mobile). Agrupa por tipo (Servicios / Productos) con encabezado, conteo y subtotal por grupo. La cantidad solo aparece cuando es > 1 (evita el "1×" omnipresente). Patrón estilo Amazon. Reemplaza la lista plana que costaba leer. | ✅ | `frontend/web/src/components/sales/SalesNewView.tsx` |
 | B9 items UX | Columna ITEMS rediseñada: nuevo `<ItemsSummary>` con ícono + nombre principal + chip "+N" para extras (servicio en mint deep, producto en sky). Cuando todas las filas filtradas comparten exactamente los mismos items, la columna se colapsa y los items aparecen en el banner contextual junto al cliente. Reduce la repetición visual cuando se filtra por una empresa que siempre compra el mismo lavado. | ✅ | `frontend/web/src/components/sales/MovementsView.tsx`, `frontend/web/test/MovementsView.test.tsx` (+1 test) |
@@ -266,22 +286,28 @@ El sidebar filtra ítems por `permissions.includes(item.permission)`.
 - E2E con Playwright cuando el resto esté estable.
 
 ### Próximos pasos pendientes (orden sugerido)
-1. ~~**`create-tenant` en el CLI**~~ ✅ hecho. Comando:
-   `uv run python -m backend.cli create-tenant --subdomain X --name "..." --responsible "..." --admin-username U --admin-password P [--email ...] [--phone ...]`.
-   Crea lavandería + rol "admin" + asignación de todos los permisos activos
-   + usuario admin en una transacción. Subdominio se normaliza (lowercase
-   + trim) y se valida contra `^[a-z0-9-]+$`. Password mínimo 8 chars.
-   Rollback completo si algo falla.
-2. ~~**Importación legacy del .db SQLite**~~ ✅ hecho para AutoCare.
-   Script `scripts/import_autocare_legacy.py` ejecutado contra local:
-   468 ventas + 64 egresos + catálogos importados. Pendiente: cuando
-   migremos a producción, repetir contra esa DB. Para nuevos clientes,
-   nuevo script ad-hoc por cliente.
-3. **E2E con Playwright**: golden paths "registrar venta" y "registrar
-   egreso" en navegador real.
-4. **Validación de contraste en CLI** (opcional): `set-branding` advierte
-   si el `color_primario` no pasa AA contra blanco. Solo warning, no
-   bloquea (el operador es vos).
+
+Histórico cerrado:
+1. ~~**`create-tenant` en el CLI**~~ ✅
+2. ~~**Importación legacy del .db SQLite**~~ ✅ (AutoCare: 479 ventas + 64 egresos en prod, snapshot del 2026-05-12).
+3. ~~**Containerización + docker compose**~~ ✅ (D1).
+4. ~~**Seed demo idempotente**~~ ✅ (D2).
+5. ~~**Doc de deploy `docs/DEPLOY.md`**~~ ✅ (D3).
+6. ~~**Bootstrap manual de producción siguiendo el doc**~~ ✅ (D4).
+7. ~~**CD con GitHub Actions (push main → deploy)**~~ ✅ (D5).
+8. ~~**Backup diario automático**~~ ✅ (D6).
+
+Operativos no urgentes:
+- **`.env` de prod en KeePassXC**: pendiente. La base `~/Documents/keepassXC/muku.kdbx` está creada pero el usuario no recuerda la maestra que recién eligió. El `.env` vive en el VPS (permisos 600), regenerable si se pierde (con costo: relogueo masivo por nueva `AUTH_TOKEN_SECRET`).
+- **Validación browser de prod por humano**: pendiente. Los dos subdominios responden 200 a `curl`, pero el usuario aún no completó el checklist visual completo (login + dashboard + venta nueva + edit + dark mode).
+- **Aviso a Rafael** con URL `https://autocare.carwash.mukusoft.com` + credenciales + pedirle que cambie su password.
+
+Features pendientes (no urgentes):
+- **E2E con Playwright**: golden paths "registrar venta" y "registrar egreso" en navegador real.
+- **Validación de contraste en CLI** (opcional): `set-branding` advierte si el `color_primario` no pasa AA contra blanco.
+- **Sentry / monitoreo de errores en runtime**: hoy si el frontend explota en runtime nadie se entera salvo que Rafael avise.
+- **Backups remotos**: hoy los backups viven solo en el mismo VPS. Si el VPS muere, se pierden con la DB.
+- **Wildcard SSL** si la cantidad de clientes crece (hoy emitimos un cert por subdominio con HTTP challenge; sostenible hasta ~10-15 clientes).
 
 ### Otros
 - Logo iso "C" del Carwash sigue como **draft**. El usuario quiere refinarlo
