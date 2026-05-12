@@ -11,3 +11,4 @@ data/*.db
 
 .DS_Store
 datos/autocare_legacy.db
+.env.docker

@@ -1,0 +1,29 @@
+# Overrides para produccion. Se aplica sobre docker-compose.yml.
+#
+# Uso (en el VPS, dentro de ~/projects/carwash-v2/):
+#   docker compose --env-file .env -f docker-compose.yml -f docker-compose.prod.yml up -d --build
+#
+# Diferencias con dev:
+#   1. El frontend se une a la network externa `proxy` (la misma que usa
+#      nginx-proxy-manager). Asi NPM puede proxear hacia el container.
+#   2. El frontend NO expone puerto al host: NPM lo alcanza por nombre de
+#      container dentro de la network `proxy`.
+#   3. El backend tambien va a `proxy` por si en el futuro queremos exponerlo
+#      directo. En este compose lo accede solo el frontend via `carwash-net`.
+
+services:
+  backend:
+    networks:
+      - carwash-net
+      - proxy
+
+  frontend:
+    # No expone puerto al host. NPM hace el proxy interno por la red `proxy`.
+    ports: !reset []
+    networks:
+      - carwash-net
+      - proxy
+
+networks:
+  proxy:
+    external: true

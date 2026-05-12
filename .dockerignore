@@ -1,0 +1,32 @@
+# No copiar al build context del backend.
+.git
+.venv
+__pycache__
+*.pyc
+.pytest_cache
+.mypy_cache
+.env
+.env.local
+
+# Datos privados de cliente
+datos/
+
+# Cosas del frontend que no necesita el backend
+frontend/web/node_modules
+frontend/web/dist
+frontend/web/test-results
+frontend/web/.astro
+
+# Legacy
+frontend/streamlit/
+
+# Docs y guidelines que no van en runtime
+DesignGuide/
+docs/
+*.md
+!CLAUDE.md
+
+# IDE
+.vscode/
+.idea/
+.DS_Store

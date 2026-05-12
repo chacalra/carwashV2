@@ -1,0 +1,16 @@
+# No copiar al build context del frontend.
+node_modules
+dist
+test-results
+.astro
+
+.env
+.env.local
+.env.production
+
+.git
+.DS_Store
+.vscode/
+.idea/
+
+*.log

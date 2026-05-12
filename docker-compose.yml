@@ -1,0 +1,98 @@
+# Stack docker para desarrollo y produccion.
+#
+# Servicios:
+#   db        - Postgres 16, datos persistidos en volume nombrado.
+#   backend   - FastAPI/uvicorn. Espera a db, corre migrations al arrancar.
+#   frontend  - Nginx con dist/ de Astro + proxy /api/ -> backend.
+#
+# Local (dev):
+#   docker compose up --build
+#   abre http://localhost
+#
+# Produccion en el VPS:
+#   - Las variables sensibles vienen de un .env real (NUNCA comiteado).
+#   - El frontend se conecta a un NGINX Proxy Manager externo via la network
+#     "proxy" (sobreescribimos networks abajo en un compose.prod.yml o con
+#     `docker network connect`). En este compose base, solo declaramos la red
+#     interna `carwash-net`.
+#
+# Re-deploy autocontenido: `docker compose up -d --build` baja, rebuildea y
+# levanta cambiados; los demas siguen corriendo. Es lo que hace el script
+# de deploy del CD.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-carwash}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      POSTGRES_DB: ${POSTGRES_DB:-carwash}
+    volumes:
+      - carwash-db-data:/var/lib/postgresql/data
+    # No exponemos puerto al host por defecto: el backend lo accede via red interna.
+    # Si necesitas conectarte con DBeaver desde tu maquina:
+    #   ports:
+    #     - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-carwash} -d ${POSTGRES_DB:-carwash}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - carwash-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      # Backend lee DATABASE_URL si existe; sino arma desde PG* vars.
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-carwash}:${POSTGRES_PASSWORD:-changeme}@db:5432/${POSTGRES_DB:-carwash}
+      PGHOST: db
+      PGPORT: "5432"
+      PGUSER: ${POSTGRES_USER:-carwash}
+      PGPASSWORD: ${POSTGRES_PASSWORD:-changeme}
+      PGDATABASE: ${POSTGRES_DB:-carwash}
+      # Secrets: deben venir del .env. Si faltan, el backend rompe en boot.
+      AUTH_TOKEN_SECRET: ${AUTH_TOKEN_SECRET:?Seteala en .env. Generala con openssl rand -hex 32}
+      AUTH_TOKEN_EXPIRES_MINUTES: ${AUTH_TOKEN_EXPIRES_MINUTES:-60}
+      # CORS para dev (browser pega directo a localhost). En prod se ajusta.
+      CORS_ALLOW_ORIGIN_REGEX: ${CORS_ALLOW_ORIGIN_REGEX:-https?://(localhost|127\.0\.0\.1)(:\d+)?}
+    # Backend NO se expone al host en dev: se accede via el proxy del frontend.
+    # Si querés llamar la API directo desde Postman:
+    #   ports:
+    #     - "8000:8000"
+    networks:
+      - carwash-net
+
+  frontend:
+    build:
+      context: ./frontend/web
+      dockerfile: Dockerfile
+      args:
+        # En dev el frontend pega a /api del mismo origen (proxeado por nginx
+        # interno hacia backend:8000). En prod, NGINX Proxy Manager hace
+        # el mismo proxy hacia este container.
+        PUBLIC_API_BASE_URL: /api
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      # En dev exponemos al host. En prod no hace falta: NPM proxea por la
+      # red 'proxy' y este puerto queda solo interno.
+      - "${FRONTEND_PORT:-80}:80"
+    networks:
+      - carwash-net
+
+networks:
+  carwash-net:
+    driver: bridge
+
+volumes:
+  carwash-db-data:
+    driver: local
