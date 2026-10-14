@@ -4,7 +4,7 @@ A multi-tenant car-wash management platform built around a **FastAPI + PostgreSQ
 
 The system is designed for multiple car-wash businesses sharing one deployment while keeping operational data isolated by tenant. It covers sales, expenses, customers, vehicles, service/product catalogs, reporting, authentication, and role-based permissions.
 
-> This repository is currently private while product and deployment details are being finalized.
+> Public portfolio repository. Deployment credentials, production data, and environment-specific secrets are intentionally excluded.
 
 ## Why this project matters
 
@@ -141,15 +141,16 @@ Frontend API types are generated from the backend OpenAPI schema with `openapi-t
 
 ## Tests
 
-The backend status document currently records:
+The repository has a dedicated **CI workflow** that verifies the backend and frontend independently of deployment.
 
-```text
-204 passed
-```
+Current checks include:
 
-Coverage includes authentication, catalogs, clients, expenses, sales, reports, vehicles, security and UI-related flows.
+- backend pytest suite;
+- frontend Vitest suite;
+- TypeScript type-checking;
+- production frontend build.
 
-The frontend also has Vitest/Testing Library infrastructure.
+Coverage includes authentication, catalogs, clients, expenses, sales, reports, vehicles, security, permissions and UI-related flows.
 
 Typical backend test command:
 
@@ -231,9 +232,15 @@ Some notable design choices:
 - generated OpenAPI types reduce backend/frontend contract drift;
 - secrets are expected through environment variables and are not committed.
 
+## CI vs deployment
+
+Code quality and deployment are intentionally separate concerns.
+
+The CI workflow validates backend and frontend changes on pull requests and pushes. The deployment workflow is responsible only for delivery to the VPS after code checks pass. A deployment failure therefore does not imply that the application test suite failed.
+
 ## Current limitations / next work
 
-The project is actively evolving. Remaining backend work includes:
+The project is actively evolving. Remaining work includes:
 
 - broader pagination/filtering for large lists;
 - additional administrative user/role APIs;
@@ -251,4 +258,4 @@ The project is actively evolving. Remaining backend work includes:
 
 ## Status
 
-Private product repository. The codebase is being prepared for a polished public case study / portfolio presentation.
+Active public portfolio project. The repository contains the application code, tests, migrations, Docker configuration and deployment workflow, while production secrets and operational data remain outside version control.
