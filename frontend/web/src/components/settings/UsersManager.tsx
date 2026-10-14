@@ -97,7 +97,7 @@ export function UsersManager() {
     );
   };
 
-  const startEdit = (u: { id: number; username: string; role_id: number | null }) => {
+  const startEdit = (u: { id: number; username: string; role_id?: number | null }) => {
     setEditingId(u.id);
     setEditUsername(u.username);
     setEditRoleId(u.role_id ?? "");
