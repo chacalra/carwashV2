@@ -1,8 +1,6 @@
 # Deploy de Carwash V2 al VPS Mukusoft
 
-Guía paso a paso para desplegar el stack en producción desde cero. Cada paso
-indica qué corre **vos** y qué corre **un script o GitHub Actions** (estos
-últimos se implementan en una iteración posterior; por ahora todo manual).
+Reference deployment guide for running the stack on a VPS. Public examples use placeholders intentionally; production hostnames, usernames, credentials and customer data are kept outside the repository.
 
 > Para developmento local con Docker, ver el README principal o `docker-compose.yml`.
 
@@ -10,7 +8,7 @@ indica qué corre **vos** y qué corre **un script o GitHub Actions** (estos
 
 ## 0. Inventario del entorno destino
 
-VPS: `mukusoft` (Contabo, 164.68.127.94, Ubuntu 24.04 LTS).
+Target: a Linux VPS reachable through the deployment secrets configured in GitHub Actions.
 
 Lo que **ya está instalado** (verificado el 2026-05-12):
 
@@ -18,35 +16,34 @@ Lo que **ya está instalado** (verificado el 2026-05-12):
 - NGINX Proxy Manager corriendo en `~/infra/nginx-proxy-manager/` (puertos 80/443
   públicos, admin en 127.0.0.1:81).
 - Network Docker `proxy` (externa, compartida entre NPM y otros stacks).
-- Usuario `ramon` en grupo `docker` (puede usar Docker sin sudo).
-- Otros stacks vivos: `carwash-app` (Streamlit viejo), `mukusoft-test-web`.
+- Usuario `<DEPLOY_USER>` en grupo `docker` (puede usar Docker sin sudo).
 
 Lo que **no está**:
 
 - PostgreSQL en host. La DB del V2 corre en container (parte del stack).
 - Firewall (UFW). NPM abre solo 80/443.
-- DNS para `*.carwash.mukusoft.com` (a configurar — sección 2).
+- DNS para `*.carwash.<VPS_ALIAS>.com` (a configurar — sección 2).
 
 ---
 
 ## 1. DNS de los subdominios
 
-Esto lo hacés en el provider de DNS de `mukusoft.com` (Cloudflare, Namecheap,
+Esto lo hacés en el provider de DNS de `<VPS_ALIAS>.com` (Cloudflare, Namecheap,
 donde sea que tengas el dominio).
 
 Para cada cliente vas a necesitar un subdominio. Hoy:
 
 | Subdominio | Tipo | Valor |
 |---|---|---|
-| `autocare.carwash.mukusoft.com` | A | `164.68.127.94` |
-| `demo.carwash.mukusoft.com` | A | `164.68.127.94` |
+| `autocare.carwash.<VPS_ALIAS>.com` | A | `<VPS_HOST>` |
+| `demo.carwash.<VPS_ALIAS>.com` | A | `<VPS_HOST>` |
 
 Validación local (puede tardar minutos en propagar):
 
 ```bash
-dig +short autocare.carwash.mukusoft.com
-dig +short demo.carwash.mukusoft.com
-# Ambos deben devolver 164.68.127.94
+dig +short autocare.carwash.<VPS_ALIAS>.com
+dig +short demo.carwash.<VPS_ALIAS>.com
+# Ambos deben devolver <VPS_HOST>
 ```
 
 > **Decisión vigente**: SSL por subdominio con HTTP challenge (más simple).
@@ -60,7 +57,7 @@ El container `carwash-app` (chacalra/carwash, Streamlit) está corriendo desde
 hace días. Lo bajamos antes del deploy del V2 para evitar confusión.
 
 ```bash
-ssh mukusoft
+ssh <VPS_ALIAS>
 cd ~/projects/carwash
 docker compose down
 docker ps | grep carwash  # no debe aparecer carwash-app
@@ -72,14 +69,14 @@ Si en algún momento querés volver al viejo (no debería ser el caso):
 cd ~/projects/carwash && docker compose up -d
 ```
 
-> Si Rafael u otro cliente lo estaba usando, avisarles antes.
+> Coordinate with any active users before stopping a legacy deployment.
 
 ---
 
 ## 3. Clonar el repo en el VPS
 
 ```bash
-ssh mukusoft
+ssh <VPS_ALIAS>
 mkdir -p ~/projects && cd ~/projects
 git clone https://github.com/chacalra/carwashV2.git carwash-v2
 cd carwash-v2
@@ -118,8 +115,8 @@ POSTGRES_DB=carwash
 AUTH_TOKEN_SECRET=<la-que-generaste-arriba>
 AUTH_TOKEN_EXPIRES_MINUTES=60
 
-# CORS: regex que matchea los subdominios de carwash en mukusoft
-CORS_ALLOW_ORIGIN_REGEX=https://[a-z0-9-]+\.carwash\.mukusoft\.com
+# CORS: regex que matchea los subdominios de carwash en <VPS_ALIAS>
+CORS_ALLOW_ORIGIN_REGEX=https://[a-z0-9-]+\.carwash\.<VPS_ALIAS>\.com
 
 # Frontend port no se usa en prod (NPM proxea internamente).
 # FRONTEND_PORT=80
@@ -172,7 +169,7 @@ abrí un túnel SSH:
 
 ```bash
 # en tu maquina local
-ssh -L 8181:127.0.0.1:81 mukusoft
+ssh -L 8181:127.0.0.1:81 <VPS_ALIAS>
 ```
 
 Después abrí en el browser local: `http://localhost:8181` (el túnel redirige
@@ -184,9 +181,9 @@ Credenciales del NPM admin (las tuyas, las definiste cuando lo instalaste).
 
 Hacer **dos** entradas (una por subdominio, mismas opciones):
 
-**Proxy Host #1 — `autocare.carwash.mukusoft.com`**
+**Proxy Host #1 — `autocare.carwash.<VPS_ALIAS>.com`**
 
-- Domain Names: `autocare.carwash.mukusoft.com`
+- Domain Names: `autocare.carwash.<VPS_ALIAS>.com`
 - Scheme: `http`
 - Forward Hostname / IP: `carwash-v2-frontend-1`
 - Forward Port: `80`
@@ -203,7 +200,7 @@ Tab **SSL**:
 Save. NPM va a Let's Encrypt, valida el dominio (DNS challenge HTTP, requiere
 que el A record ya esté apuntando al VPS) y emite el cert.
 
-**Proxy Host #2 — `demo.carwash.mukusoft.com`**
+**Proxy Host #2 — `demo.carwash.<VPS_ALIAS>.com`**
 
 Igual al anterior, cambiando el Domain Name.
 
@@ -212,10 +209,10 @@ Igual al anterior, cambiando el Domain Name.
 Desde tu máquina:
 
 ```bash
-curl -sI https://demo.carwash.mukusoft.com | head -3
+curl -sI https://demo.carwash.<VPS_ALIAS>.com | head -3
 # HTTP/2 200
 
-curl -s https://demo.carwash.mukusoft.com/api/health
+curl -s https://demo.carwash.<VPS_ALIAS>.com/api/health
 # {"status":"ok"}
 ```
 
@@ -253,43 +250,43 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml exec backend \
 ### Tenant autocare
 
 ```bash
-AUTOCARE_PASSWORD="<contraseña que defina Rafael o vos>"
+CLIENT_PASSWORD="<contraseña que defina el cliente o vos>"
 
 docker compose -f docker-compose.yml -f docker-compose.prod.yml exec backend \
   uv run python -m backend.cli create-tenant \
-  --subdomain autocare \
-  --name "AutoCare" \
-  --responsible "Rafael Almada" \
+  --subdomain client-a \
+  --name "Client A" \
+  --responsible "<CLIENT_OWNER>" \
   --admin-username admin \
-  --admin-password "$AUTOCARE_PASSWORD" \
-  --email "chacalra21@gmail.com" \
-  --phone "+595 982514407"
+  --admin-password "$CLIENT_PASSWORD" \
+  --email "<CONTACT_EMAIL>" \
+  --phone "<CONTACT_PHONE>"
 ```
 
 Importar el .db legacy actualizado. Bajar el .db reciente desde Render:
 
 ```bash
 # En tu maquina local
-scp srv-d7gee2flk1mc7386jocg@ssh.ohio.render.com:/var/data/carwash.db/carwash.db \
-  /tmp/autocare_legacy.db
+scp <LEGACY_SOURCE_SSH>:/var/data/carwash.db/carwash.db \
+  /tmp/client_legacy.db
 
 # Subir al VPS (dentro de la carpeta `datos/` del proyecto)
-scp /tmp/autocare_legacy.db mukusoft:/home/ramon/projects/carwash-v2/datos/
+scp /tmp/client_legacy.db <VPS_ALIAS>:~/projects/carwash-v2/datos/
 
 # En el VPS
-ssh mukusoft
+ssh <VPS_ALIAS>
 cd ~/projects/carwash-v2
 docker compose -f docker-compose.yml -f docker-compose.prod.yml exec backend \
   uv run python scripts/import_autocare_legacy.py \
-  --subdomain autocare \
-  --db-path datos/autocare_legacy.db \
+  --subdomain client-a \
+  --db-path datos/client_legacy.db \
   --dry-run
 
 # Si el dry-run se ve OK:
 docker compose -f docker-compose.yml -f docker-compose.prod.yml exec backend \
   uv run python scripts/import_autocare_legacy.py \
-  --subdomain autocare \
-  --db-path datos/autocare_legacy.db
+  --subdomain client-a \
+  --db-path datos/client_legacy.db
 ```
 
 ---
@@ -298,12 +295,12 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml exec backend \
 
 Desde tu máquina (no desde el VPS):
 
-1. Abrí `https://demo.carwash.mukusoft.com` → debe cargar el login.
+1. Abrí `https://demo.carwash.<VPS_ALIAS>.com` → debe cargar el login.
 2. Logueate con `admin` + la contraseña que guardaste + subdominio `demo` (el
    campo `subdominio` solo aparece en localhost; en prod se infiere del Host).
 3. Dashboard con KPIs reales.
-4. Repetir con `https://autocare.carwash.mukusoft.com` (admin / contraseña de
-   AutoCare). Dashboard con ~468 ventas si la importación fue completa.
+4. Repetir con `https://autocare.carwash.<VPS_ALIAS>.com` (admin / contraseña de
+   Client A). Dashboard con ~468 ventas si la importación fue completa.
 5. Crear una venta de prueba en `demo`, anularla.
 
 Si algo falla, ver sección "Operación".
@@ -350,24 +347,24 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T db \
   pg_dump -U carwash -d carwash | gzip > ~/backups/carwash-$(date +%Y%m%d-%H%M).sql.gz
 
 # Bajarlo a tu maquina
-scp mukusoft:/home/ramon/backups/carwash-*.sql.gz /tmp/
+scp <VPS_ALIAS>:~/backups/carwash-*.sql.gz /tmp/
 ```
 
 Recomendación: cron diario.
 
 ```bash
 # crontab -e (en el VPS)
-0 3 * * * cd /home/ramon/projects/carwash-v2 && docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T db pg_dump -U carwash -d carwash | gzip > /home/ramon/backups/carwash-$(date +\%Y\%m\%d).sql.gz
+0 3 * * * cd ~/projects/carwash-v2 && docker compose -f docker-compose.yml -f docker-compose.prod.yml exec -T db pg_dump -U carwash -d carwash | gzip > ~/backups/carwash-$(date +\%Y\%m\%d).sql.gz
 ```
 
 ### Restore
 
 ```bash
 # Subir el dump al VPS
-scp /tmp/carwash-20260512.sql.gz mukusoft:~/backups/
+scp /tmp/carwash-20260512.sql.gz <VPS_ALIAS>:~/backups/
 
 # Restaurar (CUIDADO: pisa la DB actual)
-ssh mukusoft
+ssh <VPS_ALIAS>
 cd ~/projects/carwash-v2
 gunzip -c ~/backups/carwash-20260512.sql.gz | docker compose \
   -f docker-compose.yml -f docker-compose.prod.yml exec -T db \
@@ -406,7 +403,7 @@ docker compose -f docker-compose.yml -f docker-compose.prod.yml down -v
 NPM no encuentra el container del frontend. Verificar:
 
 ```bash
-ssh mukusoft
+ssh <VPS_ALIAS>
 docker network inspect proxy --format '{{range .Containers}}{{.Name}} {{end}}'
 # Tiene que aparecer: nginx-proxy-manager carwash-v2-frontend-1 ...
 ```
@@ -448,9 +445,9 @@ NPM intenta renovar 30 días antes de expirar. Si falla:
 
 ## 11. Procedimiento de alta de cliente nuevo
 
-Para sumar `<cliente>.carwash.mukusoft.com`:
+Para sumar `<cliente>.carwash.<VPS_ALIAS>.com`:
 
-1. **DNS**: A record `<cliente>.carwash.mukusoft.com` → `164.68.127.94`.
+1. **DNS**: A record `<cliente>.carwash.<VPS_ALIAS>.com` → `<VPS_HOST>`.
 2. **NPM**: Proxy Host nuevo → forward a `carwash-v2-frontend-1:80` + SSL Let's Encrypt.
 3. **Tenant** en backend:
    ```bash
