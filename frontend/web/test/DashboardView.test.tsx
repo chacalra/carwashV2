@@ -69,7 +69,6 @@ const PRODUCTS = {
 
 beforeEach(() => {
   // ResizeObserver lo necesita Recharts y happy-dom no lo trae.
-  // @ts-expect-error monkey-patch global para tests
   globalThis.ResizeObserver =
     globalThis.ResizeObserver ||
     class {
