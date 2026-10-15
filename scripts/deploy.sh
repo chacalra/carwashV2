@@ -13,7 +13,7 @@
 
 set -euo pipefail
 
-PROJECT_DIR="/home/ramon/projects/carwash-v2"
+PROJECT_DIR="${PROJECT_DIR:-$HOME/projects/carwash-v2}"
 COMPOSE_ARGS="-f docker-compose.yml -f docker-compose.prod.yml"
 HEALTH_URL="http://carwash-v2-frontend-1/api/health"
 
