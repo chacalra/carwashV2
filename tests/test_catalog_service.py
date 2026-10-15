@@ -3,6 +3,7 @@
 import pytest
 from unittest.mock import patch
 from sqlalchemy.exc import IntegrityError
+from backend.utils.security import verify_password
 from backend.services.catalog_service import (
     _validate_name,
     _validate_password,
@@ -181,7 +182,7 @@ def test_add_user_exitoso():
         args = mock.call_args[0]
         assert args[0] == "Juan"
         assert args[1] == "operador"
-        assert ":" in args[2]  # password hasheada
+        assert verify_password("pass1234", args[2]) is True
         assert mock.call_args.kwargs["lavanderia_id"] == 1
 
 
@@ -203,7 +204,7 @@ def test_change_user_password_exitosa():
         mock.assert_called_once()
         args = mock.call_args[0]
         assert args[0] == 1
-        assert ":" in args[1]  # hasheada
+        assert verify_password("nueva_pass", args[1]) is True
         assert mock.call_args.kwargs["lavanderia_id"] == 1
 
 
