@@ -9,6 +9,8 @@ from datetime import datetime, timedelta, timezone
 
 
 DEFAULT_TOKEN_EXPIRES_MINUTES = 60
+PBKDF2_ITERATIONS = 600_000
+_PASSWORD_SCHEME = "pbkdf2_sha256"
 
 
 class TokenError(ValueError):
@@ -123,16 +125,38 @@ def decode_access_token(token: str) -> dict:
 
 
 def hash_password(password: str) -> str:
-    """Genera un hash seguro para una contrasena usando SHA-256 con salt aleatorio."""
-    salt = os.urandom(32).hex()
-    hashed = hashlib.sha256((salt + password).encode()).hexdigest()
-    return f"{salt}:{hashed}"
+    """Genera un hash PBKDF2-HMAC-SHA256 con salt aleatorio."""
+    salt = os.urandom(16)
+    derived = hashlib.pbkdf2_hmac(
+        "sha256",
+        password.encode(),
+        salt,
+        PBKDF2_ITERATIONS,
+    )
+    return (
+        f"{_PASSWORD_SCHEME}${PBKDF2_ITERATIONS}$"
+        f"{salt.hex()}${derived.hex()}"
+    )
 
 
 def verify_password(password: str, stored_hash: str) -> bool:
-    """Verifica una contrasena contra su hash almacenado."""
+    """Verifica hashes PBKDF2 actuales y hashes SHA-256 legacy."""
     try:
-        salt, hashed = stored_hash.split(":", 1)
-        return hashlib.sha256((salt + password).encode()).hexdigest() == hashed
-    except Exception:
+        if stored_hash.startswith(f"{_PASSWORD_SCHEME}$"):
+            scheme, raw_iterations, salt_hex, expected_hex = stored_hash.split("$", 3)
+            if scheme != _PASSWORD_SCHEME:
+                return False
+            iterations = int(raw_iterations)
+            if iterations <= 0:
+                return False
+            salt = bytes.fromhex(salt_hex)
+            expected = bytes.fromhex(expected_hex)
+            actual = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, iterations)
+            return hmac.compare_digest(actual, expected)
+
+        # Compatibilidad temporal con hashes legacy: <salt_hex>:<sha256_hex>.
+        salt, expected_hex = stored_hash.split(":", 1)
+        actual_hex = hashlib.sha256((salt + password).encode()).hexdigest()
+        return hmac.compare_digest(actual_hex, expected_hex)
+    except (TypeError, ValueError):
         return False
