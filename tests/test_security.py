@@ -12,10 +12,11 @@ from backend.utils.security import (
 
 def test_hash_password_formato():
     h = hash_password("test123")
-    partes = h.split(":")
-    assert len(partes) == 2
-    assert len(partes[0]) == 64  # salt: 32 bytes en hex
-    assert len(partes[1]) == 64  # sha256 en hex
+    esquema, iteraciones, salt, derivado = h.split("$")
+    assert esquema == "pbkdf2_sha256"
+    assert int(iteraciones) >= 600_000
+    assert len(salt) == 32  # 16 bytes en hex
+    assert len(derivado) == 64  # SHA-256 en hex
 
 
 def test_hash_password_unico():
@@ -41,6 +42,15 @@ def test_verify_hash_invalido():
 
 def test_verify_hash_vacio():
     assert verify_password("cualquiera", "") is False
+
+
+def test_verify_hash_legacy_compatible():
+    import hashlib
+
+    salt = "a" * 64
+    legacy = f"{salt}:{hashlib.sha256((salt + 'legacy-pass').encode()).hexdigest()}"
+    assert verify_password("legacy-pass", legacy) is True
+    assert verify_password("wrong-pass", legacy) is False
 
 
 def test_create_and_decode_access_token():
