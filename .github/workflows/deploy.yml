@@ -1,4 +1,4 @@
-# CD: push a main -> tests -> deploy al VPS via SSH.
+# CD: manual deployment to the VPS via SSH.
 #
 # Requiere los siguientes secrets en GitHub:
 #   SSH_HOST          - hostname o IP del VPS
@@ -17,9 +17,6 @@
 name: Deploy
 
 on:
-  push:
-    branches: [main]
-  # Permite disparar manualmente desde la pestaña Actions.
   workflow_dispatch:
 
 jobs:
@@ -70,9 +67,6 @@ jobs:
     name: Deploy to VPS
     runs-on: ubuntu-latest
     needs: test
-    # No deploy si el push fue a una rama distinta de main (futuro-proof
-    # si agregamos otras ramas que disparen el workflow).
-    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v6
