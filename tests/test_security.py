@@ -64,7 +64,9 @@ def test_decode_access_token_rejects_tampered_signature():
         lavanderia_id=2,
         permissions=["dashboard"],
     )
-    tampered = token[:-1] + ("a" if token[-1] != "a" else "b")
+    header, payload, signature = token.split(".")
+    tampered_signature = ("a" if signature[0] != "a" else "b") + signature[1:]
+    tampered = f"{header}.{payload}.{tampered_signature}"
 
     with pytest.raises(TokenError, match="Token invalido"):
         decode_access_token(tampered)
