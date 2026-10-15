@@ -1,9 +1,9 @@
 # CD: push a main -> tests -> deploy al VPS via SSH.
 #
 # Requiere los siguientes secrets en GitHub:
-#   SSH_HOST          - IP del VPS (164.68.127.94)
-#   SSH_USER          - usuario SSH (ramon)
-#   SSH_PORT          - puerto SSH (22)
+#   SSH_HOST          - hostname o IP del VPS
+#   SSH_USER          - usuario SSH de despliegue
+#   SSH_PORT          - puerto SSH
 #   SSH_PRIVATE_KEY   - private key dedicada (la pub esta en VPS)
 #
 # Estructura:
