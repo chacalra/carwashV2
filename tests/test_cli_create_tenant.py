@@ -4,6 +4,7 @@ import pytest
 from types import SimpleNamespace
 from unittest.mock import MagicMock
 
+from backend.utils.security import verify_password
 from backend.cli.create_tenant import (
     _create_tenant_in_session,
     create_tenant,
@@ -131,7 +132,7 @@ def test_create_tenant_happy_path(monkeypatch):
     # El password no se almacena en claro
     usuario = next(c[0][0] for c in session.add.call_args_list if c[0][0].__class__.__name__ == "Usuario")
     assert usuario.password_hash != "superseguro"
-    assert ":" in usuario.password_hash  # formato salt:hash
+    assert verify_password("superseguro", usuario.password_hash) is True
 
 
 def test_create_tenant_normaliza_subdomain(monkeypatch):
