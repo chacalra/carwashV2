@@ -122,9 +122,9 @@ export function RolesManager() {
       </div>
 
       {/* Form crear */}
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border-subtle bg-bg-surface p-4 shadow-card">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border-default bg-bg-surface p-4">
         <div className="flex flex-1 min-w-[200px] flex-col gap-1">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+          <label className="text-xs text-text-secondary">
             Nombre del rol
           </label>
           <Input
@@ -155,7 +155,7 @@ export function RolesManager() {
       </div>
 
       {/* Tabla */}
-      <div className="overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-card">
+      <div className="overflow-hidden rounded-lg border border-border-default bg-bg-surface">
         {rolesQ.isLoading ? (
           <div className="space-y-2 p-4">
             {Array.from({ length: 3 }).map((_, i) => (
@@ -370,7 +370,7 @@ function RolePermissionsPanel({
 
   return (
     <div className="border-t border-border-subtle bg-bg-sunken/30 px-4 py-4">
-      <p className="mb-3 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+      <p className="mb-3 text-xs text-text-secondary">
         Permisos para {roleName}
       </p>
       {catalogLoading || permsQ.isLoading ? (

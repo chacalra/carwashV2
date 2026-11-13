@@ -108,17 +108,11 @@ function LoginFormInner() {
       <article
         className={cn(
           "animate-fade-in-up w-full overflow-hidden rounded-2xl",
-          "border border-border-subtle bg-bg-surface",
-          "shadow-elevated ring-1 ring-black/[.04]",
+          // Vidrio con sombra de panel flotante: es la única pieza de la pantalla.
+          "border border-white/60 bg-bg-surface shadow-elevated dark:border-white/10",
         )}
       >
-        {/* Accent stripe Mukusoft */}
-        <div
-          aria-hidden
-          className="h-1 bg-gradient-to-r from-brand-deep via-brand-mint to-brand-sky"
-        />
-
-        <div className="p-8">
+        <div className="p-6 sm:p-8">
         <div className="mb-6 space-y-2">
           <h1 className="text-2xl font-semibold tracking-tight">Iniciar sesión</h1>
           <p className="text-sm text-text-secondary">
@@ -206,7 +200,7 @@ function LoginFormInner() {
 
             <Button
               type="submit"
-              className="w-full bg-accent text-white hover:bg-accent-hover"
+              className="h-10 w-full bg-accent font-medium text-white hover:bg-accent-hover dark:text-bg-app"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -230,7 +224,7 @@ function LoginFormInner() {
       {/* Powered by Mukusoft — sólo si el tenant lo permite */}
       {brand.showMukusoft ? (
         <div className="flex flex-col items-center gap-1.5 opacity-80">
-          <p className="text-[10px] uppercase tracking-wider text-text-tertiary">
+          <p className="text-[11px] text-text-tertiary">
             Powered by
           </p>
           <MukusoftMark className="h-9 w-auto sm:h-10" />

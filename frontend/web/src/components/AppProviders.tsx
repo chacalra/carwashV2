@@ -19,7 +19,7 @@ export function AppProviders({ children }: { children: ReactNode }) {
         toastOptions={{
           // Borde lateral por tipo (alineado al DS).
           classNames: {
-            toast: "border-l-[3px] border-l-border-default",
+            toast: "border-l-[3px] border-l-border-default !backdrop-blur-xl !backdrop-saturate-[1.8] !shadow-[var(--shadow-glass)]",
             success: "!border-l-pos",
             error: "!border-l-neg",
             warning: "!border-l-warn",

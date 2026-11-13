@@ -60,21 +60,27 @@
   --color-brand-sky: var(--brand-sky);
   --color-brand-mint: var(--brand-mint);
 
-  /* === Surface === */
-  --color-bg-app: #FAFAF9;
-  --color-bg-surface: #FFFFFF;
-  --color-bg-sunken: #F4F4F2;
+  /*
+   * === Surface (glassmorphism) ===
+   * `bg-app` es solo el color base: encima va la malla de color de marca
+   * (ver `body`). Las superficies son translúcidas y una regla global les
+   * agrega blur + canto de luz (ver "Glass global" más abajo).
+   */
+  --color-bg-app: #DCE9E8;
+  --color-bg-surface: rgba(255, 255, 255, 0.48);
+  --color-bg-sunken: rgba(15, 60, 60, 0.06);
+  --color-bg-field: rgba(255, 255, 255, 0.62);
 
   /* === Text === */
   --color-text-primary: #0A0A0A;
-  --color-text-secondary: #525252;
-  --color-text-tertiary: #737373;
+  --color-text-secondary: #485252;
+  --color-text-tertiary: #677272;
   --color-text-disabled: #A3A3A3;
 
-  /* === Borders === */
-  --color-border-subtle: #EDEDEA;
-  --color-border-default: #E4E4E0;
-  --color-border-strong: #D4D4D0;
+  /* === Borders (con alpha: se ven igual sobre cualquier tinte del fondo) === */
+  --color-border-subtle: rgba(15, 50, 50, 0.08);
+  --color-border-default: rgba(15, 50, 50, 0.12);
+  --color-border-strong: rgba(15, 50, 50, 0.22);
 
   /* === Accent (referencial: cae a brand-deep, así sigue el branding del tenant) === */
   --color-accent: var(--brand-deep);
@@ -83,17 +89,18 @@
 
   /* === Estado financiero === */
   --color-pos: #0E806F;
-  --color-pos-soft: #E6F7F4;
+  --color-pos-soft: rgba(14, 128, 111, 0.12);
   --color-pos-fg: #0E806F;
   --color-neg: #DC2626;
-  --color-neg-soft: #FEF2F2;
+  --color-neg-soft: rgba(220, 38, 38, 0.10);
   --color-neg-fg: #DC2626;
   --color-warn: #D97706;
-  --color-warn-soft: #FFFBEB;
+  --color-warn-soft: rgba(217, 119, 6, 0.12);
   --color-warn-fg: #D97706;
 
   /* === Overlays / glass === */
   --color-bg-overlay: rgba(255, 255, 255, 0.72);
+  --color-bg-bar: rgba(255, 255, 255, 0.42);
 
   /* === Tipografía === */
   --font-sans: "Geist", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -111,26 +118,29 @@
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
   --shadow-md: 0 4px 8px -2px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.04);
   --shadow-lg: 0 10px 20px -4px rgb(0 0 0 / 0.10), 0 4px 8px -4px rgb(0 0 0 / 0.06);
-  --shadow-glass: 0 1px 0 rgb(255 255 255 / 0.6) inset, 0 16px 40px -8px rgb(15 76 76 / 0.18), 0 4px 12px -4px rgb(0 0 0 / 0.10);
+  /* Borde de luz interno (canto del vidrio) + sombra neutra. */
+  --shadow-glass: 0 0 0 1px rgb(255 255 255 / 0.5), 0 1px 0 rgb(255 255 255 / 0.8) inset, 0 16px 40px -12px rgb(15 50 50 / 0.28), 0 4px 12px -6px rgb(15 50 50 / 0.12);
+  /* Paneles: canto de luz arriba + sombra suave teñida. */
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.75) inset, 0 1px 2px 0 rgb(15 50 50 / 0.05), 0 12px 32px -18px rgb(15 50 50 / 0.30);
 
   /* === Compat shadcn/ui (mapeo a tokens Mukusoft) === */
-  --color-background: #FAFAF9;
+  --color-background: rgba(255, 255, 255, 0.6);
   --color-foreground: #0A0A0A;
-  --color-card: #FFFFFF;
+  --color-card: rgba(255, 255, 255, 0.58);
   --color-card-foreground: #0A0A0A;
-  --color-popover: #FFFFFF;
+  --color-popover: rgba(255, 255, 255, 0.72);
   --color-popover-foreground: #0A0A0A;
   --color-primary: #0F4C4C;
   --color-primary-foreground: #FFFFFF;
-  --color-secondary: #F4F4F2;
+  --color-secondary: rgba(15, 60, 60, 0.06);
   --color-secondary-foreground: #0A0A0A;
-  --color-muted: #F4F4F2;
-  --color-muted-foreground: #525252;
+  --color-muted: rgba(15, 60, 60, 0.06);
+  --color-muted-foreground: #485252;
   --color-accent-foreground: #0F4C4C;
   --color-destructive: #DC2626;
   --color-destructive-foreground: #FFFFFF;
-  --color-border: #E4E4E0;
-  --color-input: #E4E4E0;
+  --color-border: rgba(15, 50, 50, 0.12);
+  --color-input: rgba(15, 50, 50, 0.14);
   --color-ring: #0F4C4C;
   /* Chart 1/2/3 siguen el branding (tenant). 4/5 quedan fijos pos/warn. */
   --color-chart-1: var(--brand-deep);
@@ -147,6 +157,21 @@
 }
 
 /* === Base === */
+
+/*
+ * Tailwind v4 usa `currentColor` como color de borde por defecto. Sin esta
+ * regla, cualquier `border` sin color explícito (ej. el borde del sidebar de
+ * shadcn) sale negro.
+ */
+@layer base {
+  *,
+  ::before,
+  ::after,
+  ::backdrop {
+    border-color: var(--color-border-default);
+  }
+}
+
 html, body {
   background-color: var(--color-bg-app);
   color: var(--color-text-primary);
@@ -157,19 +182,59 @@ html, body {
 }
 
 /*
- * Sutil glow de marca en el fondo. Solo se nota en pantallas grandes;
- * en una vista densa (dashboard, listados) prácticamente desaparece debajo del contenido.
+ * === Glassmorphism ===
+ * Fondo: malla de manchas con los 3 colores de marca (siguen el branding del
+ * tenant porque leen --brand-*). Fija al viewport para que al hacer scroll
+ * los paneles "deslicen" sobre el color.
  */
 body {
+  background-color: var(--color-bg-app);
   background-image:
-    radial-gradient(60rem 40rem at 100% -10%, color-mix(in oklab, var(--color-brand-sky) 7%, transparent), transparent 60%),
-    radial-gradient(50rem 30rem at -10% 100%, color-mix(in oklab, var(--color-brand-deep) 5%, transparent), transparent 55%);
+    radial-gradient(48rem 40rem at 4% -8%, color-mix(in oklab, var(--brand-sky) 62%, transparent), transparent 70%),
+    radial-gradient(50rem 42rem at 104% 8%, color-mix(in oklab, var(--brand-mint) 55%, transparent), transparent 70%),
+    radial-gradient(40rem 34rem at 42% 46%, color-mix(in oklab, var(--brand-sky) 34%, transparent), transparent 72%),
+    radial-gradient(44rem 36rem at 82% 78%, color-mix(in oklab, var(--brand-mint) 36%, transparent), transparent 72%),
+    radial-gradient(56rem 44rem at 30% 112%, color-mix(in oklab, var(--brand-deep) 38%, transparent), transparent 72%);
   background-attachment: fixed;
+}
+
+.dark body {
+  background-image:
+    radial-gradient(42rem 34rem at 6% -6%, color-mix(in oklab, var(--brand-deep) 70%, transparent), transparent 70%),
+    radial-gradient(46rem 38rem at 104% 12%, color-mix(in oklab, var(--brand-mint) 22%, transparent), transparent 70%),
+    radial-gradient(52rem 42rem at 55% 112%, color-mix(in oklab, var(--brand-sky) 16%, transparent), transparent 72%),
+    radial-gradient(30rem 26rem at 38% 42%, color-mix(in oklab, var(--brand-deep) 30%, transparent), transparent 70%);
+}
+
+/*
+ * Glass global: toda superficie (`bg-bg-surface`) es vidrio esmerilado.
+ * En @layer components para que cualquier `shadow-*` utilitario (ej. el ring
+ * de un tile seleccionado) pueda pisar la sombra del panel.
+ */
+@layer components {
+  .bg-bg-surface,
+  [data-slot="sidebar-inner"] {
+    backdrop-filter: blur(24px) saturate(170%);
+    -webkit-backdrop-filter: blur(24px) saturate(170%);
+  }
+  .bg-bg-surface {
+    box-shadow: var(--shadow-panel);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root {
+    --color-bg-surface: rgba(255, 255, 255, 0.92);
+  }
+  .dark {
+    --color-bg-surface: rgba(24, 32, 32, 0.95);
+  }
 }
 
 /* Números financieros con tabular numbers para que columnen prolijos. */
 .font-mono,
-[class*="font-mono"] {
+[class*="font-mono"],
+.tabular-nums {
   font-variant-numeric: tabular-nums;
 }
 
@@ -177,7 +242,7 @@ body {
 @keyframes fade-in-up {
   from {
     opacity: 0;
-    transform: translateY(8px);
+    transform: translateY(4px);
   }
   to {
     opacity: 1;
@@ -185,22 +250,55 @@ body {
   }
 }
 
+/* Entrada corta y discreta. Antes era 600ms con stagger: se notaba "demo". */
 .animate-fade-in-up {
-  animation: fade-in-up 600ms cubic-bezier(0.16, 1, 0.3, 1) backwards;
+  animation: fade-in-up 220ms ease-out backwards;
 }
 
-/* Sombra "premium" para hero cards: combina depth suave con un halo brand. */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up {
+    animation: none;
+  }
+}
+
+/* Paneles que deben despegarse más del fondo (login, resumen de egreso). */
 .shadow-elevated {
-  box-shadow:
-    0 1px 2px 0 rgb(0 0 0 / 0.04),
-    0 8px 24px -8px rgb(15 76 76 / 0.10),
-    0 24px 60px -20px rgb(15 76 76 / 0.08);
+  box-shadow: var(--shadow-glass);
 }
 
+/* Compat: componentes que todavía piden `shadow-card` reciben la del panel de vidrio. */
 .shadow-card {
-  box-shadow:
-    0 1px 2px 0 rgb(0 0 0 / 0.04),
-    0 1px 3px 0 rgb(0 0 0 / 0.04);
+  box-shadow: var(--shadow-panel);
+}
+
+/*
+ * === Glass (vidrio esmerilado) ===
+ * Solo para capas que flotan SOBRE contenido (barras fijas, menús, diálogos,
+ * toasts, sidebar móvil). En superficies que no tapan nada el blur no se ve,
+ * por eso las tarjetas normales siguen sólidas.
+ *
+ * - `glass`: paneles flotantes (menús, popovers, diálogos, toasts).
+ * - `glass-bar`: barras fijas (top bar, barra de cobro móvil). Un poco más
+ *   opaca para que el texto que pasa por detrás no compita con el de la barra.
+ * Sin soporte de backdrop-filter caen a superficie sólida.
+ */
+@utility glass {
+  background-color: var(--color-bg-overlay);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  box-shadow: var(--shadow-glass);
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--color-bg-surface);
+  }
+}
+
+@utility glass-bar {
+  background-color: var(--color-bg-bar);
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    background-color: var(--color-bg-app);
+  }
 }
 
 .shadow-card-hover {
@@ -261,14 +359,14 @@ body {
  */
 
 :root {
-  /* Mapeo a tokens Mukusoft */
-  --sidebar: #FFFFFF;
+  /* Sidebar de vidrio (el blur lo pone la regla "Glass global"). */
+  --sidebar: rgba(255, 255, 255, 0.28);
   --sidebar-foreground: #0A0A0A;
   --sidebar-primary: #0F4C4C;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F4F4F2;
+  --sidebar-accent: rgba(255, 255, 255, 0.5);
   --sidebar-accent-foreground: #0A0A0A;
-  --sidebar-border: #EDEDEA;
+  --sidebar-border: rgba(255, 255, 255, 0.55);
   --sidebar-ring: #0F4C4C;
 }
 
@@ -284,9 +382,10 @@ body {
  */
 .dark {
   /* Surface */
-  --color-bg-app: #0A0A0A;
-  --color-bg-surface: #141414;
-  --color-bg-sunken: #0F0F0F;
+  --color-bg-app: #061010;
+  --color-bg-surface: rgba(255, 255, 255, 0.055);
+  --color-bg-sunken: rgba(0, 0, 0, 0.28);
+  --color-bg-field: rgba(255, 255, 255, 0.05);
 
   /* Text */
   --color-text-primary: #FAFAFA;
@@ -295,9 +394,9 @@ body {
   --color-text-disabled: #525252;
 
   /* Borders */
-  --color-border-subtle: #1F1F1F;
-  --color-border-default: #262626;
-  --color-border-strong: #333333;
+  --color-border-subtle: rgba(255, 255, 255, 0.07);
+  --color-border-default: rgba(255, 255, 255, 0.11);
+  --color-border-strong: rgba(255, 255, 255, 0.2);
 
   /* Accent: mint Mukusoft luminoso sobre fondo oscuro */
   --color-accent: #3DA89F;
@@ -316,49 +415,44 @@ body {
   --color-warn-fg: #FBBF24;
 
   /* Overlay glass más oscuro */
-  --color-bg-overlay: rgba(20, 20, 20, 0.72);
+  --color-bg-overlay: rgba(16, 28, 28, 0.66);
+  --color-bg-bar: rgba(6, 16, 16, 0.45);
+  --shadow-panel: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 12px 32px -16px rgb(0 0 0 / 0.6);
 
   /* Compat shadcn (mismos tokens en versión dark) */
-  --color-background: #0A0A0A;
+  --color-background: rgba(255, 255, 255, 0.04);
   --color-foreground: #FAFAFA;
-  --color-card: #141414;
+  --color-card: rgba(255, 255, 255, 0.055);
   --color-card-foreground: #FAFAFA;
-  --color-popover: #141414;
+  --color-popover: rgba(16, 28, 28, 0.66);
   --color-popover-foreground: #FAFAFA;
   --color-primary: #3DA89F;
   --color-primary-foreground: #0A0A0A;
-  --color-secondary: #1F1F1F;
+  --color-secondary: rgba(255, 255, 255, 0.06);
   --color-secondary-foreground: #FAFAFA;
-  --color-muted: #1F1F1F;
+  --color-muted: rgba(255, 255, 255, 0.06);
   --color-muted-foreground: #A3A3A3;
   --color-accent-foreground: #FAFAFA;
   --color-destructive: #EF4444;
   --color-destructive-foreground: #FAFAFA;
-  --color-border: #262626;
-  --color-input: #262626;
+  --color-border: rgba(255, 255, 255, 0.11);
+  --color-input: rgba(255, 255, 255, 0.13);
   --color-ring: #3DA89F;
 
   /* Sidebar coherente con la paleta dark */
-  --sidebar: #141414;
+  --sidebar: rgba(255, 255, 255, 0.03);
   --sidebar-foreground: #FAFAFA;
   --sidebar-primary: #3DA89F;
   --sidebar-primary-foreground: #0A0A0A;
-  --sidebar-accent: #1F1F1F;
+  --sidebar-accent: rgba(255, 255, 255, 0.06);
   --sidebar-accent-foreground: #FAFAFA;
-  --sidebar-border: #1F1F1F;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
   --sidebar-ring: #3DA89F;
 }
 
-/* En dark, el halo radial del body usa los brand más saturados para no perderse. */
-.dark body {
-  background-image:
-    radial-gradient(60rem 40rem at 100% -10%, color-mix(in oklab, var(--color-brand-mint) 10%, transparent), transparent 60%),
-    radial-gradient(50rem 30rem at -10% 100%, color-mix(in oklab, var(--color-brand-deep) 14%, transparent), transparent 55%);
-}
-
-/* Glass shadow ajustado para dark (sin highlight blanco interno). */
+/* Glass en dark: canto de luz tenue en vez de highlight blanco, sombra más profunda. */
 .dark {
-  --shadow-glass: 0 16px 40px -8px rgb(0 0 0 / 0.55), 0 4px 12px -4px rgb(0 0 0 / 0.40);
+  --shadow-glass: 0 0 0 1px rgb(255 255 255 / 0.08), 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 16px 40px -8px rgb(0 0 0 / 0.6), 0 4px 12px -4px rgb(0 0 0 / 0.4);
 }
 
 /*

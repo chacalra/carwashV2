@@ -1,19 +1,18 @@
 /**
  * Charts del dashboard (Recharts).
  *  - TrendChart: barras de ventas diarias en el período.
- *  - DonutChart: distribución (sales o expenses breakdown).
  *
- * Esquema de color Mukusoft (deep / sky / mint / pos / warn).
+ * Un solo color (accent: deep teal en light, mint en dark). Los días sin
+ * ventas se completan con 0 para que el eje X sea un calendario honesto y
+ * no salte de "02-nov" a "06-nov" como si fueran contiguos.
  */
 
+import { addDays, format, isAfter, parseISO } from "date-fns";
+import { es } from "date-fns/locale";
 import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
-  Legend,
-  Pie,
-  PieChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -22,142 +21,90 @@ import {
 
 import { formatMoney } from "@/lib/format";
 
-// Paleta resuelta vía CSS vars: cambia automáticamente con el tema.
-const PALETTE = [
-  "var(--color-brand-deep)",
-  "var(--color-brand-mint)",
-  "var(--color-brand-sky)",
-  "var(--color-pos)",
-  "var(--color-warn)",
-  "var(--color-text-secondary)",
-  "var(--color-accent)",
-  "var(--color-text-tertiary)",
-];
-
 interface TrendPoint {
   date: string;
   total: number;
 }
 
-export function TrendChart({ data }: { data: TrendPoint[] }) {
-  // Formato corto en eje X: "06 may"
-  const formatted = data.map((d) => ({
-    ...d,
-    label: new Date(`${d.date}T00:00:00`).toLocaleDateString("es-PY", {
-      day: "2-digit",
-      month: "short",
-    }),
-  }));
+function fillDays(data: TrendPoint[], start?: string, end?: string) {
+  if (!start || !end) return data;
+  const byDate = new Map(data.map((d) => [d.date, d.total]));
+  const today = new Date();
+  const out: TrendPoint[] = [];
+  let cur = parseISO(start);
+  const last = parseISO(end);
+  // No dibujamos días futuros: el mes en curso termina hoy.
+  while (!isAfter(cur, last) && !isAfter(cur, today) && out.length < 400) {
+    const key = format(cur, "yyyy-MM-dd");
+    out.push({ date: key, total: byDate.get(key) ?? 0 });
+    cur = addDays(cur, 1);
+  }
+  return out.length > 0 ? out : data;
+}
+
+function compact(v: number) {
+  if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1).replace(".0", "")}M`;
+  if (v >= 1_000) return `${Math.round(v / 1000)}k`;
+  return `${v}`;
+}
+
+export function TrendChart({
+  data,
+  start,
+  end,
+  height = 200,
+}: {
+  data: TrendPoint[];
+  start?: string;
+  end?: string;
+  height?: number;
+}) {
+  const formatted = fillDays(data, start, end).map((d) => {
+    const date = parseISO(d.date);
+    return {
+      ...d,
+      label: format(date, "d", { locale: es }),
+      full: format(date, "EEE d 'de' MMM", { locale: es }),
+    };
+  });
 
   return (
-    <ResponsiveContainer width="100%" height={260}>
-      <BarChart
-        data={formatted}
-        margin={{ top: 8, right: 8, bottom: 8, left: -10 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border-subtle)" vertical={false} />
+    <ResponsiveContainer width="100%" height={height}>
+      <BarChart data={formatted} margin={{ top: 4, right: 0, bottom: 0, left: 0 }} barCategoryGap="20%">
+        <CartesianGrid stroke="var(--color-border-subtle)" vertical={false} />
         <XAxis
           dataKey="label"
           tick={{ fontSize: 11, fill: "var(--color-text-tertiary)" }}
           tickLine={false}
           axisLine={{ stroke: "var(--color-border-default)" }}
+          interval="preserveStartEnd"
+          minTickGap={8}
         />
         <YAxis
+          orientation="right"
+          width={36}
           tick={{ fontSize: 11, fill: "var(--color-text-tertiary)" }}
           tickLine={false}
-          axisLine={{ stroke: "var(--color-border-default)" }}
-          tickFormatter={(v: number) =>
-            v >= 1_000_000
-              ? `${(v / 1_000_000).toFixed(1)}M`
-              : v >= 1_000
-                ? `${Math.round(v / 1000)}k`
-                : `${v}`
-          }
+          axisLine={false}
+          tickCount={4}
+          tickFormatter={compact}
         />
         <Tooltip
-          cursor={{ fill: "var(--color-accent-soft)" }}
+          cursor={{ fill: "var(--color-bg-sunken)" }}
           contentStyle={{
-            borderRadius: 8,
+            borderRadius: 6,
             border: "1px solid var(--color-border-default)",
             background: "var(--color-bg-surface)",
             color: "var(--color-text-primary)",
             fontSize: 12,
-            boxShadow: "var(--shadow-md)",
+            boxShadow: "var(--shadow-sm)",
+            padding: "6px 10px",
           }}
+          labelFormatter={(_, payload) => payload?.[0]?.payload?.full ?? ""}
           formatter={(v) => [formatMoney(Number(v)), "Ventas"]}
         />
-        <Bar
-          dataKey="total"
-          fill="var(--color-brand-mint)"
-          radius={[4, 4, 0, 0]}
-          maxBarSize={40}
-        />
+        <Bar dataKey="total" fill="var(--color-accent)" radius={[2, 2, 0, 0]} maxBarSize={28} />
       </BarChart>
-    </ResponsiveContainer>
-  );
-}
-
-interface DonutItem {
-  name: string;
-  total: number | null;
-}
-
-export function DonutChart({ data }: { data: DonutItem[] }) {
-  const cleaned = data
-    .map((d) => ({ name: d.name, value: d.total ?? 0 }))
-    .filter((d) => d.value > 0);
-
-  if (cleaned.length === 0) {
-    return (
-      <div className="flex h-[260px] items-center justify-center text-sm text-text-tertiary">
-        Sin datos para graficar.
-      </div>
-    );
-  }
-
-  const total = cleaned.reduce((acc, d) => acc + d.value, 0);
-
-  return (
-    <ResponsiveContainer width="100%" height={260}>
-      <PieChart>
-        <Pie
-          data={cleaned}
-          dataKey="value"
-          nameKey="name"
-          cx="50%"
-          cy="50%"
-          innerRadius={60}
-          outerRadius={95}
-          paddingAngle={2}
-          stroke="var(--color-bg-surface)"
-          strokeWidth={2}
-        >
-          {cleaned.map((_, i) => (
-            <Cell key={i} fill={PALETTE[i % PALETTE.length]} />
-          ))}
-        </Pie>
-        <Tooltip
-          contentStyle={{
-            borderRadius: 8,
-            border: "1px solid var(--color-border-default)",
-            background: "var(--color-bg-surface)",
-            color: "var(--color-text-primary)",
-            fontSize: 12,
-            boxShadow: "var(--shadow-md)",
-          }}
-          formatter={(v, name) => {
-            const num = Number(v);
-            const pct = total > 0 ? ((num / total) * 100).toFixed(1) : "0";
-            return [`${formatMoney(num)} (${pct}%)`, String(name)];
-          }}
-        />
-        <Legend
-          verticalAlign="bottom"
-          iconType="circle"
-          iconSize={8}
-          wrapperStyle={{ fontSize: 12, paddingTop: 8 }}
-        />
-      </PieChart>
     </ResponsiveContainer>
   );
 }

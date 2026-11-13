@@ -16,14 +16,16 @@ interface TopBarProps {
 
 export function TopBar({ title, subtitle, actions }: TopBarProps) {
   return (
-    <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-3 border-b border-border-subtle bg-bg-app/80 px-4 backdrop-blur-sm md:px-8">
-      <SidebarTrigger className="-ml-1" />
-      <Separator orientation="vertical" className="mx-1 h-5" />
-      <div className="flex-1 leading-tight">
-        {subtitle && <p className="text-xs text-text-tertiary">{subtitle}</p>}
-        <h1 className="text-lg font-semibold tracking-tight">{title}</h1>
+    <header className="sticky top-0 z-10 flex h-14 shrink-0 items-center gap-3 border-b border-border-default glass-bar px-4 md:px-6">
+      <SidebarTrigger className="-ml-1 text-text-tertiary" />
+      <Separator orientation="vertical" className="h-4" />
+      <div className="flex min-w-0 flex-1 items-baseline gap-2 leading-tight">
+        <h1 className="truncate text-[15px] font-semibold tracking-tight">{title}</h1>
+        {subtitle && (
+          <p className="hidden truncate text-[13px] text-text-tertiary sm:block">{subtitle}</p>
+        )}
       </div>
-      <div className="flex items-center gap-2">
+      <div className="flex shrink-0 items-center gap-2">
         {actions}
         <ThemeToggle />
       </div>

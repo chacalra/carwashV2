@@ -1,10 +1,13 @@
 /**
  * Iter 3 — Nueva venta.
  *
- * Layout 2 columnas:
- *  - Izquierda: cabecera (fecha, tipo de cobro, método de pago) + tile grids
- *    de servicios/productos + items agregados + vehículo opcional + factura opcional + observación.
- *  - Derecha (sticky): resumen con total y botón "Cobrar Gs. X" (CTA verde).
+ * Layout de punto de venta:
+ *  - Izquierda: catálogo de servicios y productos en tiles. Cada tile muestra
+ *    cuántas unidades ya están en la venta.
+ *  - Derecha (sticky en desktop): ticket con ítems editables, vehículo
+ *    (solo si hay servicio), cobro, factura, observación, total y "Cobrar".
+ *  - Mobile: el ticket va debajo del catálogo y el total + CTA quedan en una
+ *    barra fija inferior.
  *
  * Submit: POST /sales (useCreateSale) → toast + redirect a /dashboard.
  */
@@ -12,20 +15,13 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Banknote,
-  Car,
-  ChevronUp,
   CreditCard,
-  FileText,
   Loader2,
   Minus,
-  Package,
   Plus,
-  Receipt,
   Smartphone,
-  Sparkles,
   Trash2,
   Wallet,
-  Wrench,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -159,58 +155,27 @@ const PAYMENT_METHODS = [
 
 // ----- helpers UI -----
 
-function Section({
-  title,
-  description,
-  icon: Icon,
-  children,
-  right,
-}: {
-  title: string;
-  description?: string;
-  icon?: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
-  children: React.ReactNode;
-  right?: React.ReactNode;
-}) {
-  return (
-    <section className="overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-card animate-fade-in-up">
-      <header className="flex items-start justify-between gap-3 border-b border-border-subtle px-5 py-4">
-        <div className="flex items-start gap-3">
-          {Icon ? (
-            <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-md bg-brand-mint/10 text-brand-deep">
-              <Icon size={16} strokeWidth={2.25} />
-            </span>
-          ) : null}
-          <div>
-            <h3 className="text-sm font-semibold tracking-tight">{title}</h3>
-            {description ? (
-              <p className="text-xs text-text-tertiary">{description}</p>
-            ) : null}
-          </div>
-        </div>
-        {right}
-      </header>
-      <div className="p-5">{children}</div>
-    </section>
-  );
-}
-
 function SegmentedField<T extends string | number>({
   options,
   value,
   onChange,
   ariaLabel,
+  columns,
 }: {
   options: { value: T; label: string; icon?: React.ComponentType<{ size?: number; className?: string }> }[];
   value: T | undefined;
   onChange: (v: T) => void;
   ariaLabel?: string;
+  columns?: 2 | 4;
 }) {
   return (
     <div
       role="radiogroup"
       aria-label={ariaLabel}
-      className="inline-flex flex-wrap gap-1.5 rounded-md border border-border-subtle bg-bg-sunken p-1"
+      className={cn(
+        "grid gap-0.5 rounded-md border border-border-default bg-bg-sunken p-0.5",
+        columns === 4 ? "grid-cols-2 sm:grid-cols-4 lg:grid-cols-2" : "grid-cols-2",
+      )}
     >
       {options.map((opt) => {
         const active = value === opt.value;
@@ -223,13 +188,15 @@ function SegmentedField<T extends string | number>({
             aria-checked={active}
             onClick={() => onChange(opt.value)}
             className={cn(
-              "inline-flex items-center gap-1.5 rounded border border-transparent px-3 py-1.5 text-xs font-medium transition-[box-shadow,color,background,border-color] duration-200 ease-out",
+              "inline-flex h-8 items-center justify-center gap-1.5 rounded-[5px] px-2 text-[13px] transition-colors",
               active
-                ? "bg-gradient-to-r from-brand-deep/15 via-brand-mint/20 to-brand-sky/15 font-semibold text-brand-deep shadow-glow-mint-active dark:text-text-primary"
-                : "text-text-secondary hover-any:text-text-primary hover-any:shadow-glow-mint-soft",
+                ? "bg-white font-medium text-text-primary shadow-[0_0_0_1px_var(--color-border-default),0_1px_2px_0_rgb(0_0_0/0.06)] dark:bg-white/12"
+                : "text-text-secondary hover-any:text-text-primary",
             )}
           >
-            {Icon ? <Icon size={14} /> : null}
+            {Icon ? (
+              <Icon size={14} className={active ? "text-accent" : "text-text-tertiary"} />
+            ) : null}
             {opt.label}
           </button>
         );
@@ -240,72 +207,109 @@ function SegmentedField<T extends string | number>({
 
 function CatalogTile({
   item,
+  quantity,
   onAdd,
 }: {
   item: CatalogItem;
+  quantity: number;
   onAdd: (item: CatalogItem) => void;
 }) {
+  const inCart = quantity > 0;
   return (
     <button
       type="button"
       onClick={() => onAdd(item)}
       className={cn(
-        "group relative flex min-h-[68px] flex-col items-start gap-1.5 rounded-lg border border-border-subtle bg-bg-surface p-3 text-left transition-[transform,box-shadow,border-color] duration-300 ease-out",
-        "active:scale-[0.98] active:bg-bg-sunken",
-        // hover-any: variante custom sin @media (hover: hover). Ver global.css.
-        "hover-any:-translate-y-1 hover-any:scale-[1.02] hover-any:border-transparent hover-any:shadow-glow-mint",
-        "focus-visible:outline-none focus-visible:border-transparent focus-visible:shadow-glow-mint",
+        "relative flex min-h-[76px] flex-col justify-between gap-2 rounded-lg border bg-bg-surface p-3 text-left transition-[border-color,background-color,box-shadow] duration-150",
+        "active:bg-bg-sunken",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40",
+        inCart
+          ? "border-accent shadow-[0_0_0_1px_var(--color-accent)]"
+          : "border-border-default hover-any:border-border-strong hover-any:bg-white/75 dark:hover-any:bg-white/[0.09]",
       )}
     >
-      <span className="line-clamp-2 text-sm font-medium leading-tight">
-        {item.name}
-      </span>
-      <span className="font-mono text-xs tabular-nums text-text-tertiary">
+      <span className="line-clamp-2 pr-6 text-[13px] font-medium leading-snug">{item.name}</span>
+      <span className="text-[13px] tabular-nums text-text-secondary">
         {formatMoney(item.price ?? 0)}
       </span>
-      <span
-        aria-hidden
-        className="absolute right-2 top-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-brand-mint/10 text-brand-deep opacity-0 transition group-hover:opacity-100"
-      >
-        <Plus size={12} strokeWidth={3} />
-      </span>
+      {inCart ? (
+        <span className="absolute right-2 top-2 grid h-5 min-w-5 place-items-center rounded-full bg-accent px-1.5 text-[11px] font-semibold tabular-nums text-white dark:text-bg-app">
+          {quantity}
+        </span>
+      ) : null}
     </button>
   );
 }
 
 function CatalogGrid({
   title,
-  icon: Icon,
   items,
   loading,
   emptyLabel,
+  quantities,
   onAdd,
 }: {
   title: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number; className?: string }>;
   items: CatalogItem[] | undefined;
   loading: boolean;
   emptyLabel: string;
+  quantities: Map<number, number>;
   onAdd: (item: CatalogItem) => void;
 }) {
   return (
-    <Section title={title} icon={Icon}>
+    <section>
+      <h2 className="mb-2 flex items-baseline justify-between text-[13px] font-medium text-text-secondary">
+        {title}
+        {items && items.length > 0 ? (
+          <span className="text-xs font-normal text-text-tertiary">{items.length}</span>
+        ) : null}
+      </h2>
       {loading ? (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="h-[68px] rounded-lg" />
+            <Skeleton key={i} className="h-[76px] rounded-lg" />
           ))}
         </div>
       ) : !items || items.length === 0 ? (
-        <p className="text-sm text-text-tertiary">{emptyLabel}</p>
+        <p className="rounded-lg border border-dashed border-border-default px-4 py-6 text-[13px] text-text-tertiary">
+          {emptyLabel}
+        </p>
       ) : (
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4">
           {items.map((it) => (
-            <CatalogTile key={it.id} item={it} onAdd={onAdd} />
+            <CatalogTile
+              key={it.id}
+              item={it}
+              quantity={quantities.get(it.id) ?? 0}
+              onAdd={onAdd}
+            />
           ))}
         </div>
       )}
-    </Section>
+    </section>
+  );
+}
+
+/** Bloque del ticket: separador superior + título chico opcional. */
+function TicketBlock({
+  title,
+  right,
+  children,
+}: {
+  title?: string;
+  right?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="border-t border-border-subtle px-4 py-3.5">
+      {title || right ? (
+        <div className="mb-2.5 flex items-center justify-between gap-2">
+          {title ? <p className="text-xs font-medium text-text-secondary">{title}</p> : <span />}
+          {right}
+        </div>
+      ) : null}
+      {children}
+    </div>
   );
 }
 
@@ -327,145 +331,156 @@ function ItemsList({
   const watched = useWatch({ control, name: "items" }) ?? [];
   if (fields.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-border-subtle bg-bg-sunken/40 px-4 py-8 text-center">
-        <p className="text-sm text-text-secondary">
-          Tocá un servicio o producto arriba para empezar la venta.
-        </p>
-      </div>
+      <p className="px-4 py-8 text-center text-[13px] text-text-tertiary">
+        Tocá un servicio o producto para empezar la venta.
+      </p>
     );
   }
   return (
-    <ul className="divide-y divide-border-subtle rounded-lg border border-border-subtle">
+    <ul className="divide-y divide-border-subtle">
       {fields.map((field, i) => {
         const it = watched[i] ?? field;
         const subtotal = (it.quantity || 0) * (it.unitPrice || 0);
         const isZeroPrice = (Number(it.unitPrice) || 0) <= 0;
         return (
-          <li
-            key={field.id}
-            className={cn(
-              "flex flex-col gap-2 px-3 py-3 sm:grid sm:grid-cols-12 sm:items-center",
-              // Sutil fondo warn para que la fila con precio 0 se note de lejos.
-              isZeroPrice && "bg-warn-soft/40",
-            )}
-          >
-            {/* Fila 1 mobile / col 1 desktop: nombre + borrar */}
-            <div className="flex items-start justify-between gap-2 sm:col-span-5 sm:block">
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium">{it.name}</p>
-                <p className="text-[11px] uppercase tracking-wider text-text-tertiary">
+          <li key={field.id} className={cn("px-4 py-2.5", isZeroPrice && "bg-warn-soft/50")}>
+            <div className="flex items-baseline justify-between gap-3">
+              <p className="min-w-0 truncate text-[13px] font-medium">
+                {it.name}
+                <span className="ml-1.5 text-[11px] font-normal text-text-tertiary">
                   {it.kind === "service" ? "Servicio" : "Producto"}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => remove(i)}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-text-tertiary hover:bg-neg-soft hover:text-neg sm:hidden"
-                aria-label="Quitar"
-              >
-                <Trash2 size={16} />
-              </button>
-            </div>
-
-            {/* Fila 2 mobile / cols 2-4 desktop: stepper + precio + subtotal */}
-            <div className="flex items-center justify-between gap-2 sm:contents">
-              {/* qty stepper */}
-              <div className="sm:col-span-3">
-                <div className="inline-flex items-center rounded-md border border-border-subtle">
-                  <button
-                    type="button"
-                    className="grid h-9 w-9 place-items-center text-text-secondary hover:text-text-primary disabled:opacity-40 sm:h-8 sm:w-8"
-                    disabled={(it.quantity || 1) <= 1}
-                    onClick={() =>
-                      setValue(`items.${i}.quantity`, Math.max(1, (it.quantity || 1) - 1), {
-                        shouldValidate: true,
-                      })
-                    }
-                    aria-label="Disminuir"
-                  >
-                    <Minus size={14} />
-                  </button>
-                  <Controller
-                    control={control}
-                    name={`items.${i}.quantity`}
-                    render={({ field }) => (
-                      <input
-                        type="number"
-                        inputMode="numeric"
-                        min={1}
-                        value={field.value ?? 1}
-                        onChange={(e) => field.onChange(Number(e.target.value) || 1)}
-                        className="h-9 w-12 border-x border-border-subtle bg-transparent text-center text-sm tabular-nums focus:outline-none sm:h-8"
-                      />
-                    )}
-                  />
-                  <button
-                    type="button"
-                    className="grid h-9 w-9 place-items-center text-text-secondary hover:text-text-primary sm:h-8 sm:w-8"
-                    onClick={() =>
-                      setValue(`items.${i}.quantity`, (it.quantity || 1) + 1, {
-                        shouldValidate: true,
-                      })
-                    }
-                    aria-label="Aumentar"
-                  >
-                    <Plus size={14} />
-                  </button>
-                </div>
-              </div>
-
-              {/* unit price */}
-              <div className="sm:col-span-2">
-                <Controller
-                  control={control}
-                  name={`items.${i}.unitPrice`}
-                  render={({ field }) => (
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      min={0}
-                      step={1}
-                      value={field.value ?? 0}
-                      onChange={(e) => field.onChange(Number(e.target.value) || 0)}
-                      aria-invalid={isZeroPrice}
-                      title={isZeroPrice ? "Precio en 0. Editá antes de cobrar." : undefined}
-                      className={cn(
-                        "h-9 w-24 rounded-md border bg-bg-surface px-2 text-right text-sm tabular-nums focus:outline-none sm:h-8 sm:w-full",
-                        isZeroPrice
-                          ? "border-warn text-warn-fg focus:border-warn"
-                          : "border-border-subtle focus:border-brand-mint",
-                      )}
-                    />
-                  )}
-                />
-              </div>
-
-              {/* subtotal */}
-              <div
+                </span>
+              </p>
+              <span
                 className={cn(
-                  "text-right font-mono text-sm font-semibold tabular-nums sm:col-span-1",
+                  "shrink-0 text-[13px] font-medium tabular-nums",
                   isZeroPrice && "text-warn-fg",
                 )}
               >
                 {formatMoney(subtotal)}
-              </div>
+              </span>
+            </div>
 
-              {/* trash desktop only */}
-              <div className="hidden sm:col-span-1 sm:block sm:text-right">
+            <div className="mt-1.5 flex items-center gap-2">
+              <div className="inline-flex h-7 items-center rounded-md border border-border-default">
                 <button
                   type="button"
-                  onClick={() => remove(i)}
-                  className="inline-flex h-8 w-8 items-center justify-center rounded-md text-text-tertiary hover:bg-neg-soft hover:text-neg"
-                  aria-label="Quitar"
+                  className="grid h-full w-7 place-items-center text-text-secondary hover:text-text-primary disabled:opacity-40"
+                  disabled={(it.quantity || 1) <= 1}
+                  onClick={() =>
+                    setValue(`items.${i}.quantity`, Math.max(1, (it.quantity || 1) - 1), {
+                      shouldValidate: true,
+                    })
+                  }
+                  aria-label="Disminuir"
                 >
-                  <Trash2 size={14} />
+                  <Minus size={12} />
+                </button>
+                <Controller
+                  control={control}
+                  name={`items.${i}.quantity`}
+                  render={({ field }) => (
+                    <input
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      aria-label="Cantidad"
+                      value={field.value ?? 1}
+                      onChange={(e) => field.onChange(Number(e.target.value) || 1)}
+                      className="h-full w-9 border-x border-border-default bg-transparent text-center text-[13px] tabular-nums [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                  )}
+                />
+                <button
+                  type="button"
+                  className="grid h-full w-7 place-items-center text-text-secondary hover:text-text-primary"
+                  onClick={() =>
+                    setValue(`items.${i}.quantity`, (it.quantity || 1) + 1, {
+                      shouldValidate: true,
+                    })
+                  }
+                  aria-label="Aumentar"
+                >
+                  <Plus size={12} />
                 </button>
               </div>
+
+              <span className="text-xs text-text-tertiary">×</span>
+
+              <Controller
+                control={control}
+                name={`items.${i}.unitPrice`}
+                render={({ field }) => (
+                  <input
+                    type="number"
+                    inputMode="numeric"
+                    min={0}
+                    step={1}
+                    aria-label="Precio unitario"
+                    value={field.value ?? 0}
+                    onChange={(e) => field.onChange(Number(e.target.value) || 0)}
+                    aria-invalid={isZeroPrice}
+                    title={isZeroPrice ? "Precio en 0. Editá antes de cobrar." : undefined}
+                    className={cn(
+                      "h-7 w-24 rounded-md border bg-bg-field px-2 text-right text-[13px] tabular-nums [appearance:textfield] focus:outline-none [&::-webkit-inner-spin-button]:appearance-none",
+                      isZeroPrice
+                        ? "border-warn text-warn-fg focus:border-warn"
+                        : "border-border-default focus:border-accent",
+                    )}
+                  />
+                )}
+              />
+
+              <button
+                type="button"
+                onClick={() => remove(i)}
+                className="ml-auto inline-flex h-7 w-7 items-center justify-center rounded-md text-text-tertiary hover:bg-neg-soft hover:text-neg"
+                aria-label="Quitar"
+              >
+                <Trash2 size={14} />
+              </button>
             </div>
           </li>
         );
       })}
     </ul>
+  );
+}
+
+/** Observación: colapsada por defecto (casi nunca se usa), abierta si ya trae texto. */
+function NoteField({ control }: { control: Control<FormValues> }) {
+  const initial = useWatch({ control, name: "observacion" });
+  const [open, setOpen] = useState(Boolean(initial));
+  if (!open) {
+    return (
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        className="inline-flex items-center gap-1 text-[13px] text-text-secondary hover:text-text-primary"
+      >
+        <Plus size={14} />
+        Agregar observación
+      </button>
+    );
+  }
+  return (
+    <FormField
+      control={control}
+      name="observacion"
+      render={({ field }) => (
+        <FormItem>
+          <FormLabel className="text-xs font-medium text-text-secondary">Observación</FormLabel>
+          <FormControl>
+            <textarea
+              {...field}
+              rows={2}
+              placeholder="Notas internas opcionales…"
+              className="w-full rounded-md border border-border-default bg-bg-field px-3 py-2 text-[13px] focus:border-accent focus:outline-none"
+            />
+          </FormControl>
+        </FormItem>
+      )}
+    />
   );
 }
 
@@ -624,289 +639,279 @@ function SalesFormInner({ mode, saleId, defaultValues }: SalesFormInnerProps) {
   const isSubmitting =
     createSale.isPending || updateSale.isPending || upsertVehicle.isPending;
 
+  // Cantidad en carrito por item de catálogo, para el contador de cada tile.
+  const serviceQty = new Map<number, number>();
+  const productQty = new Map<number, number>();
+  for (const it of watchedItems) {
+    if (!it) continue;
+    const map = it.kind === "service" ? serviceQty : productQty;
+    map.set(it.refId, (map.get(it.refId) ?? 0) + (Number(it.quantity) || 0));
+  }
+  const itemCount = watchedItems.reduce((acc, it) => acc + (Number(it?.quantity) || 0), 0);
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="grid gap-4 pb-[120px] lg:grid-cols-3 lg:pb-0"
+        className="grid gap-6 pb-[96px] lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start lg:gap-5 lg:pb-0"
       >
-        <div className="space-y-4 lg:col-span-2">
-          {/* Header — fecha, tipo cobro, método pago */}
-          <Section title="Datos del cobro" icon={Receipt}>
-            <div className="grid gap-4 sm:grid-cols-2">
+        {/* Catálogo */}
+        <div className="space-y-6">
+          <CatalogGrid
+            title="Servicios"
+            items={services.data}
+            loading={services.isLoading}
+            emptyLabel="Sin servicios activos. Configurá el catálogo en Ajustes."
+            quantities={serviceQty}
+            onAdd={(it) => addCatalogItem(it, "service")}
+          />
+          <CatalogGrid
+            title="Productos"
+            items={products.data}
+            loading={products.isLoading}
+            emptyLabel="Sin productos activos."
+            quantities={productQty}
+            onAdd={(it) => addCatalogItem(it, "product")}
+          />
+        </div>
+
+        {/* Ticket */}
+        <aside className="lg:sticky lg:top-[4.75rem]">
+          <div className="flex flex-col overflow-hidden rounded-lg border border-border-default bg-bg-surface lg:max-h-[calc(100svh-6.25rem)]">
+            <header className="flex items-center justify-between gap-3 px-4 py-3">
+              <div>
+                <p className="text-[13px] font-medium">
+                  {mode === "edit" ? `Venta #${saleId ?? ""}` : "Venta"}
+                </p>
+                <p className="text-xs text-text-tertiary">
+                  {itemCount > 0 ? `${itemCount} ítem${itemCount === 1 ? "" : "s"}` : "Sin ítems"}
+                </p>
+              </div>
               <FormField
                 control={form.control}
                 name="fecha_venta"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Fecha</FormLabel>
+                  <FormItem className="gap-0">
+                    <FormLabel className="sr-only">Fecha</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" className="h-8 w-[140px] text-[13px]" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+            </header>
 
-              <FormItem>
-                <FormLabel>Tipo de cobro</FormLabel>
-                <Controller
+            <div className="min-h-0 flex-1 overflow-y-auto">
+              <div className="border-t border-border-subtle">
+                <ItemsList
                   control={form.control}
-                  name="tipo_cobro"
-                  render={({ field }) => (
-                    <SegmentedField
-                      ariaLabel="Tipo de cobro"
-                      value={field.value}
-                      onChange={field.onChange}
-                      options={[
-                        { value: "Contado", label: "Contado" },
-                        { value: "Credito", label: "Crédito" },
-                      ]}
-                    />
-                  )}
+                  fields={itemsField.fields}
+                  remove={itemsField.remove}
+                  setValue={form.setValue}
                 />
-              </FormItem>
-            </div>
+                {form.formState.errors.items?.message ? (
+                  <p className="px-4 pb-3 text-xs text-neg">{form.formState.errors.items.message}</p>
+                ) : null}
+                {hasZeroPrice ? (
+                  <p className="mx-4 mb-3 rounded-md border border-warn/40 bg-warn-soft px-3 py-2 text-xs text-warn-fg">
+                    Hay ítems con precio en Gs. 0. Editá el precio antes de cobrar.
+                  </p>
+                ) : null}
+              </div>
 
-            {tipoCobro === "Contado" ? (
-              <div className="mt-4">
-                <FormItem>
-                  <FormLabel>Método de pago</FormLabel>
+              {/* Vehículo: acoplado a servicios. */}
+              <TicketBlock title="Vehículo">
+                {hasService ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <FormField
+                      control={form.control}
+                      name="license_plate"
+                      render={({ field }) => (
+                        <FormItem className="gap-1">
+                          <FormLabel className="text-xs font-normal text-text-tertiary">
+                            Placa
+                          </FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="ABC123"
+                              className="h-8 font-mono text-[13px] uppercase tracking-wider"
+                              {...field}
+                              onChange={(e) => field.onChange(e.target.value.toUpperCase())}
+                              onBlur={async (e) => {
+                                field.onBlur();
+                                const plate = e.target.value.trim().toUpperCase();
+                                if (!plate) return;
+                                try {
+                                  const v = await findVehicleByPlate(plate);
+                                  if (v && v.vehicle_type_id) {
+                                    form.setValue("vehicle_type_id", v.vehicle_type_id, {
+                                      shouldValidate: true,
+                                    });
+                                    toast.message("Vehículo encontrado", {
+                                      description: `${v.license_plate} · ${v.vehicle_type_name ?? ""}`,
+                                    });
+                                  }
+                                } catch {
+                                  /* noop */
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="vehicle_type_id"
+                      render={({ field }) => (
+                        <FormItem className="gap-1">
+                          <FormLabel className="text-xs font-normal text-text-tertiary">
+                            Tipo de vehículo
+                          </FormLabel>
+                          <FormControl>
+                            <select
+                              value={field.value ?? ""}
+                              onChange={(e) =>
+                                field.onChange(e.target.value ? Number(e.target.value) : undefined)
+                              }
+                              className="h-8 w-full rounded-md border border-border-default bg-bg-field px-2 text-[13px] focus:border-accent focus:outline-none"
+                            >
+                              <option value="">Seleccioná…</option>
+                              {(vehicleTypes.data ?? []).map((t) => (
+                                <option key={t.id} value={t.id}>
+                                  {t.name}
+                                </option>
+                              ))}
+                            </select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-[13px] text-text-tertiary">
+                    Agregá un servicio al detalle para habilitar el vehículo.
+                  </p>
+                )}
+              </TicketBlock>
+
+              {/* Cobro */}
+              <TicketBlock title="Cobro">
+                <div className="space-y-2">
                   <Controller
                     control={form.control}
-                    name="metodo_pago"
+                    name="tipo_cobro"
                     render={({ field }) => (
                       <SegmentedField
-                        ariaLabel="Método de pago"
+                        ariaLabel="Tipo de cobro"
                         value={field.value}
                         onChange={field.onChange}
-                        options={PAYMENT_METHODS.map((m) => ({
-                          value: m.value,
-                          label: m.label,
-                          icon: m.icon,
-                        }))}
+                        options={[
+                          { value: "Contado", label: "Contado" },
+                          { value: "Credito", label: "Crédito" },
+                        ]}
                       />
                     )}
                   />
-                </FormItem>
-              </div>
-            ) : null}
-          </Section>
-
-          {/* Servicios */}
-          <CatalogGrid
-            title="Servicios"
-            icon={Wrench}
-            items={services.data}
-            loading={services.isLoading}
-            emptyLabel="Sin servicios activos. Configurá el catálogo en Ajustes."
-            onAdd={(it) => addCatalogItem(it, "service")}
-          />
-
-          {/* Productos */}
-          <CatalogGrid
-            title="Productos"
-            icon={Package}
-            items={products.data}
-            loading={products.isLoading}
-            emptyLabel="Sin productos activos."
-            onAdd={(it) => addCatalogItem(it, "product")}
-          />
-
-          {/* Items */}
-          <Section
-            title="Detalle"
-            description="Tocá ± para ajustar cantidad o editá el precio."
-            icon={Sparkles}
-          >
-            <ItemsList
-              control={form.control}
-              fields={itemsField.fields}
-              remove={itemsField.remove}
-              setValue={form.setValue}
-            />
-            {form.formState.errors.items?.message ? (
-              <p className="mt-2 text-xs text-neg">
-                {form.formState.errors.items.message}
-              </p>
-            ) : null}
-            {watchedItems.length > 0 &&
-            watchedItems.some((it) => (Number(it?.unitPrice) || 0) <= 0) ? (
-              <p className="mt-2 text-xs text-warn-fg">
-                Hay ítems con precio en Gs. 0. Editá el precio antes de cobrar.
-              </p>
-            ) : null}
-          </Section>
-
-          {/* Vehículo: acoplado a servicios. */}
-          <Section
-            title="Vehículo"
-            description={
-              hasService
-                ? "Obligatorio cuando la venta incluye un servicio."
-                : "No aplica para ventas de solo productos."
-            }
-            icon={Car}
-          >
-            {hasService ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="license_plate"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Placa</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="ABC123"
-                          {...field}
-                          onChange={(e) => field.onChange(e.target.value.toUpperCase())}
-                          onBlur={async (e) => {
-                            field.onBlur();
-                            const plate = e.target.value.trim().toUpperCase();
-                            if (!plate) return;
-                            try {
-                              const v = await findVehicleByPlate(plate);
-                              if (v && v.vehicle_type_id) {
-                                form.setValue("vehicle_type_id", v.vehicle_type_id, {
-                                  shouldValidate: true,
-                                });
-                                toast.message("Vehículo encontrado", {
-                                  description: `${v.license_plate} · ${v.vehicle_type_name ?? ""}`,
-                                });
-                              }
-                            } catch {
-                              /* noop */
-                            }
-                          }}
+                  {tipoCobro === "Contado" ? (
+                    <Controller
+                      control={form.control}
+                      name="metodo_pago"
+                      render={({ field }) => (
+                        <SegmentedField
+                          ariaLabel="Método de pago"
+                          columns={4}
+                          value={field.value}
+                          onChange={field.onChange}
+                          options={PAYMENT_METHODS.map((pm) => ({
+                            value: pm.value,
+                            label: pm.label,
+                            icon: pm.icon,
+                          }))}
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="vehicle_type_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Tipo de vehículo</FormLabel>
-                      <FormControl>
-                        <select
-                          value={field.value ?? ""}
-                          onChange={(e) =>
-                            field.onChange(e.target.value ? Number(e.target.value) : undefined)
-                          }
-                          className="h-9 w-full rounded-md border border-border-subtle bg-bg-surface px-2 text-sm focus:border-brand-mint focus:outline-none"
-                        >
-                          <option value="">Seleccioná…</option>
-                          {(vehicleTypes.data ?? []).map((t) => (
-                            <option key={t.id} value={t.id}>
-                              {t.name}
-                            </option>
-                          ))}
-                        </select>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            ) : (
-              <p className="text-sm text-text-tertiary">
-                Agregá un servicio al detalle para habilitar el vehículo.
-              </p>
-            )}
-          </Section>
-
-          {/* Factura */}
-          <Section
-            title="Facturación"
-            description="Activá si esta venta requiere factura."
-            icon={FileText}
-            right={
-              <Controller
-                control={form.control}
-                name="requiere_factura"
-                render={({ field }) => (
-                  <ToggleSwitch checked={field.value} onCheckedChange={field.onChange} label="Requiere factura" />
-                )}
-              />
-            }
-          >
-            {requiereFactura ? (
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="ruc_ci"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>RUC / CI</FormLabel>
-                      <FormControl>
-                        <Input placeholder="80012345-6" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="razon_social"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Razón social</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Cliente S.A." {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-            ) : (
-              <p className="text-sm text-text-tertiary">
-                Se registrará sin factura. Podés activar en cualquier momento.
-              </p>
-            )}
-          </Section>
-
-          {/* Observación */}
-          <Section title="Observación" icon={FileText}>
-            <FormField
-              control={form.control}
-              name="observacion"
-              render={({ field }) => (
-                <FormItem>
-                  <FormControl>
-                    <textarea
-                      {...field}
-                      rows={3}
-                      placeholder="Notas internas opcionales…"
-                      className="w-full rounded-md border border-border-subtle bg-bg-surface px-3 py-2 text-sm focus:border-brand-mint focus:outline-none"
+                      )}
                     />
-                  </FormControl>
-                </FormItem>
-              )}
-            />
-          </Section>
-        </div>
+                  ) : null}
+                </div>
+              </TicketBlock>
 
-        {/* Sidebar resumen — sólo desktop */}
-        <aside className="hidden lg:col-span-1 lg:block">
-          <SummaryPanel
-            total={total}
-            items={watchedItems}
-            isSubmitting={isSubmitting}
-            mode={mode}
-            hasZeroPrice={hasZeroPrice}
-          />
+              {/* Factura */}
+              <TicketBlock
+                title="Factura"
+                right={
+                  <Controller
+                    control={form.control}
+                    name="requiere_factura"
+                    render={({ field }) => (
+                      <ToggleSwitch
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                        label="Requiere factura"
+                      />
+                    )}
+                  />
+                }
+              >
+                {requiereFactura ? (
+                  <div className="grid grid-cols-2 gap-2">
+                    <FormField
+                      control={form.control}
+                      name="ruc_ci"
+                      render={({ field }) => (
+                        <FormItem className="gap-1">
+                          <FormLabel className="text-xs font-normal text-text-tertiary">
+                            RUC / CI
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="80012345-6" className="h-8 text-[13px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="razon_social"
+                      render={({ field }) => (
+                        <FormItem className="gap-1">
+                          <FormLabel className="text-xs font-normal text-text-tertiary">
+                            Razón social
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder="Cliente S.A." className="h-8 text-[13px]" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-[13px] text-text-tertiary">Sin factura.</p>
+                )}
+              </TicketBlock>
+
+              <TicketBlock>
+                <NoteField control={form.control} />
+              </TicketBlock>
+            </div>
+
+            {/* Total + CTA (desktop). En mobile lo hace la barra inferior. */}
+            <TicketFooter
+              total={total}
+              hasItems={watchedItems.length > 0}
+              isSubmitting={isSubmitting}
+              mode={mode}
+              hasZeroPrice={hasZeroPrice}
+            />
+          </div>
         </aside>
 
-        {/* Bottom bar sticky — sólo mobile/tablet */}
         <MobileSummaryBar
           total={total}
-          items={watchedItems}
+          itemCount={itemCount}
           isSubmitting={isSubmitting}
           mode={mode}
           hasZeroPrice={hasZeroPrice}
@@ -916,71 +921,105 @@ function SalesFormInner({ mode, saleId, defaultValues }: SalesFormInnerProps) {
   );
 }
 
-function SummaryPanel({
+function submitClasses(enabled: boolean) {
+  return enabled
+    ? "bg-accent text-white hover:bg-accent-hover dark:text-bg-app"
+    : "border border-border-default bg-bg-sunken text-text-tertiary disabled:opacity-100";
+}
+
+function TicketFooter({
   total,
-  items,
+  hasItems,
   isSubmitting,
   mode,
   hasZeroPrice,
 }: {
   total: number;
-  items: FormValues["items"];
+  hasItems: boolean;
   isSubmitting: boolean;
   mode: SalesFormMode;
   hasZeroPrice: boolean;
 }) {
-  const ctaLabel =
-    mode === "edit" ? "Guardar cambios" : `Cobrar ${formatMoney(total)}`;
+  const ctaLabel = mode === "edit" ? "Guardar cambios" : `Cobrar ${formatMoney(total)}`;
   const submittingLabel = mode === "edit" ? "Guardando…" : "Registrando…";
   const blockedByZero = hasZeroPrice && mode !== "edit";
+  const enabled = !isSubmitting && hasItems && !blockedByZero;
   return (
-    <div className="sticky top-20 overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-elevated animate-fade-in-up">
-      <div
-        aria-hidden
-        className="h-1 bg-gradient-to-r from-brand-deep via-brand-mint to-brand-sky"
-      />
-      <div className="p-5">
-        <p className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
-          Resumen
-        </p>
-        <CartSummary items={items} className="mt-4" />
+    <div className="hidden border-t border-border-default bg-white/25 px-4 py-4 dark:bg-white/[0.02] lg:block">
+      <div className="flex items-baseline justify-between">
+        <span className="text-[13px] text-text-secondary">Total</span>
+        <span
+          className={cn(
+            "text-[26px] font-semibold leading-none tracking-tight tabular-nums",
+            total > 0 ? "text-text-primary" : "text-text-tertiary",
+          )}
+        >
+          {formatMoney(total)}
+        </span>
+      </div>
+      <Button
+        type="submit"
+        size="lg"
+        disabled={!enabled}
+        className={cn("mt-4 h-11 w-full text-[15px] font-medium", submitClasses(enabled || isSubmitting))}
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="animate-spin" />
+            {submittingLabel}
+          </>
+        ) : (
+          <>{ctaLabel}</>
+        )}
+      </Button>
+    </div>
+  );
+}
 
-        <div className="mt-5 border-t border-border-subtle pt-4">
-          <div className="flex items-end justify-between">
-            <span className="text-xs uppercase tracking-wider text-text-tertiary">
-              Total
-            </span>
-            <span
-              className={cn(
-                "font-mono text-2xl font-semibold tabular-nums",
-                total > 0
-                  ? "bg-gradient-to-r from-brand-deep via-brand-mint to-brand-sky bg-clip-text text-transparent"
-                  : "text-text-tertiary",
-              )}
-            >
-              {formatMoney(total)}
-            </span>
-          </div>
-        </div>
+/**
+ * Total + CTA en mobile/tablet, fijo al fondo con safe-area.
+ * El detalle ya está visible en el ticket (debajo del catálogo), así que no
+ * hace falta drawer.
+ */
+function MobileSummaryBar({
+  total,
+  itemCount,
+  isSubmitting,
+  mode,
+  hasZeroPrice,
+}: {
+  total: number;
+  itemCount: number;
+  isSubmitting: boolean;
+  mode: SalesFormMode;
+  hasZeroPrice: boolean;
+}) {
+  const blockedByZero = hasZeroPrice && mode !== "edit";
+  const ctaLabel =
+    mode === "edit"
+      ? "Guardar"
+      : itemCount === 0
+        ? "Sin ítems"
+        : blockedByZero
+          ? "Precio en 0"
+          : `Cobrar ${formatMoney(total)}`;
+  const submittingLabel = mode === "edit" ? "Guardando…" : "Registrando…";
+  const enabled = !isSubmitting && itemCount > 0 && !blockedByZero;
 
-        {blockedByZero ? (
-          <p className="mt-4 rounded-md border border-warn/40 bg-warn-soft px-3 py-2 text-xs text-warn-fg">
-            No se puede cobrar mientras haya ítems con precio en Gs. 0. Editá los precios en el detalle.
+  return (
+    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border-default glass-bar pb-[env(safe-area-inset-bottom)] lg:hidden">
+      <div className="flex items-center gap-3 px-4 py-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-text-tertiary">
+            Total{itemCount > 0 ? ` · ${itemCount} ítem${itemCount === 1 ? "" : "s"}` : ""}
           </p>
-        ) : null}
-
+          <p className="text-lg font-semibold leading-tight tabular-nums">{formatMoney(total)}</p>
+        </div>
         <Button
           type="submit"
           size="lg"
-          disabled={isSubmitting || items.length === 0 || blockedByZero}
-          className={cn(
-            "mt-5 w-full font-semibold transition-all duration-200",
-            // Sin items: muy opaco, sin sombra. UX: "no se puede cobrar todavía".
-            // Con items: verde pleno + ring sutil que comunica "listo para cobrar".
-            items.length === 0 || blockedByZero
-              ? "bg-pos/30 text-white/80"
-              : "bg-pos text-white shadow-md ring-2 ring-pos/30 hover:bg-pos/90 hover:ring-pos/40",
-          )}
+          disabled={!enabled}
+          className={cn("h-11 min-w-[150px] font-medium", submitClasses(enabled || isSubmitting))}
         >
           {isSubmitting ? (
             <>
@@ -993,227 +1032,6 @@ function SummaryPanel({
         </Button>
       </div>
     </div>
-  );
-}
-
-/**
- * Resumen del carrito agrupado por tipo (servicios / productos) con
- * subtotales por grupo. Pensado para que el usuario entienda de un vistazo
- * "qué pidió y cuánto cuesta cada tipo", sin tener que sumar mentalmente.
- *
- * Convenciones:
- *  - El bloque de servicios va arriba (el lavado es el motivo de la venta).
- *  - Si un grupo está vacío no se renderiza.
- *  - La cantidad solo aparece cuando es > 1 (el "1×" omnipresente es ruido).
- */
-function CartSummary({
-  items,
-  className,
-}: {
-  items: FormValues["items"];
-  className?: string;
-}) {
-  if (!items || items.length === 0) {
-    return (
-      <p className={cn("text-sm text-text-tertiary", className)}>Sin ítems aún.</p>
-    );
-  }
-  const groups: { kind: "service" | "product"; label: string; icon: typeof Wrench }[] = [
-    { kind: "service", label: "Servicios", icon: Wrench },
-    { kind: "product", label: "Productos", icon: Package },
-  ];
-  return (
-    <div className={cn("space-y-4 text-sm", className)}>
-      {groups.map((g) => {
-        const groupItems = items.filter((it) => it.kind === g.kind);
-        if (groupItems.length === 0) return null;
-        // Contamos unidades totales (sumando cantidades), no lineas distintas.
-        // Si el usuario vende 4 AREON + 6 Perfume el header debe decir 10, no 2.
-        const unitCount = groupItems.reduce(
-          (acc, it) => acc + (Number(it.quantity) || 0),
-          0,
-        );
-        const subtotal = groupItems.reduce(
-          (acc, it) => acc + (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0),
-          0,
-        );
-        const Icon = g.icon;
-        return (
-          <div key={g.kind}>
-            <div className="mb-1.5 flex items-baseline justify-between gap-2 border-b border-border-subtle pb-1">
-              <span className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
-                <Icon
-                  size={12}
-                  className={cn(
-                    g.kind === "service" ? "text-brand-deep" : "text-brand-sky",
-                  )}
-                  aria-hidden
-                />
-                {g.label}
-                <span className="text-text-tertiary">({unitCount})</span>
-              </span>
-              <span className="font-mono text-xs font-semibold tabular-nums text-text-secondary">
-                {formatMoney(subtotal)}
-              </span>
-            </div>
-            <ul className="space-y-1">
-              {groupItems.map((it) => {
-                const lineTotal = it.quantity * it.unitPrice;
-                const isZeroPrice = it.unitPrice <= 0;
-                return (
-                  <li
-                    key={`${it.kind}-${it.refId}`}
-                    className="flex items-baseline justify-between gap-2"
-                  >
-                    <span className="truncate text-text-secondary">
-                      {it.quantity > 1 ? (
-                        <span className="mr-1 text-text-tertiary">{it.quantity}×</span>
-                      ) : null}
-                      {it.name}
-                    </span>
-                    <span
-                      className={cn(
-                        "font-mono text-xs tabular-nums",
-                        isZeroPrice ? "text-warn-fg" : "text-text-tertiary",
-                      )}
-                      title={isZeroPrice ? "Precio en 0. Editá el precio en el detalle antes de cobrar." : undefined}
-                    >
-                      {formatMoney(lineTotal)}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-/**
- * Resumen + CTA en mobile/tablet. Stick al fondo de la pantalla con safe-area.
- * Tap en la barra abre un drawer con el detalle de items.
- * Se oculta en `lg:` donde el sidebar derecho hace el mismo trabajo.
- */
-function MobileSummaryBar({
-  total,
-  items,
-  isSubmitting,
-  mode,
-  hasZeroPrice,
-}: {
-  total: number;
-  items: FormValues["items"];
-  isSubmitting: boolean;
-  mode: SalesFormMode;
-  hasZeroPrice: boolean;
-}) {
-  const [open, setOpen] = useState(false);
-  const blockedByZero = hasZeroPrice && mode !== "edit";
-  const ctaLabel =
-    mode === "edit"
-      ? "Guardar"
-      : items.length === 0
-        ? "Sin ítems"
-        : blockedByZero
-          ? "Precio en 0"
-          : `Cobrar ${formatMoney(total)}`;
-  const submittingLabel = mode === "edit" ? "Guardando…" : "Registrando…";
-  const itemCount = items.reduce((acc, it) => acc + (it.quantity || 0), 0);
-
-  return (
-    <>
-      {open && (
-        <button
-          type="button"
-          aria-label="Cerrar resumen"
-          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
-          onClick={() => setOpen(false)}
-        />
-      )}
-      <div
-        className={cn(
-          "fixed inset-x-0 bottom-0 z-50 lg:hidden",
-          "border-t border-border-subtle bg-bg-surface shadow-elevated",
-          "pb-[env(safe-area-inset-bottom)]",
-          "transition-transform duration-200",
-        )}
-      >
-        {/* Drawer expandible con el detalle */}
-        {open && (
-          <div className="max-h-[55vh] overflow-y-auto border-b border-border-subtle px-4 py-3">
-            <div className="mb-2 flex items-center justify-between">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
-                Detalle ({itemCount})
-              </p>
-              <button
-                type="button"
-                onClick={() => setOpen(false)}
-                className="text-xs text-text-tertiary"
-              >
-                Cerrar
-              </button>
-            </div>
-            <CartSummary items={items} />
-          </div>
-        )}
-
-        {/* Barra principal */}
-        <div className="flex items-center gap-3 px-4 py-3">
-          <button
-            type="button"
-            onClick={() => setOpen((v) => !v)}
-            className="flex flex-1 items-center gap-2 text-left"
-            aria-expanded={open}
-            aria-label="Ver detalle del cobro"
-          >
-            <ChevronUp
-              size={16}
-              className={cn(
-                "text-text-tertiary transition-transform",
-                open && "rotate-180",
-              )}
-            />
-            <div className="min-w-0">
-              <p className="text-[11px] uppercase tracking-wider text-text-tertiary">
-                Total {itemCount > 0 ? `· ${itemCount} ítem${itemCount === 1 ? "" : "s"}` : ""}
-              </p>
-              <p
-                className={cn(
-                  "font-mono text-lg font-semibold tabular-nums leading-tight",
-                  total > 0
-                    ? "bg-gradient-to-r from-brand-deep via-brand-mint to-brand-sky bg-clip-text text-transparent"
-                    : "text-text-tertiary",
-                )}
-              >
-                {formatMoney(total)}
-              </p>
-            </div>
-          </button>
-          <Button
-            type="submit"
-            size="lg"
-            disabled={isSubmitting || items.length === 0 || blockedByZero}
-            className={cn(
-              "h-12 min-w-[140px] font-semibold transition-all duration-200",
-              items.length === 0 || blockedByZero
-                ? "bg-pos/30 text-white/80"
-                : "bg-pos text-white shadow-md ring-2 ring-pos/30 hover:bg-pos/90 hover:ring-pos/40",
-            )}
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="animate-spin" />
-                {submittingLabel}
-              </>
-            ) : (
-              <>{ctaLabel}</>
-            )}
-          </Button>
-        </div>
-      </div>
-    </>
   );
 }
 
@@ -1234,15 +1052,13 @@ function ToggleSwitch({
       aria-label={label}
       onClick={() => onCheckedChange(!checked)}
       className={cn(
-        "inline-flex h-5 w-9 items-center rounded-full border transition",
-        checked
-          ? "border-brand-mint bg-brand-mint"
-          : "border-border-default bg-bg-muted",
+        "inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors",
+        checked ? "bg-accent" : "bg-border-strong",
       )}
     >
       <span
         className={cn(
-          "ml-0.5 h-4 w-4 rounded-full bg-white shadow transition",
+          "ml-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition-transform",
           checked ? "translate-x-4" : "translate-x-0",
         )}
       />

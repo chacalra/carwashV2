@@ -9,11 +9,12 @@
 
 import {
   AlertCircle,
-  CalendarDays,
   Building2,
   ChevronDown,
   ChevronRight,
   CircleSlash,
+  Clock3,
+  FileText,
   Filter,
   Loader2,
   Package,
@@ -278,10 +279,10 @@ export function MovementsInner() {
   return (
     <div className="space-y-4">
       {/* Filtros */}
-      <section className="rounded-xl border border-border-subtle bg-bg-surface shadow-card animate-fade-in-up">
+      <section className="rounded-lg border border-border-default bg-bg-surface animate-fade-in-up">
         <div className="flex flex-wrap items-end gap-3 p-4">
           <div className="flex min-w-[140px] flex-1 flex-col gap-1 sm:flex-none">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            <label className="text-xs text-text-secondary">
               Desde
             </label>
             <Input
@@ -293,7 +294,7 @@ export function MovementsInner() {
           </div>
 
           <div className="flex min-w-[140px] flex-1 flex-col gap-1 sm:flex-none">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            <label className="text-xs text-text-secondary">
               Hasta
             </label>
             <Input
@@ -305,10 +306,10 @@ export function MovementsInner() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            <label className="text-xs text-text-secondary">
               Tipo de cobro
             </label>
-            <div className="inline-flex rounded-md border border-border-subtle bg-bg-sunken p-1">
+            <div className="inline-flex h-9 items-center rounded-md border border-border-default bg-bg-sunken p-0.5">
               {(
                 [
                   { v: "all" as TipoCobroFilter, l: "Todos" },
@@ -323,9 +324,9 @@ export function MovementsInner() {
                     type="button"
                     onClick={() => setTipoCobro(opt.v)}
                     className={cn(
-                      "rounded px-3 py-1 text-xs font-medium transition",
+                      "h-full rounded-[5px] px-3 text-[13px] transition-colors",
                       active
-                        ? "bg-bg-surface text-text-primary shadow-sm ring-1 ring-black/5"
+                        ? "bg-white font-medium text-text-primary shadow-[0_0_0_1px_var(--color-border-default),0_1px_2px_0_rgb(0_0_0/0.06)] dark:bg-white/12"
                         : "text-text-secondary hover:text-text-primary",
                     )}
                   >
@@ -337,7 +338,7 @@ export function MovementsInner() {
           </div>
 
           <div className="flex flex-1 flex-col gap-1 min-w-[220px]">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            <label className="text-xs text-text-secondary">
               Buscar
             </label>
             <div className="relative">
@@ -375,22 +376,22 @@ export function MovementsInner() {
             onExcludeChange={setExcludeRazones}
           />
 
-          <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              disabled={isFetching}
-            >
-              {isFetching ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <RefreshCw size={14} />
-              )}
-              Refrescar
-            </Button>
-          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => refetch()}
+            disabled={isFetching}
+            aria-label="Refrescar"
+            title="Refrescar"
+            className="ml-auto size-9 shrink-0 bg-bg-field"
+          >
+            {isFetching ? (
+              <Loader2 size={15} className="animate-spin" />
+            ) : (
+              <RefreshCw size={15} />
+            )}
+          </Button>
         </div>
 
         {/* Chips removibles de filtros activos. Mas claro que un contador. */}
@@ -438,19 +439,19 @@ export function MovementsInner() {
         {/* Breakdown por razón social cuando hay >1 empresa seleccionada. */}
         {razonesBreakdown && razonesBreakdown.length > 1 ? (
           <div className="border-t border-border-subtle px-4 py-3">
-            <p className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            <p className="mb-2 text-xs text-text-secondary">
               Por razón social
             </p>
             <ul className="grid gap-1.5 sm:grid-cols-2 lg:grid-cols-3">
               {razonesBreakdown.map((r) => (
                 <li
                   key={r.name}
-                  className="flex items-baseline justify-between gap-2 rounded-md bg-bg-sunken px-3 py-1.5"
+                  className="flex items-baseline justify-between gap-2 rounded-md border border-border-subtle bg-white/30 px-3 py-1.5 dark:bg-white/[0.03]"
                 >
                   <span className="truncate text-xs text-text-secondary">
                     <span className="text-text-tertiary">{r.count}×</span> {r.name}
                   </span>
-                  <span className="font-mono text-xs font-semibold tabular-nums">
+                  <span className="whitespace-nowrap text-xs font-semibold tabular-nums">
                     {formatMoney(r.total)}
                   </span>
                 </li>
@@ -577,11 +578,14 @@ function Stat({
   mono?: boolean;
 }) {
   return (
-    <div className="px-5 py-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
-        {label}
-      </p>
-      <p className={cn("text-lg font-semibold", mono && "font-mono tabular-nums")}>
+    <div className="px-4 py-3 sm:px-5">
+      <p className="text-xs text-text-secondary">{label}</p>
+      <p
+        className={cn(
+          "mt-0.5 whitespace-nowrap text-lg font-semibold tracking-tight tabular-nums sm:text-xl",
+          mono && "tabular-nums",
+        )}
+      >
         {value}
       </p>
       {hint ? <p className="text-[11px] text-text-tertiary">{hint}</p> : null}
@@ -591,7 +595,7 @@ function Stat({
 
 function TableSkeleton() {
   return (
-    <div className="overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-card">
+    <div className="overflow-hidden rounded-lg border border-border-default bg-bg-surface">
       <div className="space-y-2 p-4">
         {Array.from({ length: 6 }).map((_, i) => (
           <Skeleton key={i} className="h-11 w-full rounded-md" />
@@ -606,12 +610,13 @@ function PaymentBadge({ sale }: { sale: SaleResponse }) {
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium",
+        "inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] font-medium",
         isCredit
-          ? "bg-warn-soft text-warn"
-          : "bg-pos-soft text-pos",
+          ? "border-warn/30 bg-warn-soft text-warn-fg"
+          : "border-border-subtle bg-white/40 text-text-primary dark:bg-white/[0.04]",
       )}
     >
+      {isCredit ? <Clock3 size={11} aria-hidden /> : null}
       {isCredit ? "Crédito" : "Contado"}
       {sale.payment_method ? (
         <span className="text-text-tertiary">· {sale.payment_method}</span>
@@ -662,19 +667,19 @@ function SalesTable({
       </ul>
 
       {/* Desktop/tablet: tabla */}
-      <div className="hidden overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-card md:block">
+      <div className="hidden overflow-hidden rounded-lg border border-border-default bg-bg-surface md:block">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border-subtle bg-bg-sunken/60 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            <tr className="border-b border-border-default text-xs font-medium text-text-tertiary">
               <th className="w-8 px-3 py-2.5"></th>
-              <th className="px-3 py-2.5 text-left">Fecha</th>
-              {hideCustomer ? null : <th className="px-3 py-2.5 text-left">Cliente</th>}
-              <th className="px-3 py-2.5 text-left">Vehículo</th>
-              {hideItems ? null : <th className="px-3 py-2.5 text-left">Items</th>}
-              <th className="px-3 py-2.5 text-left">Cobro</th>
-              <th className="px-3 py-2.5 text-right">Total</th>
-              <th className="px-3 py-2.5 text-right"></th>
+              <th className="px-3 py-2.5 font-medium text-left">Fecha</th>
+              {hideCustomer ? null : <th className="px-3 py-2.5 font-medium text-left">Cliente</th>}
+              <th className="px-3 py-2.5 font-medium text-left">Vehículo</th>
+              {hideItems ? null : <th className="px-3 py-2.5 font-medium text-left">Items</th>}
+              <th className="px-3 py-2.5 font-medium text-left">Cobro</th>
+              <th className="px-3 py-2.5 font-medium text-right">Total</th>
+              <th className="px-3 py-2.5 font-medium text-right"></th>
             </tr>
           </thead>
           <tbody>
@@ -727,7 +732,7 @@ function SaleCard({
   return (
     <li
       className={cn(
-        "rounded-xl border border-border-subtle bg-bg-surface shadow-card",
+        "rounded-lg border border-border-default bg-bg-surface",
         sale.is_voided && "opacity-60",
       )}
     >
@@ -739,8 +744,7 @@ function SaleCard({
       >
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 text-[11px] text-text-tertiary">
-            <CalendarDays size={12} />
-            <span className="font-mono tabular-nums">{formatDate(sale.date)}</span>
+            <span className="tabular-nums">{formatDate(sale.date)}</span>
             <span>·</span>
             <span>#{sale.id}</span>
           </div>
@@ -763,7 +767,7 @@ function SaleCard({
           </div>
         </div>
         <div className="flex flex-col items-end gap-1">
-          <span className="font-mono text-base font-semibold tabular-nums">
+          <span className="whitespace-nowrap text-base font-semibold tabular-nums">
             {formatMoney(sale.total)}
           </span>
           {isOpen ? (
@@ -783,12 +787,12 @@ function SaleCard({
                 className="flex items-baseline justify-between gap-2 px-3 py-2 text-sm"
               >
                 <span className="truncate">
-                  <span className="text-[10px] uppercase tracking-wider text-text-tertiary">
+                  <span className="text-[11px] text-text-tertiary">
                     {it.item_type === "Servicio" ? "Servicio" : "Producto"}
                   </span>
                   <span className="ml-2">{it.item_name}</span>
                 </span>
-                <span className="font-mono tabular-nums text-text-secondary">
+                <span className="whitespace-nowrap tabular-nums text-text-secondary">
                   {it.quantity}× {formatMoney(it.unit_price)}
                 </span>
               </li>
@@ -854,7 +858,7 @@ function Row({
     <>
       <tr
         className={cn(
-          "border-b border-border-subtle transition-colors duration-150 hover-any:bg-accent-soft/60",
+          "border-b border-border-subtle transition-colors duration-150 last:border-b-0 hover-any:bg-white/45 dark:hover-any:bg-white/[0.03]",
           sale.is_voided && "opacity-60",
         )}
       >
@@ -869,11 +873,8 @@ function Row({
           </button>
         </td>
         <td className="whitespace-nowrap px-3 py-2.5">
-          <div className="flex items-center gap-2">
-            <CalendarDays size={14} className="text-text-tertiary" />
-            <span className="font-mono text-xs tabular-nums">{formatDate(sale.date)}</span>
-          </div>
-          <p className="ml-5 text-[11px] text-text-tertiary">#{sale.id}</p>
+          <p className="text-[13px] tabular-nums">{formatDate(sale.date)}</p>
+          <p className="text-[11px] tabular-nums text-text-tertiary">#{sale.id}</p>
         </td>
         {hideCustomer ? null : (
           <td className="px-3 py-2.5">
@@ -909,14 +910,15 @@ function Row({
               </span>
             ) : null}
             {sale.requires_invoice ? (
-              <span className="text-[10px] uppercase tracking-wider text-text-tertiary">
+              <span className="inline-flex items-center gap-1 text-[11px] text-text-tertiary">
+                <FileText size={11} aria-hidden />
                 Con factura
               </span>
             ) : null}
           </div>
         </td>
         <td className="px-3 py-2.5 text-right">
-          <span className="font-mono text-sm font-semibold tabular-nums">
+          <span className="whitespace-nowrap text-sm font-semibold tabular-nums">
             {formatMoney(sale.total)}
           </span>
         </td>
@@ -955,25 +957,25 @@ function Row({
             className="px-3 py-3"
           >
             <div className="space-y-2">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+              <p className="text-xs text-text-secondary">
                 Detalle
               </p>
-              <ul className="divide-y divide-border-subtle rounded-lg border border-border-subtle bg-bg-surface">
+              <ul className="divide-y divide-border-subtle rounded-md border border-border-subtle bg-white/40 dark:bg-white/[0.03]">
                 {sale.items.map((it) => (
                   <li
                     key={it.id}
                     className="grid grid-cols-12 items-center gap-2 px-3 py-2 text-sm"
                   >
                     <span className="col-span-6 truncate">
-                      <span className="text-[10px] uppercase tracking-wider text-text-tertiary">
+                      <span className="text-[11px] text-text-tertiary">
                         {it.item_type === "Servicio" ? "Servicio" : "Producto"}
                       </span>
                       <span className="ml-2">{it.item_name}</span>
                     </span>
-                    <span className="col-span-2 text-center text-text-secondary">
+                    <span className="col-span-2 text-center tabular-nums text-text-secondary">
                       {it.quantity}× {formatMoney(it.unit_price)}
                     </span>
-                    <span className="col-span-4 text-right font-mono tabular-nums">
+                    <span className="col-span-4 text-right font-medium tabular-nums">
                       {formatMoney(it.subtotal)}
                     </span>
                   </li>
@@ -1076,7 +1078,7 @@ function RazonSocialFilter({
 
   return (
     <div ref={containerRef} className="relative flex min-w-[200px] flex-1 flex-col gap-1 sm:flex-none">
-      <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+      <label className="text-xs text-text-secondary">
         Razón social
       </label>
       <button
@@ -1085,7 +1087,7 @@ function RazonSocialFilter({
         disabled={options.length === 0}
         className={cn(
           "flex h-9 items-center justify-between gap-2 rounded-md border border-border-subtle bg-bg-surface px-3 text-left text-sm",
-          "hover:border-border-default focus:border-brand-mint focus:outline-none disabled:cursor-not-allowed disabled:opacity-60",
+          "hover:border-border-default focus:border-accent focus:outline-none disabled:cursor-not-allowed disabled:opacity-60",
           selected.length > 0 && "border-accent",
         )}
         aria-expanded={open}
@@ -1100,7 +1102,7 @@ function RazonSocialFilter({
 
       {open ? (
         <div
-          className="absolute left-0 top-full z-20 mt-1 w-[280px] overflow-hidden rounded-md border border-border-subtle bg-bg-surface shadow-lg"
+          className="absolute left-0 top-full z-20 mt-1 w-[280px] overflow-hidden rounded-lg glass"
           role="listbox"
         >
           <div className="border-b border-border-subtle p-2">

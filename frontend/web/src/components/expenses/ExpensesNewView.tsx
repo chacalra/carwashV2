@@ -6,7 +6,7 @@
  */
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, Receipt, Wallet } from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
@@ -27,7 +27,6 @@ import { ApiError } from "@/lib/api/client";
 import { useExpenseCategories } from "@/lib/api/queries/catalogs";
 import { useCreateExpense } from "@/lib/api/queries/expenses";
 import { formatMoney, todayISO } from "@/lib/format";
-import { cn } from "@/lib/utils";
 
 const formSchema = z.object({
   fecha: z.string().min(1, "Requerido"),
@@ -81,169 +80,145 @@ function ExpensesNewInner() {
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="grid gap-4 lg:grid-cols-3"
-      >
-        <div className="space-y-4 lg:col-span-2">
-          <section className="overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-card animate-fade-in-up">
-            <header className="flex items-start gap-3 border-b border-border-subtle px-5 py-4">
-              <span className="mt-0.5 inline-flex h-8 w-8 items-center justify-center rounded-md bg-brand-mint/10 text-brand-deep">
-                <Receipt size={16} strokeWidth={2.25} />
-              </span>
-              <div>
-                <h3 className="text-sm font-semibold tracking-tight">Datos del egreso</h3>
-                <p className="text-xs text-text-tertiary">
-                  Registralo con su categoría para que aparezca en los reportes.
-                </p>
-              </div>
-            </header>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="mx-auto w-full max-w-xl">
+        <section className="overflow-hidden rounded-lg border border-border-default bg-bg-surface animate-fade-in-up">
+          <header className="border-b border-border-subtle px-5 py-4">
+            <h2 className="text-[15px] font-semibold tracking-tight">Datos del egreso</h2>
+            <p className="text-[13px] text-text-tertiary">
+              Registralo con su categoría para que aparezca en los reportes.
+            </p>
+          </header>
 
-            <div className="space-y-4 p-5">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormField
-                  control={form.control}
-                  name="fecha"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Fecha</FormLabel>
-                      <FormControl>
-                        <Input type="date" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="categoria_egreso_id"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Categoría</FormLabel>
-                      <FormControl>
-                        {categories.isLoading ? (
-                          <Skeleton className="h-9 w-full" />
-                        ) : (
-                          <select
-                            value={field.value || ""}
-                            onChange={(e) =>
-                              field.onChange(
-                                e.target.value ? Number(e.target.value) : 0,
-                              )
-                            }
-                            className="h-9 w-full rounded-md border border-border-subtle bg-bg-surface px-2 text-sm focus:border-brand-mint focus:outline-none"
-                          >
-                            <option value="">Seleccioná…</option>
-                            {(categories.data ?? []).map((cat) => (
-                              <option key={cat.id} value={cat.id}>
-                                {cat.name}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-
-              <FormField
-                control={form.control}
-                name="monto"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Monto</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-sm text-text-tertiary">
-                          Gs.
-                        </span>
-                        <Input
-                          type="number"
-                          min={0}
-                          step={1}
-                          className="pl-10 font-mono tabular-nums"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(Number(e.target.value) || 0)
-                          }
-                        />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="descripcion"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Descripción</FormLabel>
-                    <FormControl>
-                      <textarea
+          <div className="space-y-5 p-5">
+            {/* El monto es el dato principal: va primero y en grande. */}
+            <FormField
+              control={form.control}
+              name="monto"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-normal text-text-secondary">Monto</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-lg text-text-tertiary">
+                        Gs.
+                      </span>
+                      <Input
+                        type="number"
+                        min={0}
+                        step={1}
+                        className="h-14 pl-14 text-2xl font-semibold tracking-tight tabular-nums [appearance:textfield] md:text-2xl [&::-webkit-inner-spin-button]:appearance-none"
                         {...field}
-                        rows={3}
-                        placeholder="Ej: Compra de jabón industrial al proveedor X…"
-                        className="w-full rounded-md border border-border-subtle bg-bg-surface px-3 py-2 text-sm focus:border-brand-mint focus:outline-none"
+                        onChange={(e) => field.onChange(Number(e.target.value) || 0)}
                       />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <div className="grid gap-4 sm:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="fecha"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-normal text-text-secondary">Fecha</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="categoria_egreso_id"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-normal text-text-secondary">
+                      Categoría
+                    </FormLabel>
+                    <FormControl>
+                      {categories.isLoading ? (
+                        <Skeleton className="h-9 w-full" />
+                      ) : (
+                        <select
+                          value={field.value || ""}
+                          onChange={(e) =>
+                            field.onChange(e.target.value ? Number(e.target.value) : 0)
+                          }
+                          className="h-9 w-full rounded-md border border-input bg-bg-field px-2 text-sm focus:border-accent focus:outline-none"
+                        >
+                          <option value="">Seleccioná…</option>
+                          {(categories.data ?? []).map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name}
+                            </option>
+                          ))}
+                        </select>
+                      )}
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
             </div>
-          </section>
-        </div>
 
-        <aside className="lg:col-span-1">
-          <div className="sticky top-20 overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-elevated animate-fade-in-up">
-            <div
-              aria-hidden
-              className="h-1 bg-gradient-to-r from-brand-deep via-brand-mint to-brand-sky"
+            <FormField
+              control={form.control}
+              name="descripcion"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-normal text-text-secondary">
+                    Descripción
+                  </FormLabel>
+                  <FormControl>
+                    <textarea
+                      {...field}
+                      rows={3}
+                      placeholder="Ej: Compra de jabón industrial al proveedor X…"
+                      className="w-full rounded-md border border-input bg-bg-field px-3 py-2 text-sm focus:border-accent focus:outline-none"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
-            <div className="p-5">
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
-                Resumen
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                <span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-neg-soft text-neg">
-                  <Wallet size={18} />
-                </span>
-                <div>
-                  <p className="text-[11px] uppercase tracking-wider text-text-tertiary">
-                    Egreso
-                  </p>
-                  <p className="font-mono text-2xl font-semibold tabular-nums text-neg">
-                    {monto > 0 ? `-${formatMoney(monto)}` : formatMoney(0)}
-                  </p>
-                </div>
-              </div>
-
-              <Button
-                type="submit"
-                size="lg"
-                disabled={isSubmitting}
-                className={cn(
-                  "mt-6 w-full font-semibold",
-                  "bg-accent text-white hover:bg-accent-hover",
-                )}
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="animate-spin" />
-                    Registrando…
-                  </>
-                ) : (
-                  <>Registrar egreso</>
-                )}
-              </Button>
-            </div>
           </div>
-        </aside>
+
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border-default bg-white/25 px-5 py-4 dark:bg-white/[0.02]">
+            <p className="text-[13px] text-text-secondary">
+              {monto > 0 ? (
+                <>
+                  Se descuenta{" "}
+                  <span className="font-semibold tabular-nums text-neg-fg">
+                    {formatMoney(monto)}
+                  </span>{" "}
+                  del balance.
+                </>
+              ) : (
+                "Ingresá el monto del gasto."
+              )}
+            </p>
+            <Button
+              type="submit"
+              size="lg"
+              disabled={isSubmitting}
+              className="h-11 min-w-[180px] bg-accent font-medium text-white hover:bg-accent-hover dark:text-bg-app"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin" />
+                  Registrando…
+                </>
+              ) : (
+                <>Registrar egreso</>
+              )}
+            </Button>
+          </footer>
+        </section>
       </form>
     </Form>
   );
