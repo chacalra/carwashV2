@@ -45,7 +45,7 @@ function SettingsInner() {
       <nav
         role="tablist"
         aria-label="Catálogos"
-        className="flex flex-wrap gap-1 rounded-md border border-border-subtle bg-bg-sunken p-1"
+        className="inline-flex max-w-full gap-0.5 overflow-x-auto rounded-md border border-border-default bg-bg-sunken p-0.5"
       >
         {TABS.map((t) => {
           const Icon = t.icon;
@@ -58,10 +58,10 @@ function SettingsInner() {
               aria-selected={isActive}
               onClick={() => setActive(t.key)}
               className={cn(
-                "inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-sm font-medium transition",
+                "inline-flex shrink-0 items-center gap-1.5 rounded-[5px] px-3 py-1.5 text-[13px] transition-colors",
                 isActive
-                  ? "bg-bg-surface text-text-primary shadow-sm ring-1 ring-black/5"
-                  : "text-text-secondary hover:text-text-primary",
+                  ? "bg-white font-medium text-text-primary shadow-[0_0_0_1px_var(--color-border-default),0_1px_2px_0_rgb(0_0_0/0.06)] dark:bg-white/12 [&>svg]:text-accent"
+                  : "text-text-secondary hover:text-text-primary [&>svg]:text-text-tertiary",
               )}
             >
               <Icon size={14} />

@@ -9,7 +9,7 @@ interface MoneyTextProps {
 
 export function MoneyText({ value, className, withSymbol = true }: MoneyTextProps) {
   return (
-    <span className={cn("font-mono tabular-nums", className)}>
+    <span className={cn("whitespace-nowrap tabular-nums", className)}>
       {formatMoney(value, { withSymbol })}
     </span>
   );

@@ -177,9 +177,9 @@ export function UsersManager() {
       </div>
 
       {/* Form crear */}
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border-subtle bg-bg-surface p-4 shadow-card">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border-default bg-bg-surface p-4">
         <div className="flex flex-1 min-w-[160px] flex-col gap-1">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+          <label className="text-xs text-text-secondary">
             Usuario
           </label>
           <Input
@@ -189,7 +189,7 @@ export function UsersManager() {
           />
         </div>
         <div className="flex w-[180px] flex-col gap-1">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+          <label className="text-xs text-text-secondary">
             Rol
           </label>
           <select
@@ -197,7 +197,7 @@ export function UsersManager() {
             onChange={(e) =>
               setNewRoleId(e.target.value ? Number(e.target.value) : "")
             }
-            className="h-9 rounded-md border border-border-subtle bg-bg-surface px-2 text-sm focus:border-brand-mint focus:outline-none"
+            className="h-9 rounded-md border border-input bg-bg-field px-2 text-sm focus:border-accent focus:outline-none"
           >
             <option value="">Seleccioná…</option>
             {activeRoles.map((r) => (
@@ -208,7 +208,7 @@ export function UsersManager() {
           </select>
         </div>
         <div className="flex w-[180px] flex-col gap-1">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+          <label className="text-xs text-text-secondary">
             Contraseña
           </label>
           <Input
@@ -234,7 +234,7 @@ export function UsersManager() {
       </div>
 
       {/* Tabla */}
-      <div className="overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-card">
+      <div className="overflow-hidden rounded-lg border border-border-default bg-bg-surface">
         {usersQ.isLoading ? (
           <div className="space-y-2 p-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -248,7 +248,7 @@ export function UsersManager() {
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border-subtle bg-bg-sunken/60 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+              <tr className="border-b border-border-default text-xs font-medium text-text-tertiary">
                 <th className="px-3 py-2.5 text-left">Usuario</th>
                 <th className="px-3 py-2.5 text-left">Rol</th>
                 <th className="px-3 py-2.5 text-left">Estado</th>
@@ -263,7 +263,7 @@ export function UsersManager() {
                   <tr
                     key={u.id}
                     className={cn(
-                      "border-b border-border-subtle transition hover:bg-bg-sunken/30",
+                      "border-b border-border-subtle transition hover:bg-white/40 dark:hover:bg-white/[0.03]",
                       !u.is_active && "opacity-60",
                     )}
                   >
@@ -295,7 +295,7 @@ export function UsersManager() {
                               e.target.value ? Number(e.target.value) : "",
                             )
                           }
-                          className="h-8 rounded-md border border-border-subtle bg-bg-surface px-2 text-sm focus:border-brand-mint focus:outline-none"
+                          className="h-8 rounded-md border border-input bg-bg-field px-2 text-sm focus:border-accent focus:outline-none"
                         >
                           <option value="">Seleccioná…</option>
                           {activeRoles.map((r) => (

@@ -75,13 +75,10 @@ export function AppSidebar({ activeKey }: AppSidebarProps) {
             {/* Sin logo propio del tenant: mostramos wordmark Carwash + by Mukusoft. */}
             {!brand.logoUrl ? (
               <>
-                <p className="text-sm font-semibold tracking-tight">
-                  <span className="text-brand-sky">C</span>
-                  <span className="text-brand-deep">arwash</span>
+                <p className="text-sm font-semibold tracking-tight text-text-primary">
+                  Carwash
                 </p>
-                <p className="text-[10px] font-medium uppercase tracking-wider text-text-tertiary">
-                  by Mukusoft
-                </p>
+                <p className="text-[11px] text-text-tertiary">by Mukusoft</p>
               </>
             ) : (
               <p className="truncate text-sm font-semibold tracking-tight">
@@ -104,13 +101,12 @@ export function AppSidebar({ activeKey }: AppSidebarProps) {
                     isActive={isActive(item)}
                     tooltip={item.label}
                     className={cn(
-                      "relative",
-                      // Item activo: degradado de marca diluido + texto deep teal
-                      // + rail vertical 3px mint a la izquierda. Sobreescribimos
-                      // el `bg-sidebar-accent` que viene del primitive.
-                      "data-[active=true]:bg-gradient-to-r data-[active=true]:from-brand-deep/12 data-[active=true]:via-brand-mint/15 data-[active=true]:to-transparent",
-                      "data-[active=true]:text-brand-deep data-[active=true]:font-semibold dark:data-[active=true]:text-brand-mint",
-                      "data-[active=true]:before:absolute data-[active=true]:before:left-0 data-[active=true]:before:top-1.5 data-[active=true]:before:bottom-1.5 data-[active=true]:before:w-[3px] data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-gradient-to-b data-[active=true]:before:from-brand-deep data-[active=true]:before:via-brand-mint data-[active=true]:before:to-brand-sky",
+                      "h-8 text-text-secondary [&>svg]:text-text-tertiary",
+                      // Item activo: superficie blanca con borde fino (como una
+                      // pestaña levantada). El color de marca queda solo en el ícono.
+                      "data-[active=true]:bg-white/80 data-[active=true]:font-medium data-[active=true]:text-text-primary dark:data-[active=true]:bg-white/10",
+                      "data-[active=true]:shadow-[0_0_0_1px_var(--color-border-default),0_1px_2px_0_rgb(0_0_0/0.04)]",
+                      "data-[active=true]:[&>svg]:text-accent",
                     )}
                   >
                     <a href={item.href}>
@@ -131,8 +127,8 @@ export function AppSidebar({ activeKey }: AppSidebarProps) {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton size="lg" className="cursor-pointer">
-                  <Avatar className="size-7 rounded-md ring-1 ring-black/5">
-                    <AvatarFallback className="rounded-md bg-gradient-to-br from-brand-deep via-brand-mint to-brand-sky text-xs font-bold text-white">
+                  <Avatar className="size-7 rounded-md">
+                    <AvatarFallback className="rounded-md bg-accent text-xs font-semibold text-white dark:text-bg-app">
                       {initial}
                     </AvatarFallback>
                   </Avatar>

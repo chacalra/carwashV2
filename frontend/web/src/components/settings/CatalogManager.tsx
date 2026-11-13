@@ -192,9 +192,9 @@ export function CatalogManager({
       </div>
 
       {/* Form crear */}
-      <div className="flex flex-wrap items-end gap-3 rounded-xl border border-border-subtle bg-bg-surface p-4 shadow-card">
+      <div className="flex flex-wrap items-end gap-3 rounded-lg border border-border-default bg-bg-surface p-4">
         <div className="flex flex-1 flex-col gap-1 min-w-[200px]">
-          <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+          <label className="text-xs text-text-secondary">
             Nombre
           </label>
           <Input
@@ -212,7 +212,7 @@ export function CatalogManager({
 
         {withPrice ? (
           <div className="flex flex-col gap-1 w-[180px]">
-            <label className="text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+            <label className="text-xs text-text-secondary">
               Precio
             </label>
             <div className="relative">
@@ -224,7 +224,7 @@ export function CatalogManager({
                 min={0}
                 value={newPrice}
                 onChange={(e) => setNewPrice(Number(e.target.value) || 0)}
-                className="pl-10 font-mono tabular-nums"
+                className="pl-10 tabular-nums"
               />
             </div>
           </div>
@@ -246,7 +246,7 @@ export function CatalogManager({
       </div>
 
       {/* Tabla */}
-      <div className="overflow-hidden rounded-xl border border-border-subtle bg-bg-surface shadow-card">
+      <div className="overflow-hidden rounded-lg border border-border-default bg-bg-surface">
         {list.isLoading ? (
           <div className="space-y-2 p-4">
             {Array.from({ length: 4 }).map((_, i) => (
@@ -260,7 +260,7 @@ export function CatalogManager({
         ) : (
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-border-subtle bg-bg-sunken/60 text-[11px] font-semibold uppercase tracking-wider text-text-tertiary">
+              <tr className="border-b border-border-default text-xs font-medium text-text-tertiary">
                 <th className="px-3 py-2.5 text-left">Nombre</th>
                 {withPrice ? <th className="px-3 py-2.5 text-right">Precio</th> : null}
                 <th className="px-3 py-2.5 text-left">Estado</th>
@@ -274,7 +274,7 @@ export function CatalogManager({
                   <tr
                     key={it.id}
                     className={cn(
-                      "border-b border-border-subtle transition hover:bg-bg-sunken/30",
+                      "border-b border-border-subtle transition hover:bg-white/40 dark:hover:bg-white/[0.03]",
                       !it.is_active && "opacity-60",
                     )}
                   >
@@ -298,10 +298,10 @@ export function CatalogManager({
                             min={0}
                             value={editPrice}
                             onChange={(e) => setEditPrice(Number(e.target.value) || 0)}
-                            className="h-8 text-right font-mono tabular-nums"
+                            className="h-8 text-right tabular-nums"
                           />
                         ) : (
-                          <span className="font-mono tabular-nums">
+                          <span className="tabular-nums">
                             {formatMoney(it.price ?? 0)}
                           </span>
                         )}

@@ -29,8 +29,8 @@ export function Shell({ children, activeKey, title, subtitle, actions }: ShellPr
           <AppSidebar activeKey={activeKey} />
           <SidebarInset>
             <TopBar title={title} subtitle={subtitle} actions={actions} />
-            <main className="flex-1 p-4 md:p-8">
-              <div className="mx-auto w-full max-w-6xl">{children}</div>
+            <main className="flex-1 px-4 py-5 md:px-6 md:py-6">
+              <div className="mx-auto w-full max-w-7xl">{children}</div>
             </main>
           </SidebarInset>
         </SidebarProvider>

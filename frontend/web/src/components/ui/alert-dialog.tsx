@@ -36,7 +36,7 @@ function AlertDialogOverlay({
     <AlertDialogPrimitive.Overlay
       data-slot="alert-dialog-overlay"
       className={cn(
-        "fixed inset-0 z-50 bg-black/40 backdrop-blur-sm",
+        "fixed inset-0 z-50 bg-black/25",
         "data-[state=open]:animate-in data-[state=open]:fade-in-0",
         "data-[state=closed]:animate-out data-[state=closed]:fade-out-0",
         className,
@@ -57,17 +57,12 @@ function AlertDialogContent({
         data-slot="alert-dialog-content"
         className={cn(
           "fixed left-1/2 top-1/2 z-50 w-full max-w-md -translate-x-1/2 -translate-y-1/2",
-          "rounded-xl border border-border-default bg-bg-surface p-6 shadow-elevated",
-          // Glass effect alineado al DS (semi-transparente + blur leve).
-          "backdrop-blur-md",
+          // Glass: ver `@utility glass` en global.css.
+          "rounded-xl glass p-6",
           "data-[state=open]:animate-in data-[state=open]:zoom-in-95 data-[state=open]:fade-in-0",
           "data-[state=closed]:animate-out data-[state=closed]:zoom-out-95 data-[state=closed]:fade-out-0",
           className,
         )}
-        style={{
-          background: "var(--color-bg-overlay)",
-          boxShadow: "var(--shadow-glass)",
-        }}
         {...props}
       />
     </AlertDialogPortal>
