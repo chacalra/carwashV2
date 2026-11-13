@@ -6,16 +6,17 @@ import Base from "@/layouts/Base.astro";
   <main class="flex min-h-screen items-center justify-center text-sm text-text-tertiary">
     Redirigiendo…
   </main>
-  <script is:inline>
+  <script is:inline define:vars={{ base: import.meta.env.BASE_URL }}>
     (function () {
+      var root = String(base || "/").replace(/\/$/, "");
       try {
         var raw = window.localStorage.getItem("carwash.session");
         var data = raw ? JSON.parse(raw) : null;
         var hasToken = data && typeof data.token === "string" && data.token.length > 0;
         var notExpired = !data?.expiresAt || new Date(data.expiresAt).getTime() > Date.now();
-        window.location.replace(hasToken && notExpired ? "/dashboard" : "/login");
+        window.location.replace(root + (hasToken && notExpired ? "/dashboard" : "/login"));
       } catch (e) {
-        window.location.replace("/login");
+        window.location.replace(root + "/login");
       }
     })();
   </script>

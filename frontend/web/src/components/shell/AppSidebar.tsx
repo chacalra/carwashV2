@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthStore } from "@/lib/auth/store";
 import { cn } from "@/lib/utils";
+import { stripBase, withBase } from "@/lib/paths";
 import { NAV_ITEMS } from "@/components/shell/nav-config";
 
 interface AppSidebarProps {
@@ -53,14 +54,15 @@ export function AppSidebar({ activeKey }: AppSidebarProps) {
 
   const isActive = (item: (typeof NAV_ITEMS)[number]) => {
     if (activeKey) return item.key === activeKey;
-    return pathname === item.href || pathname.startsWith(`${item.href}/`);
+    const path = stripBase(pathname);
+    return path === item.href || path.startsWith(`${item.href}/`);
   };
 
   const initial = (user?.username ?? "?").charAt(0).toUpperCase();
 
   const onLogout = () => {
     logout();
-    window.location.href = "/login";
+    window.location.href = withBase("/login");
   };
 
   return (
@@ -109,7 +111,7 @@ export function AppSidebar({ activeKey }: AppSidebarProps) {
                       "data-[active=true]:[&>svg]:text-accent",
                     )}
                   >
-                    <a href={item.href}>
+                    <a href={withBase(item.href)}>
                       <item.icon />
                       <span>{item.label}</span>
                     </a>

@@ -6,6 +6,7 @@
 import { Construction } from "lucide-react";
 import { Shell } from "@/components/shell/Shell";
 import { cn } from "@/lib/utils";
+import { withBase } from "@/lib/paths";
 
 interface PendingPageProps {
   activeKey: string;
@@ -40,7 +41,7 @@ export function PendingPage({ activeKey, title, subtitle, iteration }: PendingPa
             Esta sección se construye en la próxima iteración del plan.
           </p>
           <a
-            href="/dashboard"
+            href={withBase("/dashboard")}
             className="mt-4 text-sm font-medium text-accent hover:underline"
           >
             ← Volver al dashboard

@@ -31,6 +31,7 @@ import { ApiError } from "@/lib/api/client";
 import { useLogin } from "@/lib/api/queries/auth";
 import { useBrandStore } from "@/lib/branding/store";
 import { cn } from "@/lib/utils";
+import { IS_DEMO, withBase } from "@/lib/paths";
 
 const DEV_HOSTS = new Set(["localhost", "127.0.0.1", ""]);
 const DEFAULT_SUBDOMAIN = "demo";
@@ -61,8 +62,8 @@ function LoginFormInner() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: "",
-      password: "",
+      username: IS_DEMO ? "admin" : "",
+      password: IS_DEMO ? "demo" : "",
       subdominio: DEFAULT_SUBDOMAIN,
     },
   });
@@ -79,7 +80,7 @@ function LoginFormInner() {
         toast.success("¡Bienvenido!", { description: "Sesión iniciada correctamente." });
         // Redirect a la primera ruta permitida (ej. operario sin dashboard
         // va directo a /sales/new).
-        window.location.href = getDefaultRouteForPermissions(data.permissions);
+        window.location.href = withBase(getDefaultRouteForPermissions(data.permissions));
       },
       onError: (err) => {
         const message = err instanceof ApiError
@@ -119,6 +120,15 @@ function LoginFormInner() {
             Accedé con tu usuario de la lavandería.
           </p>
         </div>
+
+        {IS_DEMO ? (
+          <p className="mb-5 rounded-md border border-accent/25 bg-accent-soft px-3 py-2.5 text-[13px] leading-relaxed text-text-secondary">
+            Demo con datos de ejemplo. Entrá como{" "}
+            <span className="font-medium text-text-primary">admin</span> o como{" "}
+            <span className="font-medium text-text-primary">cajero</span> (con menos
+            permisos). La contraseña puede ser cualquiera.
+          </p>
+        ) : null}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">

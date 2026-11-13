@@ -6,6 +6,8 @@ interface Props {
 }
 
 const { title = "Carwash" } = Astro.props;
+// BASE_URL respeta el `base` del build de demo (GitHub Pages).
+const base = import.meta.env.BASE_URL.replace(/\/$/, "");
 ---
 
 <!doctype html>
@@ -15,6 +17,7 @@ const { title = "Carwash" } = Astro.props;
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
+    <link rel="icon" type="image/png" href={`${base}/brand/logo_carwash_sinfondo.png`} />
     <script is:inline>
       // Anti-flash: aplica la clase `dark` antes del primer paint.
       // El valor lo gestiona useThemeStore (localStorage `carwash.theme`).

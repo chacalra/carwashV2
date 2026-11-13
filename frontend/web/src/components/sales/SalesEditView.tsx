@@ -10,6 +10,7 @@ import { useEffect, useState } from "react";
 
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Shell } from "@/components/shell/Shell";
+import { withBase } from "@/lib/paths";
 import { Button } from "@/components/ui/button";
 import { useSale } from "@/lib/api/queries/sales";
 import { SalesFormInner, saleToFormValues } from "@/components/sales/SalesNewView";
@@ -73,7 +74,7 @@ function EditInner() {
         />
         <div className="text-center">
           <Button variant="outline" asChild>
-            <a href="/sales">
+            <a href={withBase("/sales")}>
               <ArrowLeft size={14} /> Volver a movimientos
             </a>
           </Button>
@@ -99,7 +100,7 @@ export function SalesEditView() {
       subtitle="Operación · Ventas"
       actions={
         <Button variant="outline" size="sm" asChild>
-          <a href="/sales">
+          <a href={withBase("/sales")}>
             <ArrowLeft size={14} /> Movimientos
           </a>
         </Button>
