@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "build:demo": "PUBLIC_DEMO=true DEMO_BASE=/carwashV2 astro build",
     "preview": "astro preview",
     "astro": "astro",
     "lint": "biome lint .",

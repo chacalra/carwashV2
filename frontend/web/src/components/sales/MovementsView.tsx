@@ -51,6 +51,7 @@ import { useAuthStore } from "@/lib/auth/store";
 import type { components } from "@/lib/api/schema";
 import { firstDayOfMonthISO, formatDate, formatMoney, todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { withBase } from "@/lib/paths";
 
 type SaleResponse = components["schemas"]["SaleResponse"];
 
@@ -810,7 +811,7 @@ function SaleCard({
           <div className="flex items-center gap-2">
             {canEdit && !sale.is_voided ? (
               <a
-                href={`/sales/edit?id=${sale.id}`}
+                href={withBase(`/sales/edit?id=${sale.id}`)}
                 className="inline-flex h-9 flex-1 items-center justify-center gap-1.5 rounded-md border border-border-subtle text-sm font-medium text-text-secondary hover:bg-bg-sunken"
               >
                 <Pencil size={14} /> Editar
@@ -926,7 +927,7 @@ function Row({
           <div className="inline-flex items-center gap-1">
             {canEdit && !sale.is_voided ? (
               <a
-                href={`/sales/edit?id=${sale.id}`}
+                href={withBase(`/sales/edit?id=${sale.id}`)}
                 className="grid h-7 w-7 place-items-center rounded-md text-text-tertiary hover:bg-bg-sunken hover:text-text-primary"
                 aria-label="Editar"
                 title="Editar"

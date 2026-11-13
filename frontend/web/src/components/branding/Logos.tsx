@@ -15,9 +15,10 @@
 
 import { useBrandStore } from "@/lib/branding/store";
 import { cn } from "@/lib/utils";
+import { withBase } from "@/lib/paths";
 
-const MUKUSOFT_SRC = "/brand/logo_mukusoft_sinfondo.png";
-const CARWASH_SRC = "/brand/logo_carwash_sinfondo.png";
+const MUKUSOFT_SRC = withBase("/brand/logo_mukusoft_sinfondo.png");
+const CARWASH_SRC = withBase("/brand/logo_carwash_sinfondo.png");
 
 interface LogoProps {
   className?: string;

@@ -11,6 +11,7 @@ import { AlertTriangle, RefreshCw, Home } from "lucide-react";
 import { Component, type ErrorInfo, type ReactNode } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { withBase } from "@/lib/paths";
 
 interface Props {
   children: ReactNode;
@@ -65,7 +66,7 @@ function ErrorFallback({ error, onReset }: { error: Error; onReset: () => void }
             Reintentar
           </Button>
           <a
-            href="/dashboard"
+            href={withBase("/dashboard")}
             className="inline-flex h-9 items-center justify-center gap-1.5 rounded-md bg-accent px-4 text-sm font-medium text-white transition hover:bg-accent-hover"
           >
             <Home size={14} />

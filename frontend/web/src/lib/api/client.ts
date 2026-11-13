@@ -6,6 +6,7 @@
  */
 
 import { useAuthStore } from "@/lib/auth/store";
+import { stripBase, withBase } from "@/lib/paths";
 
 const BASE_URL = import.meta.env.PUBLIC_API_BASE_URL ?? "http://localhost:8000";
 
@@ -71,15 +72,19 @@ export async function apiFetch<T = unknown>(
 
   let response: Response;
   try {
-    response = await fetch(`${BASE_URL}${path}`, init);
+    // Comparación literal (no IS_DEMO) para que Vite elimine la rama y el
+    // backend simulado no entre al build de producción.
+    response = import.meta.env.PUBLIC_DEMO === "true"
+      ? await (await import("@/lib/demo/backend")).demoFetch(path, init)
+      : await fetch(`${BASE_URL}${path}`, init);
   } catch (err) {
     throw new ApiError(0, `No se pudo conectar al servidor: ${(err as Error).message}`);
   }
 
   if (response.status === 401) {
     useAuthStore.getState().logout();
-    if (typeof window !== "undefined" && !window.location.pathname.startsWith("/login")) {
-      window.location.href = "/login";
+    if (typeof window !== "undefined" && !stripBase(window.location.pathname).startsWith("/login")) {
+      window.location.href = withBase("/login");
     }
     throw new ApiError(401, "Sesión expirada");
   }

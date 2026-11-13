@@ -7,6 +7,7 @@
 import type { ReactNode } from "react";
 import { useEffect } from "react";
 import { useAuthStore } from "@/lib/auth/store";
+import { withBase } from "@/lib/paths";
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const hydrated = useAuthStore((s) => s.hydrated);
@@ -24,7 +25,7 @@ export function AuthGuard({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (hydrated && !isAuthed && typeof window !== "undefined") {
-      window.location.href = "/login";
+      window.location.href = withBase("/login");
     }
   }, [hydrated, isAuthed]);
 

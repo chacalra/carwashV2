@@ -54,6 +54,7 @@ import { useUpsertVehicle, findVehicleByPlate } from "@/lib/api/queries/vehicles
 import type { components } from "@/lib/api/schema";
 import { formatMoney, todayISO } from "@/lib/format";
 import { cn } from "@/lib/utils";
+import { withBase } from "@/lib/paths";
 
 type CatalogItem = components["schemas"]["CatalogItem"];
 type SaleResponse = components["schemas"]["SaleResponse"];
@@ -613,7 +614,7 @@ function SalesFormInner({ mode, saleId, defaultValues }: SalesFormInnerProps) {
           toast.success("Venta actualizada", {
             description: `#${saleId} · Total ${formatMoney(total)}.`,
           });
-          window.location.href = "/sales";
+          window.location.href = withBase("/sales");
         },
         onError: (err) => {
           const msg = err instanceof ApiError ? err.message : "No se pudo actualizar la venta.";
@@ -626,7 +627,7 @@ function SalesFormInner({ mode, saleId, defaultValues }: SalesFormInnerProps) {
           toast.success("Venta registrada", {
             description: `Total ${formatMoney(total)} cobrado.`,
           });
-          window.location.href = "/dashboard";
+          window.location.href = withBase("/dashboard");
         },
         onError: (err) => {
           const msg = err instanceof ApiError ? err.message : "No se pudo registrar la venta.";

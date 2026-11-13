@@ -27,6 +27,7 @@ import { ApiError } from "@/lib/api/client";
 import { useExpenseCategories } from "@/lib/api/queries/catalogs";
 import { useCreateExpense } from "@/lib/api/queries/expenses";
 import { formatMoney, todayISO } from "@/lib/format";
+import { withBase } from "@/lib/paths";
 
 const formSchema = z.object({
   fecha: z.string().min(1, "Requerido"),
@@ -67,7 +68,7 @@ function ExpensesNewInner() {
         toast.success("Egreso registrado", {
           description: `Total ${formatMoney(values.monto)}.`,
         });
-        window.location.href = "/dashboard";
+        window.location.href = withBase("/dashboard");
       },
       onError: (err) => {
         const msg = err instanceof ApiError ? err.message : "No se pudo registrar el egreso.";
